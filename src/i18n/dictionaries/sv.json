@@ -1,0 +1,39 @@
+{
+  "common": {
+    "home": "Hem",
+    "membership": "Medlemskap",
+    "language": "Språk",
+    "footer": "© {year} Österbottens Whiskysällskap rf."
+  },
+  "landing": {
+    "joinUs": "Bli medlem",
+    "learnMore": "Läs mer om medlemskap",
+    "intro": "Vi är ett whiskyintresserat sällskap i Österbotten som samlar entusiaster från hela regionen. Genom provningar, destilleribesök och andra evenemang utforskar vi tillsammans whiskykulturens rika värld — från klassiska skotska single malts till spännande nyheter från världens alla hörn.",
+    "activities": "Våra aktiviteter",
+    "activitiesList": {
+      "tastings": "Regelbundna provningar med noggrant utvalda whiskys",
+      "trips": "Resor till destillerier i Skottland och andra whiskyländer",
+      "events": "Temakvällar och sociala sammankomster för medlemmar",
+      "knowledge": "Kunskapsdelning och föreläsningar om whiskyhistoria och tillverkning"
+    }
+  },
+  "membershipForm": {
+    "title": "Medlemsansökan",
+    "firstName": "Förnamn",
+    "lastName": "Efternamn",
+    "email": "E-post",
+    "phone": "Telefon",
+    "municipality": "Hemkommun",
+    "municipalityPlaceholder": "Sök kommun...",
+    "dateOfBirth": "Födelsedatum",
+    "submit": "Skicka ansökan",
+    "submitting": "Skickar...",
+    "success": "Tack för din ansökan! Vi har skickat en bekräftelse till din e-post.",
+    "error": "Något gick fel. Försök igen.",
+    "requiredField": "Detta fält är obligatoriskt",
+    "invalidEmail": "Ogiltig e-postadress",
+    "invalidPhone": "Ogiltigt telefonnummer",
+    "mustBe18": "Du måste vara minst 18 år",
+    "selectMunicipality": "Välj kommun"
+  }
+}

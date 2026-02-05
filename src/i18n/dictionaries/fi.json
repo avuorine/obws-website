@@ -1,0 +1,39 @@
+{
+  "common": {
+    "home": "Etusivu",
+    "membership": "Jäsenyys",
+    "language": "Kieli",
+    "footer": "© {year} Österbottens Whiskysällskap rf."
+  },
+  "landing": {
+    "joinUs": "Liity jäseneksi",
+    "learnMore": "Lue lisää jäsenyydestä",
+    "intro": "Olemme Pohjanmaalla toimiva viskiseura, joka kokoaa yhteen harrastajia eri puolilta maakuntaa. Maistelujen, tislaamovierailujen ja muiden tapahtumien kautta tutustumme yhdessä viskin rikkaaseen maailmaan — klassisista skottilaisista single malteista jännittäviin uutuuksiin maailman joka kolkasta.",
+    "activities": "Toimintamme",
+    "activitiesList": {
+      "tastings": "Säännöllisiä maisteluja huolella valituilla viskeillä",
+      "trips": "Matkoja tislamoille Skotlantiin ja muihin viskimaihin",
+      "events": "Teemailtoja ja sosiaalisia kokoontumisia jäsenille",
+      "knowledge": "Tiedon jakamista ja luentoja viskin historiasta ja valmistuksesta"
+    }
+  },
+  "membershipForm": {
+    "title": "Jäsenhakemus",
+    "firstName": "Etunimi",
+    "lastName": "Sukunimi",
+    "email": "Sähköposti",
+    "phone": "Puhelinnumero",
+    "municipality": "Kotikunta",
+    "municipalityPlaceholder": "Hae kuntaa...",
+    "dateOfBirth": "Syntymäaika",
+    "submit": "Lähetä hakemus",
+    "submitting": "Lähetetään...",
+    "success": "Kiitos hakemuksestasi! Olemme lähettäneet vahvistuksen sähköpostiisi.",
+    "error": "Jokin meni pieleen. Yritä uudelleen.",
+    "requiredField": "Tämä kenttä on pakollinen",
+    "invalidEmail": "Virheellinen sähköpostiosoite",
+    "invalidPhone": "Virheellinen puhelinnumero",
+    "mustBe18": "Sinun täytyy olla vähintään 18-vuotias",
+    "selectMunicipality": "Valitse kunta"
+  }
+}
