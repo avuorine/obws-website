@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { isValidPhoneNumber } from 'react-phone-number-input'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 
 export const membershipSchema = z.object({
   firstName: z.string().min(1),
