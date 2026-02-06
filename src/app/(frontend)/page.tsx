@@ -46,6 +46,10 @@ export default async function HomePage() {
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-amber" />
+            {t('activitiesList.education')}
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-amber" />
             {t('activitiesList.trips')}
           </li>
           <li className="flex items-start gap-3">
@@ -54,7 +58,7 @@ export default async function HomePage() {
           </li>
           <li className="flex items-start gap-3">
             <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-amber" />
-            {t('activitiesList.knowledge')}
+            {t('activitiesList.collaboration')}
           </li>
         </ul>
       </div>

@@ -9,13 +9,14 @@
   "landing": {
     "joinUs": "Bli medlem",
     "learnMore": "Läs mer om medlemskap",
-    "intro": "Vi är ett whiskyintresserat sällskap i Österbotten som samlar entusiaster från hela regionen. Genom provningar, destilleribesök och andra evenemang utforskar vi tillsammans whiskykulturens rika värld — från klassiska skotska single malts till spännande nyheter från världens alla hörn.",
+    "intro": "Österbottens Whiskysällskap rf är en allmännyttig förening som samlar whiskyentusiaster i Österbotten. Vårt syfte är att främja kunskapen om whiskykultur, traditioner och ansvarsfullt njutande genom gemensamma upplevelser och lärande.",
     "activities": "Våra aktiviteter",
     "activitiesList": {
-      "tastings": "Regelbundna provningar med noggrant utvalda whiskys",
-      "trips": "Resor till destillerier i Skottland och andra whiskyländer",
-      "events": "Temakvällar och sociala sammankomster för medlemmar",
-      "knowledge": "Kunskapsdelning och föreläsningar om whiskyhistoria och tillverkning"
+      "tastings": "Whiskyprovningar med noggrant utvalda sorter från hela världen",
+      "education": "Utbildningstillfällen och kurser om whiskyhistoria, tillverkning och uppskattning",
+      "trips": "Besök och resor till destillerier och whiskyevenemang",
+      "events": "Sociala sammankomster och temakvällar för medlemmar",
+      "collaboration": "Samarbete med andra whiskysällskap och organisationer"
     }
   },
   "membershipForm": {

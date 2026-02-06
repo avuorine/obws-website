@@ -9,13 +9,14 @@
   "landing": {
     "joinUs": "Liity jäseneksi",
     "learnMore": "Lue lisää jäsenyydestä",
-    "intro": "Olemme Pohjanmaalla toimiva viskiseura, joka kokoaa yhteen harrastajia eri puolilta maakuntaa. Maistelujen, tislaamovierailujen ja muiden tapahtumien kautta tutustumme yhdessä viskin rikkaaseen maailmaan — klassisista skottilaisista single malteista jännittäviin uutuuksiin maailman joka kolkasta.",
+    "intro": "Österbottens Whiskysällskap rf on yleishyödyllinen yhdistys, joka kokoaa yhteen viskiharrastajia Pohjanmaalla. Tarkoituksenamme on edistää tietämystä viskikulttuurista, perinteistä ja vastuullisesta nauttimisesta yhteisten kokemusten ja oppimisen kautta.",
     "activities": "Toimintamme",
     "activitiesList": {
-      "tastings": "Säännöllisiä maisteluja huolella valituilla viskeillä",
-      "trips": "Matkoja tislamoille Skotlantiin ja muihin viskimaihin",
-      "events": "Teemailtoja ja sosiaalisia kokoontumisia jäsenille",
-      "knowledge": "Tiedon jakamista ja luentoja viskin historiasta ja valmistuksesta"
+      "tastings": "Viskimaisteluja huolellisesti valituilla tuotteilla ympäri maailmaa",
+      "education": "Koulutustilaisuuksia ja kursseja viskin historiasta, valmistuksesta ja arvostamisesta",
+      "trips": "Vierailuja ja matkoja tislamoille ja viskitapahtumiin",
+      "events": "Sosiaalisia kokoontumisia ja teemailtoja jäsenille",
+      "collaboration": "Yhteistyötä muiden viskiseurojen ja järjestöjen kanssa"
     }
   },
   "membershipForm": {

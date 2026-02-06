@@ -9,13 +9,14 @@
   "landing": {
     "joinUs": "Join us",
     "learnMore": "Learn more about membership",
-    "intro": "We are a whisky society based in Ostrobothnia, Finland, bringing together enthusiasts from across the region. Through tastings, distillery visits, and other events, we explore the rich world of whisky culture together — from classic Scottish single malts to exciting newcomers from every corner of the globe.",
+    "intro": "Österbottens Whiskysällskap rf is a non-profit society dedicated to bringing together whisky enthusiasts in Ostrobothnia, Finland. Our mission is to promote knowledge of whisky culture, traditions, and responsible enjoyment through shared experiences and learning.",
     "activities": "What we do",
     "activitiesList": {
-      "tastings": "Regular tastings featuring carefully curated whiskies",
-      "trips": "Trips to distilleries in Scotland and other whisky-producing countries",
-      "events": "Themed evenings and social gatherings for members",
-      "knowledge": "Knowledge sharing and talks on whisky history and production"
+      "tastings": "Whisky tastings with carefully selected expressions from around the world",
+      "education": "Educational events and courses on whisky history, production, and appreciation",
+      "trips": "Visits and trips to distilleries and whisky events",
+      "events": "Social gatherings and themed evenings for members",
+      "collaboration": "Collaboration with other whisky societies and organisations"
     }
   },
   "membershipForm": {
