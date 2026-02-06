@@ -28,7 +28,7 @@
     "dateOfBirth": "Date of birth",
     "submit": "Submit application",
     "submitting": "Submitting...",
-    "success": "Thank you for your application! We have sent a confirmation to your email.",
+    "success": "Thank you for your application! The board will contact you once your application has been processed.",
     "error": "Something went wrong. Please try again.",
     "requiredField": "This field is required",
     "invalidEmail": "Invalid email address",

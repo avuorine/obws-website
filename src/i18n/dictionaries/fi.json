@@ -28,7 +28,7 @@
     "dateOfBirth": "Syntymäaika",
     "submit": "Lähetä hakemus",
     "submitting": "Lähetetään...",
-    "success": "Kiitos hakemuksestasi! Olemme lähettäneet vahvistuksen sähköpostiisi.",
+    "success": "Kiitos hakemuksestasi! Hallitus ottaa sinuun yhteyttä, kun hakemuksesi on käsitelty.",
     "error": "Jokin meni pieleen. Yritä uudelleen.",
     "requiredField": "Tämä kenttä on pakollinen",
     "invalidEmail": "Virheellinen sähköpostiosoite",

@@ -28,7 +28,7 @@
     "dateOfBirth": "Födelsedatum",
     "submit": "Skicka ansökan",
     "submitting": "Skickar...",
-    "success": "Tack för din ansökan! Vi har skickat en bekräftelse till din e-post.",
+    "success": "Tack för din ansökan! Styrelsen kontaktar dig när din ansökan har behandlats.",
     "error": "Något gick fel. Försök igen.",
     "requiredField": "Detta fält är obligatoriskt",
     "invalidEmail": "Ogiltig e-postadress",
