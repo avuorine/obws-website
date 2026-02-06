@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:payloadcms.com)",
+      "WebFetch(domain:stat.fi)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.stat.fi)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(npm view:*)",
+      "Bash(pnpm list:*)",
+      "WebFetch(domain:next-intl.dev)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm add:*)"
+    ]
+  }
+}
