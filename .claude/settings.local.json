@@ -14,7 +14,8 @@
       "WebFetch(domain:next-intl.dev)",
       "Bash(npx tsc:*)",
       "Bash(pnpm build:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "WebFetch(domain:www.buildwithmatija.com)"
     ]
   }
 }
