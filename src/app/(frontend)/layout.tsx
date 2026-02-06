@@ -2,6 +2,7 @@ import React from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { Inter, Playfair_Display } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import './styles.css'
@@ -35,6 +36,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
           <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">{children}</main>
           <Footer />
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   )
