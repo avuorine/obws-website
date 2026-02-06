@@ -1,20 +1,27 @@
 'use server'
 
-import { getPayloadHMR } from '@payloadcms/next/utilities'
-import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { checkBotId } from 'botid/server'
 import { membershipSchema, type MembershipFormData } from '@/lib/validation'
 import { notificationEmailHtml, confirmationEmailHtml } from '@/lib/email'
 
 export async function submitMembership(
   data: MembershipFormData,
 ): Promise<{ success: boolean; error?: string }> {
+  // Bot detection - hard block bots
+  const botResult = await checkBotId()
+  if (botResult.isBot) {
+    return { success: false, error: 'Submission failed' }
+  }
+
   const parsed = membershipSchema.safeParse(data)
   if (!parsed.success) {
     return { success: false, error: 'Validation failed' }
   }
 
   try {
-    const payload = await getPayloadHMR({ config: configPromise })
+    const payload = await getPayload({ config })
     const membershipEmail = process.env.MEMBERSHIP_EMAIL || 'members@obws.fi'
 
     await payload.sendEmail({

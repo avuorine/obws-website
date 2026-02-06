@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { BotIdClient } from 'botid/client'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import './styles.css'
@@ -31,6 +32,7 @@ export default async function FrontendLayout({ children }: { children: React.Rea
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`}>
       <body className="flex min-h-screen flex-col font-sans">
+        <BotIdClient protect={[{ path: '/membership', method: 'POST' }]} />
         <NextIntlClientProvider messages={messages}>
           <Header />
           <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">{children}</main>
