@@ -29,7 +29,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL || '',
     },
   }),
   email: resendAdapter({
