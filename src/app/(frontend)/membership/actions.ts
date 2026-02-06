@@ -1,10 +1,11 @@
 'use server'
 
-import { getPayload } from 'payload'
-import config from '@payload-config'
+import { Resend } from 'resend'
 import { checkBotId } from 'botid/server'
 import { membershipSchema, type MembershipFormData } from '@/lib/validation'
 import { notificationEmailHtml, confirmationEmailHtml } from '@/lib/email'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function submitMembership(
   data: MembershipFormData,
@@ -21,16 +22,17 @@ export async function submitMembership(
   }
 
   try {
-    const payload = await getPayload({ config })
     const membershipEmail = process.env.MEMBERSHIP_EMAIL || 'members@obws.fi'
 
-    await payload.sendEmail({
+    await resend.emails.send({
+      from: 'Österbottens Whiskysällskap <noreply@obws.fi>',
       to: membershipEmail,
       subject: `Ny medlemsansökan: ${parsed.data.firstName} ${parsed.data.lastName}`,
       html: notificationEmailHtml(parsed.data),
     })
 
-    await payload.sendEmail({
+    await resend.emails.send({
+      from: 'Österbottens Whiskysällskap <noreply@obws.fi>',
       to: parsed.data.email,
       subject: 'Medlemsansökan mottagen / Application received — OWS rf.',
       html: confirmationEmailHtml(parsed.data),
