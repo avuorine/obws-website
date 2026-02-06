@@ -40,6 +40,8 @@ export default buildConfig({
     pool: {
       connectionString: getConnectionString(),
     },
+    push: false,
+    migrationDir: path.resolve(dirname, 'migrations'),
   }),
   email: resendAdapter({
     defaultFromAddress: 'noreply@obws.fi',
