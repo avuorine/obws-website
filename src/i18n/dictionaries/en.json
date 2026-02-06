@@ -2,6 +2,7 @@
   "common": {
     "home": "Home",
     "membership": "Membership",
+    "rules": "Rules",
     "language": "Language",
     "footer": "© {year} Österbottens Whiskysällskap rf."
   },
@@ -38,5 +39,88 @@
     "invalidPhone": "Invalid phone number",
     "mustBe18": "You must be at least 18 years old",
     "selectMunicipality": "Select municipality"
+  },
+  "rules": {
+    "title": "Rules",
+    "sections": {
+      "1": {
+        "title": "1. Name and domicile of the association",
+        "content": "The name of the association is Österbottens whiskysällskap rf and its domicile is Vaasa."
+      },
+      "2": {
+        "title": "2. Purpose and forms of activity",
+        "content": "The purpose of the association is to bring together people interested in whisky and to promote knowledge of whisky culture, traditions, and responsible enjoyment. To achieve its purpose, the association organises whisky tastings, educational events, study visits, and trips for its members, and maintains contact with other similar associations and organisations. The association is non-profit and does not conduct any serving of alcohol.",
+        "activities": "The association fulfils its purpose by:",
+        "activityList": [
+          "organising courses, training and educational events, and other similar activities",
+          "organising competitions, exhibitions, excursions, camps, and other events",
+          "organising parties, concerts, exhibitions, or other events",
+          "maintaining the association's electronic media",
+          "publishing the association's announcements and other communications in various media",
+          "bringing members together for joint activities and maintaining relations with other associations in the area",
+          "organising trips related to the association's purpose for its members",
+          "acquiring necessary equipment and materials for use by the association's members",
+          "cooperating with authorities, organisations, companies, and private individuals"
+        ],
+        "support": "To support its activities, the association may, after obtaining the necessary permits if required:",
+        "supportList": [
+          "organise bazaars, flea markets, and other events",
+          "organise fee-based events",
+          "receive grants, donations, and bequests",
+          "perform volunteer work",
+          "sell advertising space",
+          "enter into sponsorship agreements"
+        ]
+      },
+      "3": {
+        "title": "3. Members",
+        "content": "Anyone who accepts the purpose of the association may become a regular member. As a supporting member, a private individual or an organisation with legal capacity that wishes to support the purpose and activities of the association may be accepted. Regular and supporting members are approved by the board of the association upon application. The association meeting may, upon proposal by the board, appoint as honorary chair or honorary member a person who has significantly promoted and supported the activities of the association."
+      },
+      "4": {
+        "title": "4. Joining and membership fees",
+        "content": "The amount of the joining fee and annual membership fee charged to regular and supporting members is decided by the annual meeting, separately for both membership groups. The honorary chair and honorary members do not pay membership fees."
+      },
+      "5": {
+        "title": "5. Board",
+        "content": "The affairs of the association are managed by the board, which has a chair and 3–5 other regular members, all appointed at the annual meeting. The board's term of office is the period between election meetings. The board elects a vice chair from among its members and appoints, from within or outside its membership, a secretary, a treasurer, and other necessary officials. The board meets at the call of the chair or, if the chair is prevented, at the call of the vice chair when they consider it necessary or when at least half of the board members so require. The board has a quorum when at least half of its members, including the chair or vice chair, are present. Votes are decided by absolute majority. In the event of a tie, the chair's vote decides. In elections, however, the matter is decided by lot."
+      },
+      "6": {
+        "title": "6. Signing on behalf of the association",
+        "content": "The name of the association is signed by the chair of the board, the secretary, or the treasurer, each individually."
+      },
+      "7": {
+        "title": "7. Financial period",
+        "content": "The financial period of the association is a calendar year."
+      },
+      "8": {
+        "title": "8. Association meetings",
+        "content": "When the board or the association meeting so decides, participation in the association meeting is also possible by mail, by data communication, or by means of some other technical device before or during the meeting. The association meeting approves the voting and election rules. The association's annual meeting is held annually on a date determined by the board in January–May. At association meetings, each regular member, honorary chair, and honorary member has one vote. A supporting member has the right to be present and to speak at association meetings. The decision of the meeting, unless otherwise provided in the rules, is the opinion supported by more than half of the votes cast. In the event of a tie, the vote of the meeting chair decides. In elections, however, the matter is decided by lot."
+      },
+      "9": {
+        "title": "9. Notice of association meetings",
+        "content": "The board shall convene association meetings no later than 7 days before the meeting. The meeting notice shall be sent by mail or e-mail, on the association's website, or in the social media group used by the association."
+      },
+      "10": {
+        "title": "10. Annual meeting",
+        "content": "At the association's annual meeting, the following matters are addressed:",
+        "items": [
+          "opening of the meeting",
+          "election of the meeting chair, secretary, two minutes inspectors, and if necessary, two vote counters",
+          "confirmation of the legality and quorum of the meeting",
+          "approval of the agenda for the meeting",
+          "presentation of the financial statements, annual report, and auditors'/operations inspectors' statement",
+          "decision on approval of the financial statements and granting discharge from liability to the board and other accountable persons",
+          "approval of the activity plan, budget, and the amount of joining and membership fees",
+          "election of the board chair and other board members",
+          "election of one or two operations inspectors and their deputies, or one or two auditors and their deputies",
+          "other matters specified in the meeting notice"
+        ],
+        "note": "If an association member wishes a matter to be addressed at the association's annual meeting, they must notify the board in writing in sufficient time for the matter to be included in the meeting notice."
+      },
+      "11": {
+        "title": "11. Amendment of rules and dissolution of the association",
+        "content": "A decision to amend the rules or dissolve the association must be made at an association meeting with at least a three-fourths (3/4) majority of the votes cast. The amendment of the rules or the dissolution of the association must be stated in the meeting notice. If the association is dissolved, the assets of the association shall be used to promote the purpose of the association in a manner determined by the meeting that makes the dissolution decision. If the association is dissolved, its assets shall be used for the same purpose."
+      }
+    }
   }
 }

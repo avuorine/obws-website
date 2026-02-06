@@ -26,6 +26,9 @@ export function Header() {
             <Link href="/membership" className="text-sm text-whisky-light hover:text-amber">
               {t('membership')}
             </Link>
+            <Link href="/rules" className="text-sm text-whisky-light hover:text-amber">
+              {t('rules')}
+            </Link>
           </nav>
         </div>
         <LanguageSwitcher />

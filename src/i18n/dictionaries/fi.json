@@ -2,6 +2,7 @@
   "common": {
     "home": "Etusivu",
     "membership": "Jäsenyys",
+    "rules": "Säännöt",
     "language": "Kieli",
     "footer": "© {year} Österbottens Whiskysällskap rf."
   },
@@ -38,5 +39,88 @@
     "invalidPhone": "Virheellinen puhelinnumero",
     "mustBe18": "Sinun täytyy olla vähintään 18-vuotias",
     "selectMunicipality": "Valitse kunta"
+  },
+  "rules": {
+    "title": "Säännöt",
+    "sections": {
+      "1": {
+        "title": "1. Yhdistyksen nimi ja kotipaikka",
+        "content": "Yhdistyksen nimi on Österbottens whiskysällskap rf ja sen kotipaikka on Vaasa."
+      },
+      "2": {
+        "title": "2. Tarkoitus ja toimintamuodot",
+        "content": "Yhdistyksen tarkoituksena on koota yhteen viskistä kiinnostuneita henkilöitä ja edistää tietämystä viskikulttuurista, perinteistä ja vastuullisesta nauttimisesta. Tarkoituksensa toteuttamiseksi yhdistys järjestää viskimaisteluja, koulutustilaisuuksia, opintovierailuja ja matkoja jäsenilleen sekä ylläpitää yhteyksiä muihin vastaaviin yhdistyksiin ja järjestöihin. Yhdistys on yleishyödyllinen eikä harjoita anniskelutoimintaa.",
+        "activities": "Yhdistys toteuttaa tarkoitustaan:",
+        "activityList": [
+          "järjestämällä kursseja, koulutus- ja opetustapahtumia sekä muuta vastaavaa toimintaa",
+          "järjestämällä kilpailuja, näytöksiä, retkiä, leirejä ja muita tapahtumia",
+          "järjestämällä juhlia, konsertteja, näyttelyitä tai muita tapahtumia",
+          "ylläpitämällä yhdistyksen sähköisiä medioita",
+          "julkaisemalla yhdistyksen tiedotteita ja muuta viestintää eri medioissa",
+          "kokoamalla jäseniä yhteiseen toimintaan ja ylläpitämällä yhteyksiä muihin alueen yhdistyksiin",
+          "järjestämällä yhdistyksen tarkoitukseen liittyviä matkoja jäsenilleen",
+          "hankkimalla tarpeellisia välineitä ja materiaaleja yhdistyksen jäsenten käyttöön",
+          "tekemällä yhteistyötä viranomaisten, järjestöjen, yritysten ja yksityishenkilöiden kanssa"
+        ],
+        "support": "Toimintansa tukemiseksi yhdistys voi, hankittuaan tarvittaessa asianmukaisen luvan:",
+        "supportList": [
+          "järjestää myyjäisiä, kirpputoreja ja muita tapahtumia",
+          "järjestää maksullisia tapahtumia",
+          "vastaanottaa avustuksia, lahjoituksia ja testamentteja",
+          "tehdä talkootyötä",
+          "myydä mainostilaa",
+          "solmia sponsorisopimuksia"
+        ]
+      },
+      "3": {
+        "title": "3. Jäsenet",
+        "content": "Yhdistyksen varsinaiseksi jäseneksi voi liittyä jokainen, joka hyväksyy yhdistyksen tarkoituksen. Kannatusjäseneksi voidaan hyväksyä yksityishenkilö tai oikeustoimikelpoinen yhteisö, joka haluaa tukea yhdistyksen tarkoitusta ja toimintaa. Varsinaiset jäsenet ja kannatusjäsenet hyväksyy hakemuksesta yhdistyksen hallitus. Kunniapuheenjohtajaksi tai kunniajäseneksi voi yhdistyksen kokous hallituksen esityksestä kutsua henkilön, joka on merkittävästi edistänyt ja tukenut yhdistyksen toimintaa."
+      },
+      "4": {
+        "title": "4. Liittymis- ja jäsenmaksu",
+        "content": "Varsinaisilta ja kannatusjäseniltä perittävän liittymismaksun ja vuotuisen jäsenmaksun suuruudesta päättää vuosikokous erikseen kummallekin jäsenryhmälle. Kunniapuheenjohtaja ja kunniajäsenet eivät maksa jäsenmaksuja."
+      },
+      "5": {
+        "title": "5. Hallitus",
+        "content": "Yhdistyksen asioita hoitaa hallitus, johon kuuluu puheenjohtaja ja 3–5 muuta varsinaista jäsentä, jotka kaikki valitaan vuosikokouksessa. Hallituksen toimikausi on vaalikokouksien välinen aika. Hallitus valitsee keskuudestaan varapuheenjohtajan sekä nimittää keskuudestaan tai ulkopuolelta sihteerin, rahastonhoitajan ja muut tarvittavat toimihenkilöt. Hallitus kokoontuu puheenjohtajan tai hänen estyneenä ollessaan varapuheenjohtajan kutsusta, kun he katsovat sen tarpeelliseksi tai kun vähintään puolet hallituksen jäsenistä sitä vaatii. Hallitus on päätösvaltainen, kun vähintään puolet sen jäsenistä, puheenjohtaja tai varapuheenjohtaja mukaan luettuna, on läsnä. Äänestykset ratkaistaan ehdottomalla enemmistöllä. Äänten mennessä tasan ratkaisee puheenjohtajan ääni. Vaaleissa ratkaisee kuitenkin arpa."
+      },
+      "6": {
+        "title": "6. Yhdistyksen nimen kirjoittaminen",
+        "content": "Yhdistyksen nimen kirjoittaa hallituksen puheenjohtaja, sihteeri tai rahastonhoitaja, kukin yksinään."
+      },
+      "7": {
+        "title": "7. Tilikausi",
+        "content": "Yhdistyksen tilikausi on kalenterivuosi."
+      },
+      "8": {
+        "title": "8. Yhdistyksen kokoukset",
+        "content": "Kun hallitus tai yhdistyksen kokous niin päättää, osallistuminen yhdistyksen kokoukseen on mahdollista myös postitse, tietoliikenneyhteyden tai muun teknisen apuvälineen avulla ennen kokousta tai sen aikana. Yhdistyksen kokous hyväksyy äänestys- ja vaalijärjestyksen. Yhdistyksen vuosikokous pidetään vuosittain hallituksen määräämänä päivänä tammi–toukokuussa. Yhdistyksen kokouksissa jokaisella varsinaisella jäsenellä, kunniapuheenjohtajalla ja kunniajäsenellä on yksi ääni. Kannatusjäsenellä on oikeus olla läsnä ja puhua yhdistyksen kokouksissa. Kokouksen päätökseksi tulee, ellei säännöissä toisin määrätä, se mielipide, jota on kannattanut yli puolet annetuista äänistä. Äänten mennessä tasan ratkaisee kokouksen puheenjohtajan ääni. Vaaleissa ratkaisee kuitenkin arpa."
+      },
+      "9": {
+        "title": "9. Yhdistyksen kokousten koollekutsuminen",
+        "content": "Hallituksen on kutsuttava yhdistyksen kokoukset koolle viimeistään 7 päivää ennen kokousta. Kokouskutsu on lähetettävä postitse tai sähköpostitse, yhdistyksen verkkosivuilla tai yhdistyksen käyttämässä sosiaalisen median ryhmässä."
+      },
+      "10": {
+        "title": "10. Vuosikokous",
+        "content": "Yhdistyksen vuosikokouksessa käsitellään seuraavat asiat:",
+        "items": [
+          "kokouksen avaus",
+          "valitaan kokouksen puheenjohtaja, sihteeri, kaksi pöytäkirjantarkastajaa ja tarvittaessa kaksi ääntenlaskijaa",
+          "todetaan kokouksen laillisuus ja päätösvaltaisuus",
+          "hyväksytään kokouksen esityslista",
+          "esitetään tilinpäätös, vuosikertomus ja toiminnantarkastajien/tilintarkastajien lausunto",
+          "päätetään tilinpäätöksen vahvistamisesta ja vastuuvapauden myöntämisestä hallitukselle ja muille vastuuvelvollisille",
+          "vahvistetaan toimintasuunnitelma, talousarvio sekä liittymis- ja jäsenmaksujen suuruus",
+          "valitaan hallituksen puheenjohtaja ja muut hallituksen jäsenet",
+          "valitaan yksi tai kaksi toiminnantarkastajaa ja varatoiminnantarkastajaa tai yksi tai kaksi tilintarkastajaa ja varatilintarkastajaa",
+          "käsitellään muut kokouskutsussa mainitut asiat"
+        ],
+        "note": "Jos yhdistyksen jäsen haluaa jonkin asian käsiteltäväksi yhdistyksen vuosikokouksessa, hänen on ilmoitettava siitä kirjallisesti hallitukselle niin hyvissä ajoin, että asia voidaan sisällyttää kokouskutsuun."
+      },
+      "11": {
+        "title": "11. Sääntöjen muuttaminen ja yhdistyksen purkaminen",
+        "content": "Päätös sääntöjen muuttamisesta ja yhdistyksen purkamisesta on tehtävä yhdistyksen kokouksessa vähintään kolmen neljäsosan (3/4) enemmistöllä annetuista äänistä. Sääntöjen muuttamisesta tai yhdistyksen purkamisesta on mainittava kokouskutsussa. Jos yhdistys puretaan, käytetään yhdistyksen varat yhdistyksen tarkoituksen edistämiseen purkamisesta päättävän kokouksen määräämällä tavalla. Jos yhdistys lakkautetaan, käytetään sen varat samaan tarkoitukseen."
+      }
+    }
   }
 }
