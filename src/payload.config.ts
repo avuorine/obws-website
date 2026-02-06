@@ -13,6 +13,14 @@ import { SiteSettings } from './globals/SiteSettings'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+function getConnectionString() {
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL || ''
+  if (!url || process.env.NODE_ENV !== 'production') return url
+  // Add sslmode=no-verify for Supabase (self-signed cert) and silence pg warning
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}sslmode=no-verify`
+}
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -29,7 +37,7 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL || '',
+      connectionString: getConnectionString(),
     },
   }),
   email: resendAdapter({
