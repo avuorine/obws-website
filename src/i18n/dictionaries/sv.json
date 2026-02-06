@@ -19,6 +19,9 @@
   },
   "membershipForm": {
     "title": "Medlemsansökan",
+    "feeTitle": "Medlemsavgift",
+    "feeAmount": "20 € per år",
+    "feeDescription": "Medlemsavgiften faktureras årligen efter att din ansökan har godkänts.",
     "firstName": "Förnamn",
     "lastName": "Efternamn",
     "email": "E-post",

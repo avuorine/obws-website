@@ -19,6 +19,9 @@
   },
   "membershipForm": {
     "title": "Jäsenhakemus",
+    "feeTitle": "Jäsenmaksu",
+    "feeAmount": "20 € vuodessa",
+    "feeDescription": "Jäsenmaksu laskutetaan vuosittain hakemuksesi hyväksymisen jälkeen.",
     "firstName": "Etunimi",
     "lastName": "Sukunimi",
     "email": "Sähköposti",

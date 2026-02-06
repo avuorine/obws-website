@@ -19,6 +19,9 @@
   },
   "membershipForm": {
     "title": "Membership Application",
+    "feeTitle": "Membership Fee",
+    "feeAmount": "€20 per year",
+    "feeDescription": "The membership fee is invoiced annually after your application has been approved.",
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email",
