@@ -2,6 +2,7 @@
   "common": {
     "home": "Hem",
     "membership": "Medlemskap",
+    "board": "Styrelsen",
     "rules": "Stadgar",
     "language": "Språk",
     "footer": "© {year} Österbottens Whiskysällskap rf."
@@ -40,6 +41,16 @@
     "invalidPhone": "Ogiltigt telefonnummer",
     "mustBe18": "Du måste vara minst 18 år",
     "selectMunicipality": "Välj kommun"
+  },
+  "board": {
+    "title": "Styrelsen",
+    "members": "Styrelsemedlemmar",
+    "chairman": "Ordförande",
+    "secretary": "Sekreterare",
+    "treasurer": "Kassör",
+    "contact": "Kontakt",
+    "generalEnquiries": "Allmänna frågor",
+    "membershipMatters": "Medlemsärenden"
   },
   "rules": {
     "title": "Stadgar",

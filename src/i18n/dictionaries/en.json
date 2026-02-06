@@ -2,6 +2,7 @@
   "common": {
     "home": "Home",
     "membership": "Membership",
+    "board": "Board",
     "rules": "Rules",
     "language": "Language",
     "footer": "© {year} Österbottens Whiskysällskap rf."
@@ -40,6 +41,16 @@
     "invalidPhone": "Invalid phone number",
     "mustBe18": "You must be at least 18 years old",
     "selectMunicipality": "Select municipality"
+  },
+  "board": {
+    "title": "Board",
+    "members": "Board Members",
+    "chairman": "Chairman of the Board",
+    "secretary": "Secretary",
+    "treasurer": "Treasurer",
+    "contact": "Contact",
+    "generalEnquiries": "General enquiries",
+    "membershipMatters": "Membership matters"
   },
   "rules": {
     "title": "Rules",

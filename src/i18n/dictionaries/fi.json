@@ -2,6 +2,7 @@
   "common": {
     "home": "Etusivu",
     "membership": "Jäsenyys",
+    "board": "Hallitus",
     "rules": "Säännöt",
     "language": "Kieli",
     "footer": "© {year} Österbottens Whiskysällskap rf."
@@ -40,6 +41,16 @@
     "invalidPhone": "Virheellinen puhelinnumero",
     "mustBe18": "Sinun täytyy olla vähintään 18-vuotias",
     "selectMunicipality": "Valitse kunta"
+  },
+  "board": {
+    "title": "Hallitus",
+    "members": "Hallituksen jäsenet",
+    "chairman": "Puheenjohtaja",
+    "secretary": "Sihteeri",
+    "treasurer": "Rahastonhoitaja",
+    "contact": "Yhteystiedot",
+    "generalEnquiries": "Yleiset tiedustelut",
+    "membershipMatters": "Jäsenyysasiat"
   },
   "rules": {
     "title": "Säännöt",
