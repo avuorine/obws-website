@@ -1,6 +1,6 @@
 'use server'
 
-import { getPayload } from 'payload'
+import { getPayloadHMR } from '@payloadcms/next/utilities'
 import configPromise from '@payload-config'
 import { membershipSchema, type MembershipFormData } from '@/lib/validation'
 import { notificationEmailHtml, confirmationEmailHtml } from '@/lib/email'
@@ -14,7 +14,7 @@ export async function submitMembership(
   }
 
   try {
-    const payload = await getPayload({ config: configPromise })
+    const payload = await getPayloadHMR({ config: configPromise })
     const membershipEmail = process.env.MEMBERSHIP_EMAIL || 'members@obws.fi'
 
     await payload.sendEmail({
