@@ -25,3 +25,14 @@ export const membershipSchema = z.object({
 })
 
 export type MembershipFormData = z.infer<typeof membershipSchema>
+
+export const profileUpdateSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  phone: z.string().refine((val) => !val || isValidPhoneNumber(val), {
+    message: 'invalidPhone',
+  }),
+  municipality: z.string().optional(),
+})
+
+export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>

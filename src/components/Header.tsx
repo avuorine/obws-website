@@ -1,7 +1,10 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { HeaderAuth } from './HeaderAuth'
 
 export function Header() {
   const t = useTranslations('common')
@@ -34,7 +37,10 @@ export function Header() {
             </Link>
           </nav>
         </div>
-        <LanguageSwitcher />
+        <div className="flex items-center gap-4">
+          <HeaderAuth />
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   )
