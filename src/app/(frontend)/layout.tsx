@@ -2,10 +2,11 @@ import React from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { Inter, Playfair_Display } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import { BotIdClient } from 'botid/client'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { CookieConsent } from '@/components/CookieConsent'
+import { AnalyticsWrapper } from '@/components/AnalyticsWrapper'
 import './styles.css'
 
 const inter = Inter({
@@ -35,10 +36,11 @@ export default async function FrontendLayout({ children }: { children: React.Rea
         <BotIdClient protect={[{ path: '/membership', method: 'POST' }]} />
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">{children}</main>
+          <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">{children}</main>
           <Footer />
+          <CookieConsent />
         </NextIntlClientProvider>
-        <Analytics />
+        <AnalyticsWrapper />
       </body>
     </html>
   )

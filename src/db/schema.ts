@@ -7,13 +7,12 @@ import {
   jsonb,
   numeric,
   pgEnum,
+  serial,
 } from 'drizzle-orm/pg-core'
 
 // --- Enums ---
 
 export const memberStatusEnum = pgEnum('member_status', ['active', 'inactive', 'honorary'])
-
-export const eventTypeEnum = pgEnum('event_type', ['tasting', 'social', 'trip', 'meeting', 'other'])
 
 export const allocationMethodEnum = pgEnum('allocation_method', ['first_come', 'lottery'])
 
@@ -25,6 +24,12 @@ export const registrationStatusEnum = pgEnum('registration_status', [
   'cancelled',
   'pending',
 ])
+
+export const paymentStatusEnum = pgEnum('payment_status', ['unpaid', 'paid', 'overdue'])
+
+export const invoiceTypeEnum = pgEnum('invoice_type', ['membership_fee', 'event_fee'])
+
+export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'sent', 'paid', 'cancelled'])
 
 // --- Localized JSON type helper ---
 export type LocalizedText = { sv?: string; fi?: string; en?: string }
@@ -47,7 +52,10 @@ export const user = pgTable('user', {
   municipality: text('municipality'),
   dateOfBirth: text('date_of_birth'),
   status: memberStatusEnum('status').default('active'),
+  memberNumber: integer('member_number').unique(),
   memberSince: timestamp('member_since'),
+  resignedAt: timestamp('resigned_at'),
+  marketingEmails: boolean('marketing_emails').notNull().default(true),
 })
 
 export const session = pgTable('session', {
@@ -108,9 +116,17 @@ export const passkey = pgTable('passkey', {
 
 // --- Application tables ---
 
+export const eventCategories = pgTable('event_categories', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  slug: text('slug').notNull().unique(),
+  nameLocales: jsonb('name_locales').$type<LocalizedText>().notNull(),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 export const events = pgTable('events', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  type: eventTypeEnum('type').notNull().default('social'),
+  categoryId: text('category_id').references(() => eventCategories.id),
   titleLocales: jsonb('title_locales').$type<LocalizedText>().notNull(),
   summaryLocales: jsonb('summary_locales').$type<LocalizedText>(),
   descriptionLocales: jsonb('description_locales').$type<LocalizedText>(),
@@ -120,11 +136,14 @@ export const events = pgTable('events', {
   capacity: integer('capacity'),
   price: numeric('price', { precision: 10, scale: 2 }),
   allocationMethod: allocationMethodEnum('allocation_method').default('first_come'),
+  registrationOpensAt: timestamp('registration_opens_at'),
   registrationDeadline: timestamp('registration_deadline'),
   lotteryDate: timestamp('lottery_date'),
   lotteryCompleted: boolean('lottery_completed').default(false),
   registrationCount: integer('registration_count').default(0),
   waitlistCount: integer('waitlist_count').default(0),
+  cancellationAllowed: boolean('cancellation_allowed').notNull().default(true),
+  cancellationDeadline: timestamp('cancellation_deadline'),
   status: eventStatusEnum('status').default('draft'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -156,4 +175,70 @@ export const eventRegistrations = pgTable('event_registrations', {
   registeredAt: timestamp('registered_at').notNull().defaultNow(),
   cancelledAt: timestamp('cancelled_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// --- Fee & Invoice tables ---
+
+export const feePeriods = pgTable('fee_periods', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  startDate: timestamp('start_date').notNull(),
+  endDate: timestamp('end_date').notNull(),
+  dueDate: timestamp('due_date').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const memberFees = pgTable('member_fees', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  feePeriodId: text('fee_period_id')
+    .notNull()
+    .references(() => feePeriods.id, { onDelete: 'cascade' }),
+  status: paymentStatusEnum('status').notNull().default('unpaid'),
+  paidAt: timestamp('paid_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const invoices = pgTable('invoices', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  invoiceNumber: integer('invoice_number').notNull().unique(),
+  type: invoiceTypeEnum('type').notNull(),
+  status: invoiceStatusEnum('status').notNull().default('draft'),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  feePeriodId: text('fee_period_id').references(() => feePeriods.id),
+  eventRegistrationId: text('event_registration_id').references(() => eventRegistrations.id),
+  recipientName: text('recipient_name').notNull(),
+  recipientEmail: text('recipient_email').notNull(),
+  description: text('description').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  dueDate: timestamp('due_date').notNull(),
+  referenceNumber: text('reference_number').notNull(),
+  paidAt: timestamp('paid_at'),
+  sentAt: timestamp('sent_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const invoiceCounter = pgTable('invoice_counter', {
+  id: serial('id').primaryKey(),
+  nextNumber: integer('next_number').notNull().default(1),
+})
+
+export const associationSettings = pgTable('association_settings', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().default(''),
+  address: text('address').default(''),
+  businessId: text('business_id').default(''),
+  iban: text('iban').default(''),
+  bic: text('bic').default(''),
+  email: text('email').default(''),
+  phone: text('phone').default(''),
+  nextInvoiceNumber: integer('next_invoice_number').notNull().default(1),
 })

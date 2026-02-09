@@ -8,10 +8,24 @@ import { membershipSchema, type MembershipFormData } from '@/lib/validation'
 import { MunicipalitySelect } from './MunicipalitySelect'
 import { PhoneInput } from './PhoneInput'
 import { submitMembership } from '@/app/(frontend)/membership/actions'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert } from '@/components/ui/alert'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
+
+function getMaxDobDate() {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - 18)
+  return d
+}
 
 export function MembershipForm() {
   const t = useTranslations('membershipForm')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const maxDob = getMaxDobDate()
 
   const {
     register,
@@ -30,9 +44,9 @@ export function MembershipForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-lg border border-green-300 bg-green-50 p-6 text-center">
-        <p className="text-green-800">{t('success')}</p>
-      </div>
+      <Alert variant="success" className="text-center">
+        {t('success')}
+      </Alert>
     )
   }
 
@@ -40,26 +54,24 @@ export function MembershipForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label={t('firstName')} error={errors.firstName && t('requiredField')}>
-          <input
+          <Input
             {...register('firstName')}
-            type="text"
-            className={inputClass(!!errors.firstName)}
+            className={cn(errors.firstName && 'border-destructive')}
           />
         </Field>
         <Field label={t('lastName')} error={errors.lastName && t('requiredField')}>
-          <input
+          <Input
             {...register('lastName')}
-            type="text"
-            className={inputClass(!!errors.lastName)}
+            className={cn(errors.lastName && 'border-destructive')}
           />
         </Field>
       </div>
 
       <Field label={t('email')} error={errors.email && t('invalidEmail')}>
-        <input
+        <Input
           {...register('email')}
           type="email"
-          className={inputClass(!!errors.email)}
+          className={cn(errors.email && 'border-destructive')}
         />
       </Field>
 
@@ -84,24 +96,57 @@ export function MembershipForm() {
       </Field>
 
       <Field label={t('dateOfBirth')} error={errors.dateOfBirth && t('mustBe18')}>
-        <input
-          {...register('dateOfBirth')}
-          type="date"
-          className={inputClass(!!errors.dateOfBirth)}
+        <Controller
+          control={control}
+          name="dateOfBirth"
+          render={({ field }) => (
+            <DatePicker
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              maxDate={maxDob}
+            />
+          )}
         />
       </Field>
 
+      <div>
+        <Controller
+          control={control}
+          name="privacyConsent"
+          defaultValue={false}
+          render={({ field }) => (
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="privacyConsent"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className={cn(errors.privacyConsent && 'border-destructive')}
+              />
+              <label htmlFor="privacyConsent" className="text-sm leading-tight">
+                {t.rich('privacyConsent', {
+                  link: (chunks) => (
+                    <a href="/privacy" target="_blank" className="underline hover:text-foreground">
+                      {chunks}
+                    </a>
+                  ),
+                })}
+              </label>
+            </div>
+          )}
+        />
+        {errors.privacyConsent && (
+          <p className="mt-1 text-sm text-destructive">{t('mustAcceptPrivacy')}</p>
+        )}
+      </div>
+
       {status === 'error' && (
-        <p className="text-sm text-red-600">{t('error')}</p>
+        <Alert variant="destructive">{t('error')}</Alert>
       )}
 
-      <button
-        type="submit"
-        disabled={status === 'submitting'}
-        className="w-full rounded-lg bg-amber px-6 py-3 font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={status === 'submitting'} size="lg" className="w-full">
         {status === 'submitting' ? t('submitting') : t('submit')}
-      </button>
+      </Button>
     </form>
   )
 }
@@ -112,20 +157,14 @@ function Field({
   children,
 }: {
   label: string
-  error?: string
+  error?: string | false
   children: React.ReactNode
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-whisky-light">{label}</label>
+      <Label>{label}</Label>
       {children}
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   )
-}
-
-function inputClass(hasError: boolean) {
-  return `w-full rounded-lg border px-4 py-2.5 text-whisky outline-none transition-colors placeholder:text-whisky-light/50 focus:border-amber focus:ring-1 focus:ring-amber ${
-    hasError ? 'border-red-400' : 'border-border'
-  }`
 }
