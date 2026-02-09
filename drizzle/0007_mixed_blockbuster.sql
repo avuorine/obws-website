@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "marketing_emails" boolean DEFAULT true NOT NULL;

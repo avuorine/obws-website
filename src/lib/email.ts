@@ -1,31 +1,71 @@
 import type { MembershipFormData } from './validation'
 
-export function notificationEmailHtml(data: MembershipFormData): string {
+const hr = '<hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />'
+
+export function massEmailHtml(subject: string, bodyHtml: string, societyName: string, unsubscribeUrl?: string): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
+  const unsubscribeBlock = unsubscribeUrl
+    ? `<p style="color: #999; font-size: 11px; margin-top: 12px;"><a href="${unsubscribeUrl}" style="color: #999; text-decoration: underline;">Avregistrera / Peruuta tilaus / Unsubscribe</a></p>`
+    : ''
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #492a0d;">Ny medlemsansökan / New Membership Application</h2>
-      <table style="width: 100%; border-collapse: collapse;">
-        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Namn / Name</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.firstName} ${data.lastName}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">E-post / Email</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.email}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Telefon / Phone</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.phone}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Kommun / Municipality</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.municipality}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Födelsedatum / Date of birth</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.dateOfBirth}</td></tr>
-      </table>
+      <img src="${siteUrl}/ows_logo_small.png" alt="${societyName}" width="120" style="display: block; margin: 0 auto 16px;" />
+      <h2 style="color: #492a0d;">${subject}</h2>
+      ${bodyHtml}
+      ${hr}
+      <p style="color: #6b4423; font-size: 12px;">${societyName}</p>
+      ${unsubscribeBlock}
     </div>
   `
 }
 
-export function confirmationEmailHtml(data: MembershipFormData): string {
+function logoHtml(societyName: string): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
+  return `<img src="${siteUrl}/ows_logo_small.png" alt="${societyName}" width="120" style="display: block; margin: 0 auto 16px;" />`
+}
+
+export function notificationEmailHtml(data: MembershipFormData, societyName: string): string {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #492a0d;">Tack för din ansökan! / Thank you for your application!</h2>
+      ${logoHtml(societyName)}
+      <h2 style="color: #492a0d;">Ny medlemsansökan / Uusi jäsenhakemus / New Membership Application</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Namn / Nimi / Name</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.firstName} ${data.lastName}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">E-post / Sähköposti / Email</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.email}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Telefon / Puhelin / Phone</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.phone}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Kommun / Kunta / Municipality</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.municipality}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #d4c4a8; font-weight: bold;">Födelsedatum / Syntymäaika / Date of birth</td><td style="padding: 8px; border-bottom: 1px solid #d4c4a8;">${data.dateOfBirth}</td></tr>
+      </table>
+      ${hr}
+      <p style="color: #6b4423; font-size: 12px;">${societyName}</p>
+    </div>
+  `
+}
+
+export function confirmationEmailHtml(data: MembershipFormData, societyName: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      ${logoHtml(societyName)}
+      <h2 style="color: #492a0d;">Tack för din ansökan! / Kiitos hakemuksestasi! / Thank you for your application!</h2>
+
+      <!-- Swedish -->
       <p>Hej ${data.firstName},</p>
-      <p>Vi har tagit emot din medlemsansökan till Österbottens Whiskysällskap rf. Vi återkommer till dig inom kort.</p>
-      <hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />
+      <p>Vi har tagit emot din medlemsansökan till ${societyName}. Vi återkommer till dig inom kort.</p>
+
+      ${hr}
+
+      <!-- Finnish -->
+      <p>Hei ${data.firstName},</p>
+      <p>Olemme vastaanottaneet jäsenhakemuksesi ${societyName}:iin. Palaamme asiaan pian.</p>
+
+      ${hr}
+
+      <!-- English -->
       <p>Hi ${data.firstName},</p>
-      <p>We have received your membership application for Österbottens Whiskysällskap rf. We will get back to you shortly.</p>
-      <hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />
-      <p style="color: #6b4423; font-size: 12px;">Österbottens Whiskysällskap rf.</p>
+      <p>We have received your membership application for ${societyName}. We will get back to you shortly.</p>
+
+      ${hr}
+      <p style="color: #6b4423; font-size: 12px;">${societyName}</p>
     </div>
   `
 }
