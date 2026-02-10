@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { getLocalized } from '@/lib/localize'
+import { formatDateShort } from '@/lib/format-date'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import type { LocalizedText } from '@/db/schema'
 
 interface EventCardProps {
@@ -8,7 +11,7 @@ interface EventCardProps {
   titleLocales: LocalizedText
   summaryLocales: LocalizedText | null
   date: Date
-  type: string
+  categoryName: string
   capacity: number | null
   registrationCount: number | null
   locale: string
@@ -20,7 +23,7 @@ export function EventCard({
   titleLocales,
   summaryLocales,
   date,
-  type,
+  categoryName,
   capacity,
   registrationCount,
   locale,
@@ -30,50 +33,37 @@ export function EventCard({
   const spotsLeft = capacity ? capacity - (registrationCount ?? 0) : null
 
   return (
-    <Link
-      href={`/members/events/${id}`}
-      className="block rounded-lg border border-border p-5 transition-colors hover:border-amber"
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <span className="rounded bg-amber/10 px-2 py-0.5 text-xs font-medium text-amber">
-          {t(type as 'tasting' | 'social' | 'trip' | 'meeting' | 'other')}
-        </span>
-        {userStatus === 'registered' && (
-          <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-            {t('registered')}
-          </span>
-        )}
-        {userStatus === 'waitlisted' && (
-          <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
-            {t('waitlisted')}
-          </span>
-        )}
-      </div>
+    <Link href={`/members/events/${id}`} className="block">
+      <Card className="transition-colors hover:border-primary">
+        <CardContent className="relative p-5">
+          {(userStatus === 'registered' || userStatus === 'waitlisted' || categoryName) && (
+            <div className="absolute right-5 top-5 flex items-center gap-2">
+              {userStatus === 'registered' && <Badge variant="success">{t('registered')}</Badge>}
+              {userStatus === 'waitlisted' && <Badge variant="warning">{t('waitlisted')}</Badge>}
+              {categoryName && <Badge>{categoryName}</Badge>}
+            </div>
+          )}
 
-      <h3 className="mb-1 font-serif text-lg font-semibold">
-        {getLocalized(titleLocales, locale)}
-      </h3>
+          <h3 className="mb-1 pr-24 font-serif text-lg font-semibold">
+            {getLocalized(titleLocales, locale)}
+          </h3>
 
-      {summaryLocales && (
-        <p className="mb-2 text-sm text-whisky-light">
-          {getLocalized(summaryLocales, locale)}
-        </p>
-      )}
+          {summaryLocales && (
+            <p className="mb-2 text-sm text-muted-foreground">
+              {getLocalized(summaryLocales, locale)}
+            </p>
+          )}
 
-      <div className="flex items-center gap-4 text-xs text-whisky-light">
-        <span>
-          {date.toLocaleDateString(locale, {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </span>
-        {spotsLeft !== null && (
-          <span>
-            {spotsLeft > 0 ? t('spotsLeft', { count: spotsLeft }) : t('full')}
-          </span>
-        )}
-      </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span>{formatDateShort(date, locale)}</span>
+            {spotsLeft !== null && (
+              <span>
+                {spotsLeft > 0 ? t('spotsLeft', { count: spotsLeft }) : t('full')}
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </Link>
   )
 }

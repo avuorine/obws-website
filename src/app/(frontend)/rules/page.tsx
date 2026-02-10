@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function RulesPage() {
   const t = await getTranslations('rules')
@@ -18,61 +19,63 @@ export default async function RulesPage() {
   ] as const
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl">
       <h1 className="mb-8 font-serif text-3xl font-bold">{t('title')}</h1>
 
       <div className="space-y-8">
         {sections.map((num) => (
-          <section key={num} className="rounded-lg border border-border bg-parchment/30 p-6">
-            <h2 className="mb-3 font-serif text-xl font-semibold text-whisky">
-              {t(`sections.${num}.title`)}
-            </h2>
-            <p className="text-whisky-light">{t(`sections.${num}.content`)}</p>
+          <Card key={num}>
+            <CardHeader>
+              <CardTitle>{t(`sections.${num}.title`)}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">{t(`sections.${num}.content`)}</p>
 
-            {t.has(`sections.${num}.activities`) && (
-              <>
-                <p className="mt-4 font-medium text-whisky">
-                  {t(`sections.${num}.activities`)}
+              {t.has(`sections.${num}.activities`) && (
+                <>
+                  <p className="mt-4 font-medium">
+                    {t(`sections.${num}.activities`)}
+                  </p>
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+                    {(t.raw(`sections.${num}.activityList`) as string[]).map(
+                      (item, i) => (
+                        <li key={i}>{item}</li>
+                      ),
+                    )}
+                  </ul>
+                </>
+              )}
+
+              {t.has(`sections.${num}.support`) && (
+                <>
+                  <p className="mt-4 font-medium">
+                    {t(`sections.${num}.support`)}
+                  </p>
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+                    {(t.raw(`sections.${num}.supportList`) as string[]).map(
+                      (item, i) => (
+                        <li key={i}>{item}</li>
+                      ),
+                    )}
+                  </ul>
+                </>
+              )}
+
+              {t.has(`sections.${num}.items`) && (
+                <ol className="mt-2 list-inside list-decimal space-y-1 text-muted-foreground">
+                  {(t.raw(`sections.${num}.items`) as string[]).map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ol>
+              )}
+
+              {t.has(`sections.${num}.note`) && (
+                <p className="mt-4 text-sm italic text-muted-foreground">
+                  {t(`sections.${num}.note`)}
                 </p>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-whisky-light">
-                  {(t.raw(`sections.${num}.activityList`) as string[]).map(
-                    (item, i) => (
-                      <li key={i}>{item}</li>
-                    ),
-                  )}
-                </ul>
-              </>
-            )}
-
-            {t.has(`sections.${num}.support`) && (
-              <>
-                <p className="mt-4 font-medium text-whisky">
-                  {t(`sections.${num}.support`)}
-                </p>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-whisky-light">
-                  {(t.raw(`sections.${num}.supportList`) as string[]).map(
-                    (item, i) => (
-                      <li key={i}>{item}</li>
-                    ),
-                  )}
-                </ul>
-              </>
-            )}
-
-            {t.has(`sections.${num}.items`) && (
-              <ol className="mt-2 list-inside list-decimal space-y-1 text-whisky-light">
-                {(t.raw(`sections.${num}.items`) as string[]).map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ol>
-            )}
-
-            {t.has(`sections.${num}.note`) && (
-              <p className="mt-4 text-sm italic text-whisky-light">
-                {t(`sections.${num}.note`)}
-              </p>
-            )}
-          </section>
+              )}
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

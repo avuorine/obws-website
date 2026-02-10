@@ -111,7 +111,16 @@
     "participants": "participants",
     "waitlist": "on waitlist",
     "cancellationNotAllowed": "Cancellation is not available for this event",
-    "cancellationDeadlinePassed": "The cancellation deadline has passed"
+    "cancellationDeadlinePassed": "The cancellation deadline has passed",
+    "guests": "Guests",
+    "addGuest": "Add guest",
+    "removeGuest": "Remove guest",
+    "guestsCount": "{count} guest(s)",
+    "guestRegistrationOpensIn": "Guest registration opens in",
+    "guestsAfterLottery": "Guest registration opens after the lottery",
+    "eventFullNoGuests": "Event is full — no guest spots available",
+    "guestLimitReached": "Guest limit reached",
+    "mustRegisterFirst": "You must register first to add guests"
   },
   "profile": {
     "title": "Profile",
@@ -291,6 +300,9 @@
     "registeredAt": "Registered at",
     "noEvents": "No events found.",
     "eventTitle": "Title",
+    "summary": "Summary",
+    "description": "Description",
+    "location": "Location",
     "eventCategory": "Category",
     "viewInvoice": "View Invoice",
     "downloadPdf": "Download PDF",
@@ -339,7 +351,14 @@
     "sendingAll": "Sending…",
     "testEmailSent": "Test email sent to your address",
     "massEmailSent": "Email sent to {count} members",
-    "confirmMassSend": "Send email to {count} members?"
+    "confirmMassSend": "Send email to {count} members?",
+    "attachments": "Attachments",
+    "addFiles": "Add files",
+    "removeFile": "Remove",
+    "guestAllowed": "Allow guest signups",
+    "maxGuestsPerMember": "Max guests per member",
+    "guestRegistrationOpensAt": "Guest registration opens at",
+    "guests": "Guests"
   },
   "rules": {
     "title": "Rules",
@@ -440,7 +459,7 @@
       },
       "2": {
         "title": "2. Personal data collected",
-        "content": "We collect the following personal data: name, email address, phone number, municipality, and date of birth when you apply for membership. When you use the member section, we store event registrations, invoices, and session data."
+        "content": "We collect the following personal data: name, email address, phone number, municipality, and date of birth when you apply for membership. When you use the member section, we store event registrations, invoices, and session data (including IP address and user agent)."
       },
       "3": {
         "title": "3. Purpose and legal basis",
@@ -448,11 +467,11 @@
       },
       "4": {
         "title": "4. Third-party processors",
-        "content": "We use the following third-party service providers: Resend (transactional email delivery), and Vercel (website hosting and optional analytics). These service providers process data on our behalf and according to our instructions."
+        "content": "We use the following third-party service providers: Resend (transactional email delivery), Vercel (website hosting and optional analytics), and BotId (bot detection on the membership application form). These service providers process data on our behalf and according to our instructions."
       },
       "5": {
         "title": "5. Data retention",
-        "content": "Member data is retained for the duration of membership plus one year after resignation. Invoices are retained for 6 years in accordance with Finnish accounting law. Session data expires automatically after 7 days."
+        "content": "Member data is retained for the duration of membership plus one year after resignation. Invoices, including recipient name and email, are retained for 6 years in accordance with Finnish accounting law even if the account is deleted. Session data expires automatically after 7 days."
       },
       "6": {
         "title": "6. Your rights",

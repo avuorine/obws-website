@@ -144,6 +144,9 @@ export const events = pgTable('events', {
   waitlistCount: integer('waitlist_count').default(0),
   cancellationAllowed: boolean('cancellation_allowed').notNull().default(true),
   cancellationDeadline: timestamp('cancellation_deadline'),
+  guestAllowed: boolean('guest_allowed').notNull().default(false),
+  maxGuestsPerMember: integer('max_guests_per_member').notNull().default(1),
+  guestRegistrationOpensAt: timestamp('guest_registration_opens_at'),
   status: eventStatusEnum('status').default('draft'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -172,6 +175,7 @@ export const eventRegistrations = pgTable('event_registrations', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   status: registrationStatusEnum('status').notNull().default('registered'),
+  guestCount: integer('guest_count').notNull().default(0),
   registeredAt: timestamp('registered_at').notNull().defaultNow(),
   cancelledAt: timestamp('cancelled_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),

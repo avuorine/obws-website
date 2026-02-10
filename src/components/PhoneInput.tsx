@@ -19,8 +19,8 @@ export function PhoneInput({ control, name, error }: Props) {
       defaultCountry="FI"
       international
       countryCallingCodeEditable={false}
-      className={`phone-input w-full rounded-lg border px-4 py-2.5 text-whisky outline-none transition-colors focus-within:border-amber focus-within:ring-1 focus-within:ring-amber ${
-        error ? 'border-red-400' : 'border-border'
+      className={`phone-input flex h-10 w-full rounded-lg border bg-transparent px-4 py-2 text-sm text-foreground outline-none transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring ${
+        error ? 'border-destructive' : 'border-input'
       }`}
     />
   )

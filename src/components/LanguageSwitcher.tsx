@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
+import { cn } from '@/lib/utils'
 
 const locales = [
   { code: 'sv', label: 'SV' },
@@ -30,11 +31,12 @@ export function LanguageSwitcher() {
           key={code}
           onClick={() => switchLocale(code)}
           disabled={isPending}
-          className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+          className={cn(
+            'rounded px-2 py-1 text-xs font-medium transition-colors',
             currentLocale === code
-              ? 'bg-amber text-white'
-              : 'text-whisky-light hover:bg-amber/10 hover:text-amber'
-          }`}
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-primary/10 hover:text-primary',
+          )}
           aria-current={currentLocale === code ? 'true' : undefined}
         >
           {label}

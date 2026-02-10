@@ -4,6 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { Alert } from '@/components/ui/alert'
 
 export function LoginForm() {
   const t = useTranslations('auth')
@@ -53,62 +58,47 @@ export function LoginForm() {
   if (magicLinkSent) {
     return (
       <div className="space-y-4">
-        <p className="text-whisky-light">{t('magicLinkSent')}</p>
-        <button
-          onClick={() => setMagicLinkSent(false)}
-          className="text-sm text-amber hover:underline"
-        >
+        <Alert variant="success">{t('magicLinkSent')}</Alert>
+        <Button variant="link" onClick={() => setMagicLinkSent(false)} className="px-0">
           {t('tryAgain')}
-        </button>
+        </Button>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <button
-        onClick={handlePasskey}
-        disabled={passkeyLoading}
-        className="w-full rounded-lg bg-amber px-4 py-3 font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50"
-      >
-        {passkeyLoading ? t('signingIn') : t('signInPasskey')}
-      </button>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2 text-whisky-light">{t('or')}</span>
-        </div>
-      </div>
-
       <form onSubmit={handleMagicLink} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium">
-            {t('email')}
-          </label>
-          <input
+          <Label htmlFor="email">{t('email')}</Label>
+          <Input
             id="email"
             type="email"
-            autoComplete="email"
+            autoComplete="email webauthn"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-lg border border-border bg-white px-4 py-2 focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={magicLinkLoading}
-          className="w-full rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-amber hover:text-amber disabled:opacity-50"
-        >
+        <Button type="submit" disabled={magicLinkLoading} size="lg" className="w-full">
           {magicLinkLoading ? t('sending') : t('sendMagicLink')}
-        </button>
+        </Button>
       </form>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <Separator label={t('or')} />
+
+      <Button
+        onClick={handlePasskey}
+        disabled={passkeyLoading}
+        variant="outline"
+        size="lg"
+        className="w-full"
+      >
+        {passkeyLoading ? t('signingIn') : t('signInPasskey')}
+      </Button>
+
+      {error && <Alert variant="destructive">{error}</Alert>}
     </div>
   )
 }

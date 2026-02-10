@@ -5,7 +5,8 @@ import { passkey } from '@better-auth/passkey'
 import { nextCookies } from 'better-auth/next-js'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
-import { resend } from './resend'
+import { sendEmail } from './email-sender'
+import { getSettings } from './settings'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -27,7 +28,9 @@ export const auth = betterAuth({
       municipality: { type: 'string', required: false },
       dateOfBirth: { type: 'string', required: false },
       status: { type: 'string', required: false, defaultValue: 'active' },
+      memberNumber: { type: 'number', required: false },
       memberSince: { type: 'date', required: false },
+      resignedAt: { type: 'date', required: false },
     },
   },
   plugins: [
@@ -35,11 +38,12 @@ export const auth = betterAuth({
     nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        await resend.emails.send({
+        const settings = await getSettings()
+        await sendEmail({
           from: 'noreply@obws.fi',
           to: email,
           subject: 'Logga in / Sign in — OWS rf.',
-          html: magicLinkEmailHtml(url),
+          html: magicLinkEmailHtml(url, settings.name),
         })
       },
     }),
@@ -47,15 +51,40 @@ export const auth = betterAuth({
   ],
 })
 
-function magicLinkEmailHtml(url: string): string {
+function magicLinkEmailHtml(url: string, societyName: string): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
+  const hr = '<hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />'
+  const btnStyle = 'display: inline-block; padding: 12px 24px; background-color: #d4a853; color: white; text-decoration: none; border-radius: 6px;'
+
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #492a0d;">Logga in / Sign In</h2>
+      <img src="${siteUrl}/ows_logo_small.png" alt="${societyName}" width="120" style="display: block; margin: 0 auto 16px;" />
+      <h2 style="color: #492a0d;">Logga in / Kirjaudu sisään / Sign in</h2>
+
+      <!-- Swedish -->
       <p>Klicka på länken nedan för att logga in:</p>
-      <p><a href="${url}" style="display: inline-block; padding: 12px 24px; background-color: #d4a853; color: white; text-decoration: none; border-radius: 6px;">Logga in / Sign in</a></p>
-      <p style="font-size: 12px; color: #6b4423;">Denna länk är giltig i 10 minuter. / This link is valid for 10 minutes.</p>
-      <hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />
-      <p style="color: #6b4423; font-size: 12px;">Österbottens Whiskysällskap rf.</p>
+      <p style="font-size: 12px; color: #6b4423;">Länken är giltig i 10 minuter.</p>
+
+      ${hr}
+
+      <!-- Finnish -->
+      <p>Klikkaa alla olevaa linkkiä kirjautuaksesi sisään:</p>
+      <p style="font-size: 12px; color: #6b4423;">Linkki on voimassa 10 minuuttia.</p>
+
+      ${hr}
+
+      <!-- English -->
+      <p>Click the link below to sign in:</p>
+      <p style="font-size: 12px; color: #6b4423;">This link is valid for 10 minutes.</p>
+
+      ${hr}
+
+      <p style="text-align: center;">
+        <a href="${url}" style="${btnStyle}">Logga in / Kirjaudu / Sign in</a>
+      </p>
+
+      ${hr}
+      <p style="color: #6b4423; font-size: 12px;">${societyName}</p>
     </div>
   `
 }

@@ -111,7 +111,16 @@
     "participants": "osallistujaa",
     "waitlist": "jonotuslistalla",
     "cancellationNotAllowed": "Peruutus ei ole mahdollinen tälle tapahtumalle",
-    "cancellationDeadlinePassed": "Peruutuksen takaraja on umpeutunut"
+    "cancellationDeadlinePassed": "Peruutuksen takaraja on umpeutunut",
+    "guests": "Vieraat",
+    "addGuest": "Lisää vieras",
+    "removeGuest": "Poista vieras",
+    "guestsCount": "{count} vieras(ta)",
+    "guestRegistrationOpensIn": "Vierasilmoittautuminen avautuu",
+    "guestsAfterLottery": "Vierasilmoittautuminen avautuu arvonnan jälkeen",
+    "eventFullNoGuests": "Tapahtuma on täynnä — ei vieraspaikkoja",
+    "guestLimitReached": "Vierasraja saavutettu",
+    "mustRegisterFirst": "Sinun täytyy ilmoittautua ensin lisätäksesi vieraita"
   },
   "profile": {
     "title": "Profiili",
@@ -291,6 +300,9 @@
     "registeredAt": "Ilmoittautunut",
     "noEvents": "Tapahtumia ei löytynyt.",
     "eventTitle": "Otsikko",
+    "summary": "Tiivistelmä",
+    "description": "Kuvaus",
+    "location": "Paikka",
     "eventCategory": "Kategoria",
     "viewInvoice": "Näytä lasku",
     "downloadPdf": "Lataa PDF",
@@ -339,7 +351,14 @@
     "sendingAll": "Lähetetään…",
     "testEmailSent": "Testiviesti lähetetty osoitteeseesi",
     "massEmailSent": "Sähköposti lähetetty {count} jäsenelle",
-    "confirmMassSend": "Lähetetäänkö sähköposti {count} jäsenelle?"
+    "confirmMassSend": "Lähetetäänkö sähköposti {count} jäsenelle?",
+    "attachments": "Liitteet",
+    "addFiles": "Lisää tiedostoja",
+    "removeFile": "Poista",
+    "guestAllowed": "Salli vierasilmoittautumiset",
+    "maxGuestsPerMember": "Max vierasta per jäsen",
+    "guestRegistrationOpensAt": "Vierasilmoittautuminen avautuu",
+    "guests": "Vieraat"
   },
   "rules": {
     "title": "Säännöt",
@@ -440,7 +459,7 @@
       },
       "2": {
         "title": "2. Kerättävät henkilötiedot",
-        "content": "Keräämme seuraavat henkilötiedot: nimi, sähköpostiosoite, puhelinnumero, kotikunta ja syntymäaika jäsenhakemuksen yhteydessä. Jäsenosiossa tallennamme tapahtumailmoittautumiset, laskut ja istuntotiedot."
+        "content": "Keräämme seuraavat henkilötiedot: nimi, sähköpostiosoite, puhelinnumero, kotikunta ja syntymäaika jäsenhakemuksen yhteydessä. Jäsenosiossa tallennamme tapahtumailmoittautumiset, laskut ja istuntotiedot (mukaan lukien IP-osoite ja selaintiedot)."
       },
       "3": {
         "title": "3. Tarkoitus ja oikeusperuste",
@@ -448,11 +467,11 @@
       },
       "4": {
         "title": "4. Kolmannen osapuolen käsittelijät",
-        "content": "Käytämme seuraavia kolmannen osapuolen palveluntarjoajia: Resend (sähköpostin lähetys) ja Vercel (verkkosivujen isännöinti ja valinnainen analytiikka). Nämä palveluntarjoajat käsittelevät tietoja puolestamme ja ohjeidemme mukaisesti."
+        "content": "Käytämme seuraavia kolmannen osapuolen palveluntarjoajia: Resend (sähköpostin lähetys), Vercel (verkkosivujen isännöinti ja valinnainen analytiikka) ja BotId (bottitunnistus jäsenhakemuslomakkeella). Nämä palveluntarjoajat käsittelevät tietoja puolestamme ja ohjeidemme mukaisesti."
       },
       "5": {
         "title": "5. Tietojen säilytys",
-        "content": "Jäsentiedot säilytetään jäsenyyden ajan ja vuosi eroamisen jälkeen. Laskut säilytetään 6 vuotta Suomen kirjanpitolain mukaisesti. Istuntotiedot vanhenevat automaattisesti 7 päivän kuluttua."
+        "content": "Jäsentiedot säilytetään jäsenyyden ajan ja vuosi eroamisen jälkeen. Laskut, mukaan lukien vastaanottajan nimi ja sähköposti, säilytetään 6 vuotta Suomen kirjanpitolain mukaisesti myös tilin poistamisen jälkeen. Istuntotiedot vanhenevat automaattisesti 7 päivän kuluttua."
       },
       "6": {
         "title": "6. Oikeutesi",
