@@ -111,7 +111,16 @@
     "participants": "deltagare",
     "waitlist": "på väntelista",
     "cancellationNotAllowed": "Avbokning är inte möjlig för detta evenemang",
-    "cancellationDeadlinePassed": "Avbokningsfristen har passerat"
+    "cancellationDeadlinePassed": "Avbokningsfristen har passerat",
+    "guests": "Gäster",
+    "addGuest": "Lägg till gäst",
+    "removeGuest": "Ta bort gäst",
+    "guestsCount": "{count} gäst(er)",
+    "guestRegistrationOpensIn": "Gästanmälan öppnar om",
+    "guestsAfterLottery": "Gästanmälan öppnar efter lottningen",
+    "eventFullNoGuests": "Evenemanget är fullt — inga gästplatser",
+    "guestLimitReached": "Gästgränsen nådd",
+    "mustRegisterFirst": "Du måste anmäla dig först för att lägga till gäster"
   },
   "profile": {
     "title": "Profil",
@@ -291,6 +300,9 @@
     "registeredAt": "Anmäld",
     "noEvents": "Inga evenemang hittades.",
     "eventTitle": "Titel",
+    "summary": "Sammanfattning",
+    "description": "Beskrivning",
+    "location": "Plats",
     "eventCategory": "Kategori",
     "viewInvoice": "Visa faktura",
     "downloadPdf": "Ladda ner PDF",
@@ -339,7 +351,14 @@
     "sendingAll": "Skickar…",
     "testEmailSent": "Testmail skickat till din adress",
     "massEmailSent": "E-post skickad till {count} medlemmar",
-    "confirmMassSend": "Skicka e-post till {count} medlemmar?"
+    "confirmMassSend": "Skicka e-post till {count} medlemmar?",
+    "attachments": "Bilagor",
+    "addFiles": "Lägg till filer",
+    "removeFile": "Ta bort",
+    "guestAllowed": "Tillåt gästanmälningar",
+    "maxGuestsPerMember": "Max gäster per medlem",
+    "guestRegistrationOpensAt": "Gästanmälan öppnar",
+    "guests": "Gäster"
   },
   "rules": {
     "title": "Stadgar",
@@ -440,7 +459,7 @@
       },
       "2": {
         "title": "2. Insamlade personuppgifter",
-        "content": "Vi samlar in följande personuppgifter: namn, e-postadress, telefonnummer, hemkommun och födelsedatum när du ansöker om medlemskap. I medlemssektionen lagrar vi evenemangsanmälningar, fakturor och sessionsdata."
+        "content": "Vi samlar in följande personuppgifter: namn, e-postadress, telefonnummer, hemkommun och födelsedatum när du ansöker om medlemskap. I medlemssektionen lagrar vi evenemangsanmälningar, fakturor och sessionsdata (inklusive IP-adress och webbläsarinfo)."
       },
       "3": {
         "title": "3. Syfte och rättslig grund",
@@ -448,11 +467,11 @@
       },
       "4": {
         "title": "4. Tredjepartsleverantörer",
-        "content": "Vi använder följande tredjepartsleverantörer: Resend (e-postleverans) och Vercel (webbhotell och valfri analys). Dessa leverantörer behandlar data på vårt uppdrag och enligt våra instruktioner."
+        "content": "Vi använder följande tredjepartsleverantörer: Resend (e-postleverans), Vercel (webbhotell och valfri analys) och BotId (botdetektering på medlemsansökan). Dessa leverantörer behandlar data på vårt uppdrag och enligt våra instruktioner."
       },
       "5": {
         "title": "5. Lagring av data",
-        "content": "Medlemsdata sparas under medlemskapet plus ett år efter utträde. Fakturor sparas i 6 år enligt finsk bokföringslag. Sessionsdata upphör automatiskt efter 7 dagar."
+        "content": "Medlemsdata sparas under medlemskapet plus ett år efter utträde. Fakturor, inklusive mottagarnamn och e-post, sparas i 6 år enligt finsk bokföringslag även om kontot raderas. Sessionsdata upphör automatiskt efter 7 dagar."
       },
       "6": {
         "title": "6. Dina rättigheter",

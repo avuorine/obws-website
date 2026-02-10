@@ -1,7 +1,20 @@
 'use client'
 
+import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { municipalities } from '@/data/municipalities'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 
 type Props = {
   value: string
@@ -11,39 +24,74 @@ type Props = {
   name: string
 }
 
-export function MunicipalitySelect({ value, onChange, onBlur, error, name }: Props) {
+export function MunicipalitySelect({ value, onChange, onBlur, error }: Props) {
   const locale = useLocale()
   const t = useTranslations('membershipForm')
-  const listId = `${name}-list`
+  const [open, setOpen] = useState(false)
 
   const displayName = (m: (typeof municipalities)[number]) => {
-    const fi = m.fi
-    const sv = m.sv
+    const { fi, sv } = m
     if (locale === 'fi') return fi === sv ? fi : `${fi} (${sv})`
     if (locale === 'sv') return fi === sv ? sv : `${sv} (${fi})`
     return fi === sv ? fi : `${fi} / ${sv}`
   }
 
+  const selectedMunicipality = value
+    ? municipalities.find((m) => displayName(m) === value || m.fi === value || m.sv === value)
+    : undefined
+  const selectedLabel = selectedMunicipality ? displayName(selectedMunicipality) : value || undefined
+
   return (
-    <div>
-      <input
-        type="text"
-        name={name}
-        list={listId}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={onBlur}
-        placeholder={t('municipalityPlaceholder')}
-        autoComplete="off"
-        className={`w-full rounded-lg border px-4 py-2.5 text-whisky outline-none transition-colors placeholder:text-whisky-light/50 focus:border-amber focus:ring-1 focus:ring-amber ${
-          error ? 'border-red-400' : 'border-border'
-        }`}
-      />
-      <datalist id={listId}>
-        {municipalities.map((m) => (
-          <option key={m.code} value={displayName(m)} />
-        ))}
-      </datalist>
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            'w-full justify-between font-normal',
+            !value && 'text-muted-foreground',
+            error && 'border-destructive',
+          )}
+          onClick={() => setOpen(true)}
+          onBlur={onBlur}
+        >
+          {selectedLabel ?? t('municipalityPlaceholder')}
+          <ChevronsUpDownIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <Command>
+          <CommandInput placeholder={t('municipalityPlaceholder')} />
+          <CommandList>
+            <CommandEmpty>—</CommandEmpty>
+            <CommandGroup>
+              {municipalities.map((m) => {
+                const label = displayName(m)
+                return (
+                  <CommandItem
+                    key={m.code}
+                    value={label}
+                    onSelect={() => {
+                      onChange(label)
+                      setOpen(false)
+                    }}
+                  >
+                    <CheckIcon
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        value === label ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    {label}
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

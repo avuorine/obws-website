@@ -18,7 +18,6 @@ import {
 } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { profileUpdateSchema, type ProfileUpdateFormData } from '@/lib/validation'
-import { getLocalized } from '@/lib/localize'
 
 export async function updateProfile(
   data: ProfileUpdateFormData,
@@ -71,10 +70,30 @@ export async function exportMyData(): Promise<{ success: boolean; data?: string;
       eventDate: events.date,
       status: eventRegistrations.status,
       registeredAt: eventRegistrations.registeredAt,
+      cancelledAt: eventRegistrations.cancelledAt,
     })
     .from(eventRegistrations)
     .innerJoin(events, eq(eventRegistrations.eventId, events.id))
     .where(eq(eventRegistrations.userId, member.id))
+
+  const sessions = await db
+    .select({
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+    })
+    .from(session)
+    .where(eq(session.userId, member.id))
+
+  const passkeys = await db
+    .select({
+      name: passkey.name,
+      deviceType: passkey.deviceType,
+      createdAt: passkey.createdAt,
+    })
+    .from(passkey)
+    .where(eq(passkey.userId, member.id))
 
   const userInvoices = await db
     .select({
@@ -115,11 +134,23 @@ export async function exportMyData(): Promise<{ success: boolean; data?: string;
       marketingEmails: userData.marketingEmails,
       createdAt: userData.createdAt,
     },
+    sessions: sessions.map((s) => ({
+      ipAddress: s.ipAddress,
+      userAgent: s.userAgent,
+      createdAt: s.createdAt,
+      expiresAt: s.expiresAt,
+    })),
+    passkeys: passkeys.map((p) => ({
+      name: p.name,
+      deviceType: p.deviceType,
+      createdAt: p.createdAt,
+    })),
     eventRegistrations: registrations.map((r) => ({
-      event: getLocalized(r.eventTitle, 'sv'),
+      eventTitle: r.eventTitle,
       date: r.eventDate,
       status: r.status,
       registeredAt: r.registeredAt,
+      cancelledAt: r.cancelledAt,
     })),
     invoices: userInvoices,
     memberFees: fees,

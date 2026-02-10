@@ -50,19 +50,19 @@ export function confirmationEmailHtml(data: MembershipFormData, societyName: str
 
       <!-- Swedish -->
       <p>Hej ${data.firstName},</p>
-      <p>Vi har tagit emot din medlemsansökan till ${societyName}. Vi återkommer till dig inom kort.</p>
+      <p>Vi har tagit emot din medlemsansökan till ${societyName}. Din ansökan behandlas vid nästa styrelsemöte. Du får ett meddelande när ansökan har behandlats.</p>
 
       ${hr}
 
       <!-- Finnish -->
       <p>Hei ${data.firstName},</p>
-      <p>Olemme vastaanottaneet jäsenhakemuksesi ${societyName}:iin. Palaamme asiaan pian.</p>
+      <p>Olemme vastaanottaneet jäsenhakemuksesi ${societyName}:iin. Hakemuksesi käsitellään seuraavassa hallituksen kokouksessa. Saat ilmoituksen, kun hakemus on käsitelty.</p>
 
       ${hr}
 
       <!-- English -->
       <p>Hi ${data.firstName},</p>
-      <p>We have received your membership application for ${societyName}. We will get back to you shortly.</p>
+      <p>We have received your membership application for ${societyName}. Your application will be processed at the next board meeting. You will be notified once your application has been reviewed.</p>
 
       ${hr}
       <p style="color: #6b4423; font-size: 12px;">${societyName}</p>

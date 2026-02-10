@@ -98,6 +98,9 @@ export const eventSchema = z.object({
   lotteryDate: z.string().optional(),
   cancellationAllowed: z.string().optional(),
   cancellationDeadline: z.string().optional(),
+  guestAllowed: z.string().optional(),
+  maxGuestsPerMember: z.string().optional(),
+  guestRegistrationOpensAt: z.string().optional(),
 })
 
 export type EventFormData = z.infer<typeof eventSchema>

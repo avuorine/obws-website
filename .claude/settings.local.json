@@ -15,7 +15,21 @@
       "Bash(npx tsc:*)",
       "Bash(pnpm build:*)",
       "Bash(pnpm add:*)",
-      "WebFetch(domain:www.buildwithmatija.com)"
+      "WebFetch(domain:www.buildwithmatija.com)",
+      "Bash(ls:*)",
+      "Bash(pnpm payload migrate:*)",
+      "WebFetch(domain:www.better-auth.com)",
+      "WebFetch(domain:orm.drizzle.team)",
+      "Bash(cat:*)",
+      "Bash(xargs cat:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(npx drizzle-kit:*)",
+      "WebFetch(domain:kotiseutuliitto.fi)",
+      "Bash(node:*)",
+      "Bash(pnpm dlx shadcn@latest add command:*)",
+      "WebFetch(domain:www.finanssiala.fi)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(pnpm dlx:*)"
     ]
   }
 }
