@@ -120,7 +120,10 @@
     "guestsAfterLottery": "Guest registration opens after the lottery",
     "eventFullNoGuests": "Event is full — no guest spots available",
     "guestLimitReached": "Guest limit reached",
-    "mustRegisterFirst": "You must register first to add guests"
+    "mustRegisterFirst": "You must register first to add guests",
+    "time": "Time",
+    "registrationDeadline": "Registration deadline",
+    "cancellationDeadline": "Cancellation deadline"
   },
   "profile": {
     "title": "Profile",

@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
 import { events, eventCategories, eventRegistrations } from '@/db/schema'
-import { eq, desc, sql } from 'drizzle-orm'
+import { eq, asc, sql } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
-import { formatDate } from '@/lib/format-date'
+import { formatDateTime } from '@/lib/format-date'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -30,7 +30,7 @@ export default async function AdminEventsPage({
       registrationCount: events.registrationCount,
     })
     .from(events)
-    .orderBy(desc(events.date))
+    .orderBy(asc(events.date))
 
   const categoriesMap = new Map<string, { sv?: string; fi?: string; en?: string }>()
   const cats = await db.select().from(eventCategories)
@@ -136,11 +136,7 @@ export default async function AdminEventsPage({
                           : '—'}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(event.date, locale, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {formatDateTime(event.date, locale)}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {regCountMap.get(event.id) ?? 0}

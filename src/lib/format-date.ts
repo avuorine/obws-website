@@ -33,6 +33,42 @@ export function formatDateLong(date: Date | string | null | undefined, locale: s
   return formatDate(date, locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 }
 
+const TIME_PREFIX: Record<string, string> = {
+  sv: 'kl',
+  fi: 'klo',
+  en: 'at',
+}
+
+function toDate(date: Date | string): Date {
+  return typeof date === 'string' ? new Date(date) : date
+}
+
+/** e.g. "kl 15:00" / "klo 15:00" / "at 15:00" */
+export function formatTime(date: Date | string | null | undefined, locale: string): string {
+  if (!date) return '—'
+  const d = toDate(date)
+  if (isNaN(d.getTime())) return '—'
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  const prefix = TIME_PREFIX[locale] || 'at'
+  return `${prefix} ${hh}:${mm}`
+}
+
+/** e.g. "27.10.2026 kl 15:00 (fredag)" */
+export function formatDateTime(date: Date | string | null | undefined, locale: string): string {
+  if (!date) return '—'
+  const d = toDate(date)
+  if (isNaN(d.getTime())) return '—'
+  const dd = String(d.getDate()).padStart(2, '0')
+  const mo = String(d.getMonth() + 1).padStart(2, '0')
+  const yyyy = d.getFullYear()
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  const weekday = d.toLocaleDateString(toFullLocale(locale), { weekday: 'long' })
+  const prefix = TIME_PREFIX[locale] || 'at'
+  return `${dd}.${mo}.${yyyy} ${prefix} ${hh}:${mm} (${weekday})`
+}
+
 /** e.g. "februari 2026" */
 export function formatMonthYear(date: Date | string | null | undefined, locale: string): string {
   return formatDate(date, locale, { month: 'long', year: 'numeric' })
