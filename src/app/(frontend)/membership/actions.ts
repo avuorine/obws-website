@@ -1,6 +1,5 @@
 'use server'
 
-import { checkBotId } from 'botid/server'
 import { membershipSchema, type MembershipFormData } from '@/lib/validation'
 import { notificationEmailHtml, confirmationEmailHtml } from '@/lib/email'
 import { sendEmail } from '@/lib/email-sender'
@@ -9,11 +8,6 @@ import { getSettings } from '@/lib/settings'
 export async function submitMembership(
   data: MembershipFormData,
 ): Promise<{ success: boolean; error?: string }> {
-  const botResult = await checkBotId()
-  if (botResult.isBot) {
-    return { success: false, error: 'Submission failed' }
-  }
-
   const parsed = membershipSchema.safeParse(data)
   if (!parsed.success) {
     return { success: false, error: 'Validation failed' }

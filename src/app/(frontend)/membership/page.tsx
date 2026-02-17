@@ -1,5 +1,4 @@
 import { getTranslations } from 'next-intl/server'
-import { BotIdClient } from 'botid/client'
 
 import { MembershipForm } from '@/components/MembershipForm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,7 +23,6 @@ export default async function MembershipPage() {
         </CardContent>
       </Card>
 
-      <BotIdClient protect={[{ path: '/membership', method: 'POST' }]} />
       <MembershipForm />
     </div>
   )
