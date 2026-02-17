@@ -40,9 +40,9 @@ export const auth = betterAuth({
       sendMagicLink: async ({ email, url }) => {
         const settings = await getSettings()
         await sendEmail({
-          from: 'noreply@obws.fi',
+          from: `${settings.name} <${settings.email || 'noreply@obws.fi'}>`,
           to: email,
-          subject: 'Logga in / Sign in — OWS rf.',
+          subject: `Logga in / Kirjaudu sisään / Sign in — ${settings.name}`,
           html: magicLinkEmailHtml(url, settings.name),
         })
       },
