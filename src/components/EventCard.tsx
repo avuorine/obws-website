@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { getLocalized } from '@/lib/localize'
-import { formatDateShort } from '@/lib/format-date'
+import { formatDateTime } from '@/lib/format-date'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { LocalizedText } from '@/db/schema'
@@ -54,10 +54,10 @@ export function EventCard({
             </p>
           )}
 
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span>{formatDateShort(date, locale)}</span>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="font-medium">{formatDateTime(date, locale)}</span>
             {spotsLeft !== null && (
-              <span>
+              <span className="text-muted-foreground">
                 {spotsLeft > 0 ? t('spotsLeft', { count: spotsLeft }) : t('full')}
               </span>
             )}

@@ -4,7 +4,7 @@ import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
 import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
 import { eq, asc } from 'drizzle-orm'
-import { formatDate } from '@/lib/format-date'
+import { formatDateTime } from '@/lib/format-date'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EventForm } from '@/components/admin/EventForm'
 
@@ -157,13 +157,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                         {reg.guestCount > 0 ? reg.guestCount : '—'}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(reg.registeredAt, locale, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {formatDateTime(reg.registeredAt, locale)}
                       </td>
                     </tr>
                   ))}

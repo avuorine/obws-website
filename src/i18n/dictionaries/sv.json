@@ -120,7 +120,10 @@
     "guestsAfterLottery": "Gästanmälan öppnar efter lottningen",
     "eventFullNoGuests": "Evenemanget är fullt — inga gästplatser",
     "guestLimitReached": "Gästgränsen nådd",
-    "mustRegisterFirst": "Du måste anmäla dig först för att lägga till gäster"
+    "mustRegisterFirst": "Du måste anmäla dig först för att lägga till gäster",
+    "time": "Tid",
+    "registrationDeadline": "Sista anmälningsdag",
+    "cancellationDeadline": "Sista avbokningsdag"
   },
   "profile": {
     "title": "Profil",

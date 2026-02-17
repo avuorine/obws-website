@@ -6,7 +6,7 @@ import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
 import { eq, and, gte } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
-import { formatDateLong } from '@/lib/format-date'
+import { formatDateTime } from '@/lib/format-date'
 import { getLocale } from 'next-intl/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -56,7 +56,7 @@ export default async function MembersDashboard() {
                     <CardContent className="p-4">
                       <p className="font-medium">{getLocalized(reg.title, locale)}</p>
                       <p className="text-sm text-muted-foreground">
-                        {formatDateLong(reg.date, locale)}
+                        {formatDateTime(reg.date, locale)}
                       </p>
                     </CardContent>
                   </Card>

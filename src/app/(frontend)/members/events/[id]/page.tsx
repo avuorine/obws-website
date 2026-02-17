@@ -5,7 +5,7 @@ import { db } from '@/db'
 import { events, eventRegistrations, eventCategories } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
-import { formatDate } from '@/lib/format-date'
+import { formatDateTime, formatTime } from '@/lib/format-date'
 import { EventRsvp } from '@/components/EventRsvp'
 import { EventInvoiceButton } from '@/components/admin/EventInvoiceButton'
 import { Badge } from '@/components/ui/badge'
@@ -78,14 +78,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <div>
           <span className="font-medium">{t('date')}</span>
           <p className="text-muted-foreground">
-            {formatDate(event.date, locale, {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {formatDateTime(event.date, locale)}
+            {event.endDate && (
+              <>
+                {' — '}
+                {new Date(event.endDate).toDateString() === new Date(event.date).toDateString()
+                  ? formatTime(event.endDate, locale)
+                  : formatDateTime(event.endDate, locale)}
+              </>
+            )}
           </p>
         </div>
         {event.locationLocales && (
@@ -110,6 +111,22 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <div>
             <span className="font-medium">{t('price')}</span>
             <p className="text-muted-foreground">{event.price} EUR</p>
+          </div>
+        )}
+        {event.registrationDeadline && (
+          <div>
+            <span className="font-medium">{t('registrationDeadline')}</span>
+            <p className="text-muted-foreground">
+              {formatDateTime(event.registrationDeadline, locale)}
+            </p>
+          </div>
+        )}
+        {event.cancellationDeadline && (
+          <div>
+            <span className="font-medium">{t('cancellationDeadline')}</span>
+            <p className="text-muted-foreground">
+              {formatDateTime(event.cancellationDeadline, locale)}
+            </p>
           </div>
         )}
       </div>
