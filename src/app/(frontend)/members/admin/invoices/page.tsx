@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { InvoiceActions } from '@/components/admin/InvoiceActions'
 import { BulkSendButton } from './bulk-send-button'
+import { Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export default async function AdminInvoicesPage() {
   const t = await getTranslations('admin')
@@ -47,9 +49,17 @@ export default async function AdminInvoicesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold">{t('invoices')}</h1>
-        {draftInvoiceIds.length > 0 && (
-          <BulkSendButton invoiceIds={draftInvoiceIds} />
-        )}
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/export/invoices">
+              <Download className="mr-1 h-4 w-4" />
+              {t('export')}
+            </a>
+          </Button>
+          {draftInvoiceIds.length > 0 && (
+            <BulkSendButton invoiceIds={draftInvoiceIds} />
+          )}
+        </div>
       </div>
 
       {allInvoices.length === 0 ? (
