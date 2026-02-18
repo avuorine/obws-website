@@ -8,6 +8,7 @@ import { formatDateTime } from '@/lib/format-date'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/admin/StatusBadge'
+import { Download } from 'lucide-react'
 
 const STATUSES = ['all', 'draft', 'published', 'completed', 'cancelled'] as const
 
@@ -72,9 +73,17 @@ export default async function AdminEventsPage({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold">{t('allEvents')}</h1>
-        <Button asChild>
-          <Link href="/members/admin/events/new">{t('addEvent')}</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/export/events">
+              <Download className="mr-1 h-4 w-4" />
+              {t('export')}
+            </a>
+          </Button>
+          <Button asChild>
+            <Link href="/members/admin/events/new">{t('addEvent')}</Link>
+          </Button>
+        </div>
       </div>
 
       {/* Status filter tabs */}

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/format-date'
 import { Card, CardContent } from '@/components/ui/card'
+import { Download } from 'lucide-react'
 
 const PAGE_SIZE = 50
 
@@ -47,9 +48,17 @@ export default async function AdminMembersPage({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold">{t('allMembers')}</h1>
-        <Button asChild>
-          <Link href="/members/admin/members/new">{t('addMember')}</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/export/members">
+              <Download className="mr-1 h-4 w-4" />
+              {t('export')}
+            </a>
+          </Button>
+          <Button asChild>
+            <Link href="/members/admin/members/new">{t('addMember')}</Link>
+          </Button>
+        </div>
       </div>
 
       {members.length === 0 ? (

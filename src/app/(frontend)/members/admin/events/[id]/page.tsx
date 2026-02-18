@@ -11,7 +11,8 @@ import { EventForm } from '@/components/admin/EventForm'
 
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EventStatusActions } from './status-actions'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -122,7 +123,17 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       {/* Registrations Card */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('registrations')}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>{t('registrations')}</CardTitle>
+            {registrations.length > 0 && (
+              <Button variant="outline" size="sm" asChild>
+                <a href={`/api/export/events/${id}/registrations`}>
+                  <Download className="mr-1 h-4 w-4" />
+                  {t('export')}
+                </a>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {registrations.length === 0 ? (

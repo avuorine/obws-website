@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings } from 'lucide-react'
+import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 interface MembersNavProps {
@@ -22,17 +22,21 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
   ]
 
   const adminLinks = [
+    { href: '/members/admin', label: t('admin.dashboard'), icon: LayoutDashboard },
     { href: '/members/admin/members', label: t('admin.members'), icon: UserPlus },
     { href: '/members/admin/events', label: t('admin.allEvents'), icon: Calendar },
     { href: '/members/admin/categories', label: t('admin.categories'), icon: Tags },
     { href: '/members/admin/fees', label: t('admin.fees'), icon: Receipt },
     { href: '/members/admin/invoices', label: t('admin.invoices'), icon: FileText },
+    { href: '/members/admin/bank-import', label: t('admin.bankImport'), icon: Landmark },
     { href: '/members/admin/mass-email', label: t('admin.massEmail'), icon: Mail },
     { href: '/members/admin/settings', label: t('admin.settings'), icon: Settings },
   ]
 
   const isActive = (href: string) =>
-    href === '/members' ? pathname === href : pathname.startsWith(href)
+    href === '/members' || href === '/members/admin'
+      ? pathname === href
+      : pathname.startsWith(href)
 
   return (
     <nav className="flex gap-1 overflow-x-auto border-b border-input pb-3 md:flex-col md:gap-0 md:border-b-0 md:border-r md:pb-0 md:pr-6">
