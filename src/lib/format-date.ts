@@ -1,3 +1,5 @@
+import { ASSOCIATION_TIMEZONE } from './timezone'
+
 const LOCALE_MAP: Record<string, string> = {
   sv: 'sv-SE',
   fi: 'fi-FI',
@@ -20,7 +22,7 @@ export function formatDate(
   if (!date) return '—'
   const d = typeof date === 'string' ? new Date(date) : date
   if (isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString(toFullLocale(locale), options)
+  return d.toLocaleDateString(toFullLocale(locale), { timeZone: ASSOCIATION_TIMEZONE, ...options })
 }
 
 /** e.g. "lö 8 feb" / "la 8. helmik." / "Sat 8 Feb" */
@@ -48,8 +50,14 @@ export function formatTime(date: Date | string | null | undefined, locale: strin
   if (!date) return '—'
   const d = toDate(date)
   if (isNaN(d.getTime())) return '—'
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: ASSOCIATION_TIMEZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d)
+  const hh = parts.find((p) => p.type === 'hour')!.value.replace('24', '00')
+  const mm = parts.find((p) => p.type === 'minute')!.value
   const prefix = TIME_PREFIX[locale] || 'at'
   return `${prefix} ${hh}:${mm}`
 }
@@ -59,12 +67,22 @@ export function formatDateTime(date: Date | string | null | undefined, locale: s
   if (!date) return '—'
   const d = toDate(date)
   if (isNaN(d.getTime())) return '—'
-  const dd = String(d.getDate()).padStart(2, '0')
-  const mo = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = d.getFullYear()
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  const weekday = d.toLocaleDateString(toFullLocale(locale), { weekday: 'long' })
+  const dateParts = new Intl.DateTimeFormat('en-US', {
+    timeZone: ASSOCIATION_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d)
+  const get = (type: Intl.DateTimeFormatPartTypes) => dateParts.find((p) => p.type === type)!.value
+  const dd = get('day')
+  const mo = get('month')
+  const yyyy = get('year')
+  const hh = get('hour').replace('24', '00')
+  const mm = get('minute')
+  const weekday = d.toLocaleDateString(toFullLocale(locale), { weekday: 'long', timeZone: ASSOCIATION_TIMEZONE })
   const prefix = TIME_PREFIX[locale] || 'at'
   return `${dd}.${mo}.${yyyy} ${prefix} ${hh}:${mm} (${weekday})`
 }

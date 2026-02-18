@@ -6,6 +6,7 @@ import { events, eventRegistrations, eventCategories } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
 import { formatDateTime, formatTime } from '@/lib/format-date'
+import { getDatePartsInTz } from '@/lib/timezone'
 import { EventRsvp } from '@/components/EventRsvp'
 import { EventInvoiceButton } from '@/components/admin/EventInvoiceButton'
 import { Badge } from '@/components/ui/badge'
@@ -82,7 +83,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             {event.endDate && (
               <>
                 {' — '}
-                {new Date(event.endDate).toDateString() === new Date(event.date).toDateString()
+                {(() => {
+                  const startParts = getDatePartsInTz(event.date)
+                  const endParts = getDatePartsInTz(event.endDate!)
+                  return startParts.year === endParts.year && startParts.month === endParts.month && startParts.day === endParts.day
+                })()
                   ? formatTime(event.endDate, locale)
                   : formatDateTime(event.endDate, locale)}
               </>

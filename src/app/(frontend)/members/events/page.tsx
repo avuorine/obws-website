@@ -5,6 +5,7 @@ import { events, eventRegistrations, eventCategories } from '@/db/schema'
 import { eq, gte, and } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
 import { formatMonthYear } from '@/lib/format-date'
+import { getDatePartsInTz } from '@/lib/timezone'
 import { EventCard } from '@/components/EventCard'
 
 export default async function EventsPage() {
@@ -50,9 +51,10 @@ export default async function EventsPage() {
       ) : (
         <div className="space-y-4">
           {allEvents.map((event, i) => {
-            const monthKey = `${event.date.getFullYear()}-${event.date.getMonth()}`
+            const ep = getDatePartsInTz(event.date)
+            const monthKey = `${ep.year}-${ep.month}`
             const prevMonthKey = i > 0
-              ? `${allEvents[i - 1].date.getFullYear()}-${allEvents[i - 1].date.getMonth()}`
+              ? (() => { const pp = getDatePartsInTz(allEvents[i - 1].date); return `${pp.year}-${pp.month}` })()
               : null
             const showHeader = monthKey !== prevMonthKey
 

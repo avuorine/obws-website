@@ -2,6 +2,7 @@ import React from 'react'
 import path from 'path'
 import { Document, Page, Text, View, Image, Svg, Rect, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
 import { formatReferenceNumber } from './reference-number'
+import { ASSOCIATION_TIMEZONE, formatBarcodeDateInTz } from './timezone'
 
 const styles = StyleSheet.create({
   page: {
@@ -144,10 +145,8 @@ function generateVirtualBarcode(
   const cleanRef = referenceNumber.replace(/\s/g, '')
   const paddedRef = cleanRef.padStart(20, '0')
 
-  // Due date as YYMMDD
-  const yy = String(dueDate.getFullYear()).slice(2)
-  const mm = String(dueDate.getMonth() + 1).padStart(2, '0')
-  const dd = String(dueDate.getDate()).padStart(2, '0')
+  // Due date as YYMMDD in association timezone
+  const { yy, mm, dd } = formatBarcodeDateInTz(dueDate)
   const dueDateStr = yy + mm + dd
 
   return '4' + paddedAccount + paddedAmount + '000' + paddedRef + dueDateStr
@@ -295,11 +294,11 @@ function InvoiceDocument({ invoice, settings }: { invoice: InvoiceData; settings
 
         <View style={styles.row}>
           <Text style={styles.label}>Datum / Päivämäärä / Date:</Text>
-          <Text style={styles.value}>{invoice.createdAt.toLocaleDateString('fi-FI')}</Text>
+          <Text style={styles.value}>{invoice.createdAt.toLocaleDateString('fi-FI', { timeZone: ASSOCIATION_TIMEZONE })}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Förfallodag / Eräpäivä / Due date:</Text>
-          <Text style={styles.value}>{invoice.dueDate.toLocaleDateString('fi-FI')}</Text>
+          <Text style={styles.value}>{invoice.dueDate.toLocaleDateString('fi-FI', { timeZone: ASSOCIATION_TIMEZONE })}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Referens / Viitenumero / Ref:</Text>
@@ -354,7 +353,7 @@ function InvoiceDocument({ invoice, settings }: { invoice: InvoiceData; settings
           </View>
           <View style={styles.paymentRow}>
             <Text style={styles.paymentLabel}>Förfallodag / Eräpäivä / Due:</Text>
-            <Text style={styles.paymentValue}>{invoice.dueDate.toLocaleDateString('fi-FI')}</Text>
+            <Text style={styles.paymentValue}>{invoice.dueDate.toLocaleDateString('fi-FI', { timeZone: ASSOCIATION_TIMEZONE })}</Text>
           </View>
 
           {settings.iban && (

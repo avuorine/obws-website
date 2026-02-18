@@ -6,6 +6,7 @@ import { db } from '@/db'
 import { feePeriods, memberFees, user, invoices } from '@/db/schema'
 import { eq, and, inArray } from 'drizzle-orm'
 import { feePeriodSchema, type FeePeriodFormData } from '@/lib/validation'
+import { parseDatetimeLocal } from '@/lib/timezone'
 
 export async function createFeePeriod(
   data: FeePeriodFormData,
@@ -18,9 +19,9 @@ export async function createFeePeriod(
   await db.insert(feePeriods).values({
     name: parsed.data.name,
     amount: parsed.data.amount,
-    startDate: new Date(parsed.data.startDate),
-    endDate: new Date(parsed.data.endDate),
-    dueDate: new Date(parsed.data.dueDate),
+    startDate: parseDatetimeLocal(parsed.data.startDate + 'T00:00'),
+    endDate: parseDatetimeLocal(parsed.data.endDate + 'T00:00'),
+    dueDate: parseDatetimeLocal(parsed.data.dueDate + 'T00:00'),
   })
 
   revalidatePath('/members/admin/fees')
