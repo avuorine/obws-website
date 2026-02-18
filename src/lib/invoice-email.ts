@@ -1,3 +1,5 @@
+import { ASSOCIATION_TIMEZONE, formatBarcodeDateInTz } from './timezone'
+
 /**
  * Finnish virtual barcode (virtuaaliviivakoodi) version 4.
  * 54-digit numeric string: version(1) + IBAN(16) + euros(6) + cents(2) + reserved(3) + reference(20) + dueDate(6)
@@ -13,10 +15,8 @@ function generateVirtualBarcode(iban: string, amount: string, referenceNumber: s
   const reserved = '000'
   // Reference number: strip spaces, zero-pad to 20 digits
   const ref = referenceNumber.replace(/\s/g, '').padStart(20, '0')
-  // Due date: YYMMDD
-  const yy = String(dueDate.getFullYear()).slice(-2)
-  const mm = String(dueDate.getMonth() + 1).padStart(2, '0')
-  const dd = String(dueDate.getDate()).padStart(2, '0')
+  // Due date: YYMMDD in association timezone
+  const { yy, mm, dd } = formatBarcodeDateInTz(dueDate)
 
   return `${version}${ibanDigits}${euros}${cents}${reserved}${ref}${yy}${mm}${dd}`
 }
@@ -37,7 +37,7 @@ export function invoiceEmailHtml(invoice: {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
   const societyName = settings.name
   const societyIban = settings.iban || ''
-  const dueDateStr = invoice.dueDate.toLocaleDateString('fi-FI')
+  const dueDateStr = invoice.dueDate.toLocaleDateString('fi-FI', { timeZone: ASSOCIATION_TIMEZONE })
   const hr = '<hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />'
   const barcode = societyIban
     ? generateVirtualBarcode(societyIban, invoice.amount, invoice.referenceNumber, invoice.dueDate)

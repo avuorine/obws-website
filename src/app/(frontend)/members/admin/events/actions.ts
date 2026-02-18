@@ -6,6 +6,7 @@ import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { eventSchema, type EventFormData } from '@/lib/validation'
+import { parseDatetimeLocal } from '@/lib/timezone'
 
 export async function createEvent(
   data: EventFormData,
@@ -23,20 +24,20 @@ export async function createEvent(
       summaryLocales: { sv: d.summarySv || undefined, fi: d.summaryFi || undefined, en: d.summaryEn || undefined },
       descriptionLocales: { sv: d.descriptionSv || undefined, fi: d.descriptionFi || undefined, en: d.descriptionEn || undefined },
       locationLocales: { sv: d.locationSv || undefined, fi: d.locationFi || undefined, en: d.locationEn || undefined },
-      date: new Date(d.date),
-      endDate: d.endDate ? new Date(d.endDate) : null,
+      date: parseDatetimeLocal(d.date),
+      endDate: d.endDate ? parseDatetimeLocal(d.endDate) : null,
       categoryId: d.categoryId || null,
       capacity: d.capacity ? Number(d.capacity) : null,
       price: d.price || null,
       allocationMethod: d.allocationMethod,
-      registrationOpensAt: d.registrationOpensAt ? new Date(d.registrationOpensAt) : null,
-      registrationDeadline: d.registrationDeadline ? new Date(d.registrationDeadline) : null,
-      lotteryDate: d.lotteryDate ? new Date(d.lotteryDate) : null,
+      registrationOpensAt: d.registrationOpensAt ? parseDatetimeLocal(d.registrationOpensAt) : null,
+      registrationDeadline: d.registrationDeadline ? parseDatetimeLocal(d.registrationDeadline) : null,
+      lotteryDate: d.lotteryDate ? parseDatetimeLocal(d.lotteryDate) : null,
       cancellationAllowed: d.cancellationAllowed === 'on',
-      cancellationDeadline: d.cancellationDeadline ? new Date(d.cancellationDeadline) : null,
+      cancellationDeadline: d.cancellationDeadline ? parseDatetimeLocal(d.cancellationDeadline) : null,
       guestAllowed: d.guestAllowed === 'on',
       maxGuestsPerMember: d.maxGuestsPerMember ? Number(d.maxGuestsPerMember) : 1,
-      guestRegistrationOpensAt: d.guestRegistrationOpensAt ? new Date(d.guestRegistrationOpensAt) : null,
+      guestRegistrationOpensAt: d.guestRegistrationOpensAt ? parseDatetimeLocal(d.guestRegistrationOpensAt) : null,
     })
     .returning({ id: events.id })
 
@@ -61,20 +62,20 @@ export async function updateEvent(
       summaryLocales: { sv: d.summarySv || undefined, fi: d.summaryFi || undefined, en: d.summaryEn || undefined },
       descriptionLocales: { sv: d.descriptionSv || undefined, fi: d.descriptionFi || undefined, en: d.descriptionEn || undefined },
       locationLocales: { sv: d.locationSv || undefined, fi: d.locationFi || undefined, en: d.locationEn || undefined },
-      date: new Date(d.date),
-      endDate: d.endDate ? new Date(d.endDate) : null,
+      date: parseDatetimeLocal(d.date),
+      endDate: d.endDate ? parseDatetimeLocal(d.endDate) : null,
       categoryId: d.categoryId || null,
       capacity: d.capacity ? Number(d.capacity) : null,
       price: d.price || null,
       allocationMethod: d.allocationMethod,
-      registrationOpensAt: d.registrationOpensAt ? new Date(d.registrationOpensAt) : null,
-      registrationDeadline: d.registrationDeadline ? new Date(d.registrationDeadline) : null,
-      lotteryDate: d.lotteryDate ? new Date(d.lotteryDate) : null,
+      registrationOpensAt: d.registrationOpensAt ? parseDatetimeLocal(d.registrationOpensAt) : null,
+      registrationDeadline: d.registrationDeadline ? parseDatetimeLocal(d.registrationDeadline) : null,
+      lotteryDate: d.lotteryDate ? parseDatetimeLocal(d.lotteryDate) : null,
       cancellationAllowed: d.cancellationAllowed === 'on',
-      cancellationDeadline: d.cancellationDeadline ? new Date(d.cancellationDeadline) : null,
+      cancellationDeadline: d.cancellationDeadline ? parseDatetimeLocal(d.cancellationDeadline) : null,
       guestAllowed: d.guestAllowed === 'on',
       maxGuestsPerMember: d.maxGuestsPerMember ? Number(d.maxGuestsPerMember) : 1,
-      guestRegistrationOpensAt: d.guestRegistrationOpensAt ? new Date(d.guestRegistrationOpensAt) : null,
+      guestRegistrationOpensAt: d.guestRegistrationOpensAt ? parseDatetimeLocal(d.guestRegistrationOpensAt) : null,
       updatedAt: new Date(),
     })
     .where(eq(events.id, id))

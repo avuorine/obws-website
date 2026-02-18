@@ -5,19 +5,13 @@ import { db } from '@/db'
 import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { formatDateTime } from '@/lib/format-date'
+import { toDatetimeLocalString } from '@/lib/timezone'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EventForm } from '@/components/admin/EventForm'
 
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EventStatusActions } from './status-actions'
 import { ArrowLeft } from 'lucide-react'
-
-function toLocalDatetimeValue(d: Date | null | undefined): string {
-  if (!d) return ''
-  const offset = d.getTimezoneOffset()
-  const local = new Date(d.getTime() - offset * 60000)
-  return local.toISOString().slice(0, 16)
-}
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -99,20 +93,20 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
               locationSv: event.locationLocales?.sv ?? '',
               locationFi: event.locationLocales?.fi ?? '',
               locationEn: event.locationLocales?.en ?? '',
-              date: toLocalDatetimeValue(event.date),
-              endDate: toLocalDatetimeValue(event.endDate),
+              date: toDatetimeLocalString(event.date),
+              endDate: toDatetimeLocalString(event.endDate),
               categoryId: event.categoryId ?? '',
               capacity: event.capacity != null ? String(event.capacity) : '',
               price: event.price ?? '',
               allocationMethod: event.allocationMethod ?? 'first_come',
-              registrationOpensAt: toLocalDatetimeValue(event.registrationOpensAt),
-              registrationDeadline: toLocalDatetimeValue(event.registrationDeadline),
-              lotteryDate: toLocalDatetimeValue(event.lotteryDate),
+              registrationOpensAt: toDatetimeLocalString(event.registrationOpensAt),
+              registrationDeadline: toDatetimeLocalString(event.registrationDeadline),
+              lotteryDate: toDatetimeLocalString(event.lotteryDate),
               cancellationAllowed: event.cancellationAllowed !== false ? 'on' : '',
-              cancellationDeadline: toLocalDatetimeValue(event.cancellationDeadline),
+              cancellationDeadline: toDatetimeLocalString(event.cancellationDeadline),
               guestAllowed: event.guestAllowed ? 'on' : '',
               maxGuestsPerMember: event.maxGuestsPerMember != null ? String(event.maxGuestsPerMember) : '1',
-              guestRegistrationOpensAt: toLocalDatetimeValue(event.guestRegistrationOpensAt),
+              guestRegistrationOpensAt: toDatetimeLocalString(event.guestRegistrationOpensAt),
             }}
           />
         </CardContent>
