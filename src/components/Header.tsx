@@ -82,7 +82,7 @@ export function Header() {
               <SheetHeader>
                 <SheetTitle className="text-left">{t('menu')}</SheetTitle>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-1">
+              <nav className="mt-6 flex flex-col gap-1 px-4">
                 {navLinks.map((link) => (
                   <Button
                     key={link.href}

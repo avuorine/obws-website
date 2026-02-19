@@ -39,7 +39,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
       : pathname.startsWith(href)
 
   return (
-    <nav className="flex gap-1 overflow-x-auto border-b border-input pb-3 md:flex-col md:gap-0 md:border-b-0 md:border-r md:pb-0 md:pr-6">
+    <nav className="flex gap-1 overflow-x-auto border-b border-input pb-3 md:w-48 md:shrink-0 md:flex-col md:gap-0 md:border-b-0 md:border-r md:pb-0 md:pr-6">
       {links.map((link) => {
         const Icon = link.icon
         return (
