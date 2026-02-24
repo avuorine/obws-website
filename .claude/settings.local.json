@@ -29,7 +29,17 @@
       "Bash(pnpm dlx shadcn@latest add command:*)",
       "WebFetch(domain:www.finanssiala.fi)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(pnpm dlx:*)"
+      "Bash(pnpm dlx:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create --title \"Improve DatePicker, add passkey management, fix magic link email\" --body \"$\\(cat <<''EOF''\n## Summary\n- **DatePicker**: Replace button trigger with typeable text input + calendar icon. Add month/year dropdown navigation for quick year selection \\(essential for date-of-birth fields\\). Locale-aware format/parse for sv \\(`YYYY-MM-DD`\\), fi \\(`DD.MM.YYYY`\\), en \\(`DD/MM/YYYY`\\). New optional `minDate`, `startYear`, `endYear` props.\n- **Passkey management**: Profile page now lists registered passkeys with device type, creation date, inline rename, and delete. Prompts for a name when adding a new passkey.\n- **Magic link email**: Subject now trilingual \\(`Logga in / Kirjaudu sisään / Sign in`\\) and uses association name from settings instead of hardcoded \"OWS rf.\". From address also uses association settings.\n\n## Test plan\n- [ ] Open `/membership` form — verify calendar has month/year dropdowns and year range is capped by maxDate\n- [ ] Type a date manually in the input field, verify it parses correctly on blur and reverts on invalid input\n- [ ] Open `/members/profile` — verify passkey list loads, add/rename/delete work\n- [ ] Trigger a magic link login — verify email subject shows full association name in 3 languages\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\nEOF\n\\)\")",
+      "WebFetch(domain:www.yhdistysavain.fi)",
+      "WebFetch(domain:flomembers.fi)",
+      "WebFetch(domain:www.nettitiimi.fi)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:www.sepaforcorporates.com)",
+      "WebFetch(domain:www.hettwer-beratung.de)"
     ]
   }
 }

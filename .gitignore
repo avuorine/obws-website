@@ -40,6 +40,9 @@ next-env.d.ts
 
 .env
 
+# Claude Code
+.claude/settings.local.json
+
 /media
 
 # Playwright
