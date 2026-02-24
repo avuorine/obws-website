@@ -1,8 +1,10 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { admin, magicLink } from 'better-auth/plugins'
 import { passkey } from '@better-auth/passkey'
 import { nextCookies } from 'better-auth/next-js'
+import { sql } from 'drizzle-orm'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
 import { sendEmail } from './email-sender'
@@ -32,6 +34,24 @@ export const auth = betterAuth({
       memberSince: { type: 'date', required: false },
       resignedAt: { type: 'date', required: false },
     },
+  },
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== '/sign-in/magic-link') return
+
+      const email = ctx.body?.email as string | undefined
+      if (!email) return
+
+      const [member] = await db
+        .select({ status: schema.user.status })
+        .from(schema.user)
+        .where(sql`LOWER(${schema.user.email}) = LOWER(${email})`)
+        .limit(1)
+
+      if (!member || (member.status !== 'active' && member.status !== 'honorary')) {
+        throw new APIError('FORBIDDEN', { message: 'MEMBER_NOT_FOUND' })
+      }
+    }),
   },
   plugins: [
     admin(),

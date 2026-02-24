@@ -63,6 +63,7 @@
     "sending": "Skickar...",
     "magicLinkSent": "En inloggningslänk har skickats till din e-post. Kontrollera din inkorg.",
     "magicLinkFailed": "Kunde inte skicka inloggningslänk. Försök igen.",
+    "memberNotFound": "Ingen medlem hittades med denna e-postadress. Fyll i en medlemsansökan om du vill bli medlem.",
     "passkeyFailed": "Passkey-inloggning misslyckades. Prova en inloggningslänk istället.",
     "tryAgain": "Försök igen"
   },
