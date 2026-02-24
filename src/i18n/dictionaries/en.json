@@ -63,6 +63,7 @@
     "sending": "Sending...",
     "magicLinkSent": "A login link has been sent to your email. Check your inbox.",
     "magicLinkFailed": "Failed to send login link. Please try again.",
+    "memberNotFound": "No member found with this email address. Fill in a membership application if you wish to become a member.",
     "passkeyFailed": "Passkey sign-in failed. Try using a magic link instead.",
     "tryAgain": "Try again"
   },

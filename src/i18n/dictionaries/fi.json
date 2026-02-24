@@ -63,6 +63,7 @@
     "sending": "Lähetetään...",
     "magicLinkSent": "Kirjautumislinkki on lähetetty sähköpostiisi. Tarkista postilaatikkosi.",
     "magicLinkFailed": "Kirjautumislinkin lähetys epäonnistui. Yritä uudelleen.",
+    "memberNotFound": "Jäsentä ei löytynyt tällä sähköpostiosoitteella. Täytä jäsenhakemus, jos haluat liittyä jäseneksi.",
     "passkeyFailed": "Passkey-kirjautuminen epäonnistui. Kokeile kirjautumislinkkiä.",
     "tryAgain": "Yritä uudelleen"
   },

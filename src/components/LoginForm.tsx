@@ -43,11 +43,19 @@ export function LoginForm() {
     setError('')
     setMagicLinkLoading(true)
     try {
-      await authClient.signIn.magicLink({
+      const result = await authClient.signIn.magicLink({
         email,
         callbackURL: '/members',
       })
-      setMagicLinkSent(true)
+      if (result?.error) {
+        if (result.error.message?.includes('MEMBER_NOT_FOUND')) {
+          setError(t('memberNotFound'))
+        } else {
+          setError(t('magicLinkFailed'))
+        }
+      } else {
+        setMagicLinkSent(true)
+      }
     } catch {
       setError(t('magicLinkFailed'))
     } finally {
