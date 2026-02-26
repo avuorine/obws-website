@@ -24,6 +24,8 @@ if (!ADMIN_EMAIL) {
   process.exit(1)
 }
 
+const normalizedEmail = ADMIN_EMAIL.toLowerCase()
+
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL env var is required')
   process.exit(1)
@@ -35,7 +37,7 @@ async function main() {
   const existing = await db
     .select({ id: user.id, role: user.role })
     .from(user)
-    .where(eq(user.email, ADMIN_EMAIL!))
+    .where(eq(user.email, normalizedEmail))
     .limit(1)
 
   if (existing.length > 0) {
@@ -47,7 +49,7 @@ async function main() {
     await db
       .update(user)
       .set({ role: 'admin' })
-      .where(eq(user.email, ADMIN_EMAIL!))
+      .where(eq(user.email, normalizedEmail))
 
     console.log(`Updated ${ADMIN_EMAIL} to admin role.`)
     return
@@ -57,7 +59,7 @@ async function main() {
   await db.insert(user).values({
     id,
     name: ADMIN_NAME,
-    email: ADMIN_EMAIL!,
+    email: normalizedEmail,
     emailVerified: true,
     role: 'admin',
     status: 'active',

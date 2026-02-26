@@ -18,11 +18,13 @@ export async function createMember(
   const parsed = createMemberSchema.safeParse(data)
   if (!parsed.success) return { success: false, error: 'Validation failed' }
 
+  const normalizedEmail = parsed.data.email.toLowerCase()
+
   // Check email uniqueness
   const existingEmail = await db
     .select({ id: user.id })
     .from(user)
-    .where(eq(user.email, parsed.data.email))
+    .where(eq(user.email, normalizedEmail))
     .then((r) => r[0])
 
   if (existingEmail) return { success: false, error: 'emailInUse' }
@@ -54,7 +56,7 @@ export async function createMember(
   await db.insert(user).values({
     id,
     name,
-    email: parsed.data.email,
+    email: normalizedEmail,
     emailVerified: false,
     role: 'user',
     status: 'active',
@@ -97,11 +99,13 @@ export async function updateMember(
   const parsed = createMemberSchema.safeParse(data)
   if (!parsed.success) return { success: false, error: 'Validation failed' }
 
+  const normalizedEmail = parsed.data.email.toLowerCase()
+
   // Check email uniqueness (excluding current user)
   const existingEmail = await db
     .select({ id: user.id })
     .from(user)
-    .where(and(eq(user.email, parsed.data.email), ne(user.id, userId)))
+    .where(and(eq(user.email, normalizedEmail), ne(user.id, userId)))
     .then((r) => r[0])
   if (existingEmail) return { success: false, error: 'emailInUse' }
 
@@ -127,7 +131,7 @@ export async function updateMember(
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
       name: `${parsed.data.firstName} ${parsed.data.lastName}`,
-      email: parsed.data.email,
+      email: normalizedEmail,
       ...(memberNumber !== undefined && { memberNumber }),
       phone: parsed.data.phone || null,
       municipality: parsed.data.municipality || null,
