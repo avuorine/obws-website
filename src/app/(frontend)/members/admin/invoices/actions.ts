@@ -13,6 +13,12 @@ import { sendEmail } from '@/lib/email-sender'
 import { getLocalized } from '@/lib/localize'
 import { getSettings } from '@/lib/settings'
 
+const DUE_DATE_DAYS = 14
+
+function computeDueDate(): Date {
+  return new Date(Date.now() + DUE_DATE_DAYS * 24 * 60 * 60 * 1000)
+}
+
 export async function createMembershipInvoice(
   feePeriodId: string,
   userId: string,
@@ -38,7 +44,7 @@ export async function createMembershipInvoice(
       recipientEmail: member.email,
       description: `Membership fee / Medlemsavgift / Jäsenmaksu — ${period.name}`,
       amount: period.amount,
-      dueDate: period.dueDate,
+      dueDate: computeDueDate(),
       referenceNumber,
     })
   } catch (error) {
@@ -92,6 +98,7 @@ export async function bulkCreateMembershipInvoices(
   const existingUserIds = new Set(existingInvoices.map((i) => i.userId))
   const feesToInvoice = unpaidFees.filter((f) => !existingUserIds.has(f.userId))
 
+  const dueDate = computeDueDate()
   let count = 0
   for (const fee of feesToInvoice) {
     const invoiceNumber = await getNextInvoiceNumber()
@@ -107,7 +114,7 @@ export async function bulkCreateMembershipInvoices(
         recipientEmail: fee.userEmail,
         description: `Membership fee / Medlemsavgift / Jäsenmaksu — ${period.name}`,
         amount: period.amount,
-        dueDate: period.dueDate,
+        dueDate,
         referenceNumber,
       })
       count++
@@ -164,6 +171,7 @@ export async function createEventInvoices(
   const regsToInvoice = registrations.filter((r) => !existingRegIds.has(r.regId))
 
   const eventTitle = getLocalized(event.titleLocales, 'en') || 'Event'
+  const dueDate = computeDueDate()
   let count = 0
 
   for (const reg of regsToInvoice) {
@@ -185,7 +193,7 @@ export async function createEventInvoices(
         recipientEmail: reg.userEmail,
         description,
         amount,
-        dueDate: event.date,
+        dueDate,
         referenceNumber,
       })
       count++
