@@ -138,7 +138,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
       {event.descriptionLocales && (
         <div className="mb-6 text-muted-foreground">
-          <p>{getLocalized(event.descriptionLocales, locale)}</p>
+          <p className="whitespace-pre-wrap">{getLocalized(event.descriptionLocales, locale)}</p>
         </div>
       )}
 
