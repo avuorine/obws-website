@@ -59,9 +59,9 @@ export async function buildApplePass(
     organizationName: labels.organizationName,
     description: labels.description,
     logoText: labels.organizationName,
-    foregroundColor: 'rgb(244, 230, 206)',
-    backgroundColor: 'rgb(73, 42, 13)',
-    labelColor: 'rgb(196, 135, 59)',
+    foregroundColor: 'rgb(73, 42, 13)',
+    backgroundColor: 'rgb(244, 230, 206)',
+    labelColor: 'rgb(107, 68, 35)',
     // Enables live updates via the PassKit web service (see api/wallet/apple/v1).
     webServiceURL: `${requireEnv('NEXT_PUBLIC_SITE_URL')}/api/wallet/apple`,
     authenticationToken: signApplePassToken(card.memberId),
