@@ -58,7 +58,7 @@ export async function buildApplePass(
     serialNumber: card.memberId,
     organizationName: labels.organizationName,
     description: labels.description,
-    logoText: labels.organizationName,
+    logoText: 'ÖSTERBOTTENS WHISKYSÄLLSKAP',
     foregroundColor: 'rgb(73, 42, 13)',
     backgroundColor: 'rgb(244, 230, 206)',
     labelColor: 'rgb(107, 68, 35)',
@@ -84,7 +84,7 @@ export async function buildApplePass(
     },
   )
 
-  pass.type = 'storeCard'
+  pass.type = 'generic'
   pass.primaryFields.push(field('name', labels.member, card.fullName))
   if (card.memberNumber != null) {
     pass.secondaryFields.push(field('memberNumber', labels.memberNumber, `#${card.memberNumber}`))
