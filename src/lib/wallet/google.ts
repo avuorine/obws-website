@@ -91,7 +91,7 @@ function buildGenericObject(
     id: objectId(card.memberId),
     classId: classId(),
     state: card.isValid ? 'ACTIVE' : 'INACTIVE',
-    hexBackgroundColor: '#492a0d',
+    hexBackgroundColor: '#f4e6ce',
     logo: {
       sourceUri: { uri: `${siteUrl}/ows_logo_small.png` },
       contentDescription: { defaultValue: { language: 'en', value: labels.organizationName } },
