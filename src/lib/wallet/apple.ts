@@ -58,7 +58,7 @@ export async function buildApplePass(
     serialNumber: card.memberId,
     organizationName: labels.organizationName,
     description: labels.description,
-    logoText: 'ÖSTERBOTTENS WHISKYSÄLLSKAP',
+    logoText: 'ÖBWS',
     foregroundColor: 'rgb(73, 42, 13)',
     backgroundColor: 'rgb(244, 230, 206)',
     labelColor: 'rgb(107, 68, 35)',
@@ -75,6 +75,8 @@ export async function buildApplePass(
       'icon@2x.png': logo,
       'logo.png': logo,
       'logo@2x.png': logo,
+      'thumbnail.png': logo,
+      'thumbnail@2x.png': logo,
     },
     {
       wwdr: decodeB64('APPLE_WWDR_CERT'),
