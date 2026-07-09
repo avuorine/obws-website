@@ -164,6 +164,20 @@
     "marketingEmails": "Markkinointiviestit",
     "marketingEmailsDescription": "Vastaanota sähköpostia tapahtumista ja uutisista."
   },
+  "membershipCard": {
+    "title": "Jäsenkortti",
+    "member": "Jäsen",
+    "memberNumber": "Jäsennumero",
+    "status": "Tila",
+    "statusActive": "Aktiivinen",
+    "statusHonorary": "Kunniajäsen",
+    "statusInactive": "Ei-aktiivinen",
+    "memberSince": "Jäsen alkaen",
+    "inactiveNotice": "Jäsenyytesi ei ole aktiivinen. Ota yhteyttä hallitukseen, jos tämä on virhe.",
+    "addToApple": "Lisää Apple Walletiin",
+    "addToGoogle": "Lisää Google Walletiin",
+    "qrHelp": "QR-koodi tunnistaa sinut tapahtumien sisäänkirjautumisessa."
+  },
   "board": {
     "title": "Hallitus",
     "members": "Hallituksen jäsenet",

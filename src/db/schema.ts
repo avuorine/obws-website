@@ -8,6 +8,7 @@ import {
   numeric,
   pgEnum,
   serial,
+  unique,
 } from 'drizzle-orm/pg-core'
 
 // --- Enums ---
@@ -234,6 +235,29 @@ export const invoiceCounter = pgTable('invoice_counter', {
   id: serial('id').primaryKey(),
   nextNumber: integer('next_number').notNull().default(1),
 })
+
+// --- Wallet pass updates (Apple PassKit web service) ---
+
+// "Last modified" tag per pass (serialNumber = user id), bumped when the
+// member's status changes so registered devices know to pull a fresh pass.
+export const walletPasses = pgTable('wallet_passes', {
+  serialNumber: text('serial_number').primaryKey(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// Devices that have registered to receive updates for a given pass.
+export const walletPassRegistrations = pgTable(
+  'wallet_pass_registrations',
+  {
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    deviceLibraryIdentifier: text('device_library_identifier').notNull(),
+    passTypeIdentifier: text('pass_type_identifier').notNull(),
+    serialNumber: text('serial_number').notNull(),
+    pushToken: text('push_token').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => [unique().on(t.deviceLibraryIdentifier, t.serialNumber)],
+)
 
 export const associationSettings = pgTable('association_settings', {
   id: serial('id').primaryKey(),

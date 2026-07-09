@@ -164,6 +164,20 @@
     "marketingEmails": "Marketing emails",
     "marketingEmailsDescription": "Receive emails about events and news."
   },
+  "membershipCard": {
+    "title": "Membership card",
+    "member": "Member",
+    "memberNumber": "Member number",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusHonorary": "Honorary",
+    "statusInactive": "Inactive",
+    "memberSince": "Member since",
+    "inactiveNotice": "Your membership is not active. Contact the board if this is a mistake.",
+    "addToApple": "Add to Apple Wallet",
+    "addToGoogle": "Add to Google Wallet",
+    "qrHelp": "The QR code identifies you for event check-in."
+  },
   "board": {
     "title": "Board",
     "members": "Board Members",

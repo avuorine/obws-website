@@ -164,6 +164,20 @@
     "marketingEmails": "Marknadsföringsutskick",
     "marketingEmailsDescription": "Ta emot e-post om evenemang och nyheter."
   },
+  "membershipCard": {
+    "title": "Medlemskort",
+    "member": "Medlem",
+    "memberNumber": "Medlemsnummer",
+    "status": "Status",
+    "statusActive": "Aktiv",
+    "statusHonorary": "Hedersmedlem",
+    "statusInactive": "Inaktiv",
+    "memberSince": "Medlem sedan",
+    "inactiveNotice": "Ditt medlemskap är inte aktivt. Kontakta styrelsen om detta är ett fel.",
+    "addToApple": "Lägg till i Apple Wallet",
+    "addToGoogle": "Lägg till i Google Wallet",
+    "qrHelp": "QR-koden identifierar dig vid incheckning till evenemang."
+  },
   "board": {
     "title": "Styrelsen",
     "members": "Styrelsemedlemmar",

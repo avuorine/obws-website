@@ -18,6 +18,7 @@ import {
 } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { profileUpdateSchema, type ProfileUpdateFormData } from '@/lib/validation'
+import { notifyMembershipChanged } from '@/lib/wallet/notify'
 
 export async function updateProfile(
   data: ProfileUpdateFormData,
@@ -187,6 +188,9 @@ export async function deleteMyAccount(): Promise<{ success: boolean; error?: str
       updatedAt: new Date(),
     })
     .where(eq(user.id, member.id))
+
+  // Revoke any installed wallet passes for this member.
+  await notifyMembershipChanged(member.id)
 
   // Clear session cookie and redirect
   const cookieStore = await cookies()

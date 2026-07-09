@@ -62,6 +62,40 @@ Alternatively, you can use [Docker](https://www.docker.com) to spin up this temp
 
 That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
 
+## Membership card (Apple & Google Wallet)
+
+Members get a digital card at `/members/card` with a QR code (a signed token used
+for event check-in via `/api/wallet/verify`) and "Add to Apple/Google Wallet"
+buttons. The card is valid while the member's status is `active` or `honorary`.
+When an admin deactivates/reactivates a member (or a member deletes their account),
+installed passes update automatically — Google via a PATCH, Apple via an APNs push.
+
+The code runs with placeholder secrets, but the wallet buttons only work once these
+external accounts are provisioned and the env vars in `.env.example` are set.
+
+### Apple Wallet (requires Apple Developer account, $99/yr)
+
+1. In the Apple Developer portal, register a **Pass Type ID** (e.g. `pass.fi.obws.membership`).
+2. Generate a signing certificate for it (via a CSR) and export the `.p12`.
+3. Split the `.p12` into PEM cert + key, and download the current Apple **WWDR (G4)** intermediate cert.
+4. Base64-encode each PEM and set `APPLE_PASS_CERT`, `APPLE_PASS_KEY`, `APPLE_WWDR_CERT`
+   (+ `APPLE_PASS_KEY_PASSPHRASE` if the key is encrypted), `APPLE_PASS_TYPE_ID`, `APPLE_TEAM_ID`.
+5. For **live updates** (pushing status changes to installed iOS cards): in the Apple
+   Developer portal → **Keys**, create a key with **Apple Push Notifications service (APNs)**
+   enabled, download the `.p8`, and set `APPLE_APNS_KEY` (base64 of the `.p8`) +
+   `APPLE_APNS_KEY_ID`. The pass exposes a PassKit web service at `/api/wallet/apple/v1/**`;
+   devices register there and pull a fresh pass when an APNs push fires.
+
+### Google Wallet (free)
+
+1. Create a Google Cloud project and enable the **Google Wallet API**.
+2. Create a **service account** + JSON key; set `GOOGLE_WALLET_SA_EMAIL` and
+   `GOOGLE_WALLET_SA_PRIVATE_KEY` from it.
+3. Register an **Issuer** in the [Google Wallet Console](https://pay.google.com/business/console),
+   link the service account, and set `GOOGLE_WALLET_ISSUER_ID` and `GOOGLE_WALLET_CLASS_SUFFIX`.
+
+The `GenericClass` is created automatically (idempotently) on first save.
+
 ## Questions
 
 If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).

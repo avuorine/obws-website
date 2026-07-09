@@ -1,6 +1,22 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: obws-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: obws
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   mailpit:
     image: axllent/mailpit
+    container_name: obws-mailpit
     ports:
       - '1025:1025' # SMTP
       - '8025:8025' # Web UI
+
+volumes:
+  pgdata:
