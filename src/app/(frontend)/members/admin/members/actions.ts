@@ -9,6 +9,7 @@ import { createMemberSchema, type CreateMemberFormData } from '@/lib/validation'
 import { sendEmail } from '@/lib/email-sender'
 import { welcomeMemberEmailHtml } from '@/lib/invoice-email'
 import { getSettings } from '@/lib/settings'
+import { notifyMembershipChanged } from '@/lib/wallet/notify'
 
 export async function createMember(
   data: CreateMemberFormData,
@@ -174,6 +175,8 @@ export async function deactivateMember(
     .set({ status: 'inactive', resignedAt: new Date(), updatedAt: new Date() })
     .where(eq(user.id, userId))
 
+  await notifyMembershipChanged(userId)
+
   revalidatePath('/members/admin/members')
   revalidatePath(`/members/admin/members/${userId}`)
   return { success: true }
@@ -188,6 +191,8 @@ export async function reactivateMember(
     .update(user)
     .set({ status: 'active', resignedAt: null, updatedAt: new Date() })
     .where(eq(user.id, userId))
+
+  await notifyMembershipChanged(userId)
 
   revalidatePath('/members/admin/members')
   revalidatePath(`/members/admin/members/${userId}`)

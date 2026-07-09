@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark } from 'lucide-react'
+import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark, CreditCard } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 interface MembersNavProps {
@@ -18,6 +18,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
   const links = [
     { href: '/members', label: t('membersDashboard.title'), icon: LayoutDashboard },
     { href: '/members/events', label: t('events.title'), icon: Calendar },
+    { href: '/members/card', label: t('membershipCard.title'), icon: CreditCard },
     { href: '/members/profile', label: t('profile.title'), icon: UserCircle },
   ]
 

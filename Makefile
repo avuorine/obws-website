@@ -1,45 +1,30 @@
 .PHONY: dev dev-db dev-app stop clean logs db-shell
 
 # Start everything (database + app)
-dev: dev-db dev-app
+dev:
+	pnpm dev
 
-# Start PostgreSQL in Docker
+# Start PostgreSQL and Mailpit in Docker
 dev-db:
-	@if [ ! "$$(docker ps -q -f name=obws-postgres)" ]; then \
-		if [ "$$(docker ps -aq -f name=obws-postgres)" ]; then \
-			echo "Starting existing obws-postgres container..."; \
-			docker start obws-postgres; \
-		else \
-			echo "Creating new obws-postgres container..."; \
-			docker run -d --name obws-postgres \
-				-e POSTGRES_PASSWORD=postgres \
-				-e POSTGRES_DB=obws \
-				-p 5432:5432 \
-				postgres:16; \
-		fi; \
-		echo "Waiting for PostgreSQL to be ready..."; \
-		sleep 2; \
-	else \
-		echo "obws-postgres is already running"; \
-	fi
+	docker compose up -d
 
 # Start Next.js dev server
 dev-app:
 	pnpm dev
 
-# Stop the database container
+# Stop the database container and mailpit
 stop:
-	@docker stop obws-postgres 2>/dev/null || true
-	@echo "Database stopped"
+	docker compose stop
+	@echo "Services stopped"
 
-# Remove the database container and data
+# Remove the containers and data volumes
 clean:
-	@docker rm -f obws-postgres 2>/dev/null || true
-	@echo "Database container removed"
+	docker compose down -v
+	@echo "Services and data volumes removed"
 
-# View database logs
+# View logs
 logs:
-	docker logs -f obws-postgres
+	docker compose logs -f
 
 # Open psql shell
 db-shell:
