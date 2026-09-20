@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
 import { user } from '@/db/schema'
-import { eq, max, and, ne } from 'drizzle-orm'
+import { eq, max, and, ne, inArray } from 'drizzle-orm'
 import { createMemberSchema, type CreateMemberFormData } from '@/lib/validation'
 import { sendEmail } from '@/lib/email-sender'
 import { welcomeMemberEmailHtml } from '@/lib/invoice-email'
@@ -204,8 +204,17 @@ export async function bulkDeactivateMembers(
 ): Promise<{ success: boolean; count: number; error?: string }> {
   await requireAdmin()
 
+  if (userIds.length === 0) return { success: true, count: 0 }
+
+  // Only active members are eligible; honorary and already-inactive members
+  // are skipped regardless of what the client sent.
+  const eligible = await db
+    .select({ id: user.id })
+    .from(user)
+    .where(and(inArray(user.id, userIds), eq(user.status, 'active')))
+
   let count = 0
-  for (const id of userIds) {
+  for (const { id } of eligible) {
     const result = await deactivateMember(id)
     if (result.success) count++
   }

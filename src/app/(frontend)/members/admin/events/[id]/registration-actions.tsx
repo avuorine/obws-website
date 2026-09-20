@@ -20,7 +20,10 @@ export function RegistrationActions({ registrationId, memberName, status }: Regi
   const [error, setError] = useState('')
   const [warning, setWarning] = useState('')
 
-  if (status === 'cancelled') return null
+  // Once the row is cancelled only a lingering paid-invoice warning is worth showing.
+  if (status === 'cancelled') {
+    return warning ? <p className="text-xs text-amber-600">{warning}</p> : null
+  }
 
   function handleRemove() {
     if (!confirm(t('confirmRemoveRegistration', { name: memberName }))) return

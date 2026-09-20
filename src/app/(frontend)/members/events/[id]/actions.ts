@@ -233,7 +233,8 @@ export async function cancelRegistration(
 
   if (!reg) return { success: false, error: 'No registration found' }
 
-  await cancelRegistrationRow(reg)
+  const cancelled = await cancelRegistrationRow(reg)
+  if (!cancelled) return { success: false, error: 'No registration found' }
 
   revalidatePath(`/members/events/${eventId}`)
   revalidatePath('/members/events')
