@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
 import { user, events, invoices, feePeriods, memberFees } from '@/db/schema'
-import { sql, eq, gte, inArray, desc } from 'drizzle-orm'
+import { sql, eq, lt, and, inArray, desc } from 'drizzle-orm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +20,7 @@ export default async function AdminDashboardPage() {
     [{ newThisYear }],
     [{ upcomingCount }],
     [{ unpaidCount, unpaidSum }],
+    [{ overdueCount, overdueSum }],
     latestPeriod,
     recentInvoicesList,
     recentMembersList,
@@ -46,7 +47,14 @@ export default async function AdminDashboardPage() {
         unpaidSum: sql<string>`coalesce(sum(${invoices.amount}), 0)`,
       })
       .from(invoices)
-      .where(inArray(invoices.status, ['sent', 'draft'])),
+      .where(eq(invoices.status, 'sent')),
+    db
+      .select({
+        overdueCount: sql<number>`count(*)::int`,
+        overdueSum: sql<string>`coalesce(sum(${invoices.amount}), 0)`,
+      })
+      .from(invoices)
+      .where(and(eq(invoices.status, 'sent'), lt(invoices.dueDate, sql`now()`))),
     // Latest fee period with stats
     db
       .select()
@@ -82,7 +90,7 @@ export default async function AdminDashboardPage() {
   ])
 
   // Fee period progress
-  let periodStats: { name: string; paid: number; total: number } | null = null
+  let periodStats: { id: string; name: string; paid: number; total: number } | null = null
   if (latestPeriod) {
     const [{ total, paid }] = await db
       .select({
@@ -92,17 +100,25 @@ export default async function AdminDashboardPage() {
       .from(memberFees)
       .where(eq(memberFees.feePeriodId, latestPeriod.id))
 
-    periodStats = { name: latestPeriod.name, paid: Number(paid), total: Number(total) }
+    periodStats = { id: latestPeriod.id, name: latestPeriod.name, paid: Number(paid), total: Number(total) }
   }
 
   const statCards = [
-    { label: t('totalActiveMembers'), value: activeCount, icon: Users },
-    { label: t('newMembersThisYear'), value: newThisYear, icon: UserPlus },
-    { label: t('upcomingEvents'), value: upcomingCount, icon: Calendar },
+    { label: t('totalActiveMembers'), value: activeCount, icon: Users, href: '/members/admin/members' },
+    { label: t('newMembersThisYear'), value: newThisYear, icon: UserPlus, href: '/members/admin/members' },
+    { label: t('upcomingEvents'), value: upcomingCount, icon: Calendar, href: '/members/admin/events?status=published' },
     {
       label: t('unpaidInvoicesCount'),
       value: `${unpaidCount} (€${Number(unpaidSum).toFixed(0)})`,
       icon: FileText,
+      href: '/members/admin/invoices?status=sent',
+    },
+    {
+      label: t('overdueInvoices'),
+      value: `${overdueCount} (€${Number(overdueSum).toFixed(0)})`,
+      icon: Receipt,
+      href: '/members/admin/invoices?status=overdue',
+      alert: overdueCount > 0,
     },
   ]
 
@@ -111,21 +127,24 @@ export default async function AdminDashboardPage() {
       <h1 className="font-serif text-3xl font-bold">{t('dashboard')}</h1>
 
       {/* Stats cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {statCards.map((stat) => {
           const Icon = stat.icon
+          const alert = 'alert' in stat && stat.alert
           return (
-            <Card key={stat.label}>
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="rounded-lg bg-muted p-2">
-                  <Icon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <Link key={stat.label} href={stat.href}>
+              <Card className="h-full transition-colors hover:border-primary/50">
+                <CardContent className="flex items-center gap-4 p-4">
+                  <div className="rounded-lg bg-muted p-2">
+                    <Icon className={`h-5 w-5 ${alert ? 'text-[#a63d2a]' : 'text-muted-foreground'}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           )
         })}
       </div>
@@ -137,7 +156,17 @@ export default async function AdminDashboardPage() {
             <CardTitle>{t('currentFeePeriod')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-2 font-medium">{periodStats.name}</p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="font-medium">{periodStats.name}</p>
+              {periodStats.total - periodStats.paid > 0 && (
+                <Link
+                  href={`/members/admin/fees/${periodStats.id}?filter=unpaid`}
+                  className="text-sm text-primary hover:underline"
+                >
+                  {t('unpaidMembersLink', { count: periodStats.total - periodStats.paid })}
+                </Link>
+              )}
+            </div>
             <div className="mb-1 flex justify-between text-sm">
               <span className="text-muted-foreground">{t('paymentProgress')}</span>
               <span>

@@ -2,35 +2,75 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { feePeriods, memberFees, user } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { feePeriods, memberFees, user, invoices } from '@/db/schema'
+import { eq, and, ne, desc } from 'drizzle-orm'
+import { effectiveInvoiceStatus, daysOverdue } from '@/lib/invoice-status'
 import { formatDate } from '@/lib/format-date'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { MemberFeeTable } from '@/components/admin/MemberFeeTable'
+import { MemberFeeTable, type MemberFeeRow } from '@/components/admin/MemberFeeTable'
 import { FeePeriodActions } from './fee-period-actions'
 import { ArrowLeft } from 'lucide-react'
 
-export default async function FeePeriodDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function FeePeriodDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ filter?: string }>
+}) {
   const { id } = await params
+  const { filter } = await searchParams
+  const showUnpaidOnly = filter === 'unpaid'
   const t = await getTranslations('admin')
   const locale = await getLocale()
 
   const period = await db.select().from(feePeriods).where(eq(feePeriods.id, id)).then((r) => r[0])
   if (!period) notFound()
 
-  const fees = await db
+  const feeRows = await db
     .select({
       id: memberFees.id,
+      userId: memberFees.userId,
       status: memberFees.status,
       paidAt: memberFees.paidAt,
       userName: user.name,
+      memberStatus: user.status,
     })
     .from(memberFees)
     .innerJoin(user, eq(memberFees.userId, user.id))
     .where(eq(memberFees.feePeriodId, id))
     .orderBy(user.name)
 
+  // Latest non-cancelled membership invoice per member for this period.
+  const periodInvoices = await db
+    .select({ id: invoices.id, userId: invoices.userId, status: invoices.status, dueDate: invoices.dueDate })
+    .from(invoices)
+    .where(
+      and(eq(invoices.feePeriodId, id), eq(invoices.type, 'membership_fee'), ne(invoices.status, 'cancelled')),
+    )
+    .orderBy(desc(invoices.createdAt))
+  const invoiceByUser = new Map<string, (typeof periodInvoices)[number]>()
+  for (const inv of periodInvoices) if (!invoiceByUser.has(inv.userId)) invoiceByUser.set(inv.userId, inv)
+
+  const now = new Date()
+  const fees: MemberFeeRow[] = feeRows.map((f) => {
+    const inv = invoiceByUser.get(f.userId) ?? null
+    return {
+      ...f,
+      invoiceId: inv?.id ?? null,
+      invoiceStatus: inv ? effectiveInvoiceStatus(inv, now) : null,
+      daysOverdue: f.status === 'paid' ? 0 : daysOverdue(inv?.dueDate ?? period.dueDate, now),
+    }
+  })
+
   const paidCount = fees.filter((f) => f.status === 'paid').length
+  const unpaidCount = fees.length - paidCount
+  const visibleFees = showUnpaidOnly ? fees.filter((f) => f.status !== 'paid') : fees
+
+  const pill = (active: boolean) =>
+    `rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+      active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'
+    }`
 
   return (
     <div>
@@ -87,10 +127,24 @@ export default async function FeePeriodDetailPage({ params }: { params: Promise<
       {fees.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>{t('memberFees')}</CardTitle>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <CardTitle>{t('memberFees')}</CardTitle>
+              <div className="flex gap-2">
+                <Link href={`/members/admin/fees/${id}`} className={pill(!showUnpaidOnly)}>
+                  {t('all')} ({fees.length})
+                </Link>
+                <Link href={`/members/admin/fees/${id}?filter=unpaid`} className={pill(showUnpaidOnly)}>
+                  {t('unpaid')} ({unpaidCount})
+                </Link>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
-            <MemberFeeTable fees={fees} />
+            {visibleFees.length === 0 ? (
+              <p className="px-4 pb-4 text-sm text-muted-foreground">{t('allFeesPaid')}</p>
+            ) : (
+              <MemberFeeTable fees={visibleFees} />
+            )}
           </CardContent>
         </Card>
       )}
