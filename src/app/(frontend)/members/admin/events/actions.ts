@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
-import { events, eventRegistrations } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { events, eventRegistrations, invoices } from '@/db/schema'
+import { eq, and } from 'drizzle-orm'
+import { cancelRegistrationRow } from '@/lib/registrations'
 import { eventSchema, type EventFormData } from '@/lib/validation'
 import { parseDatetimeLocal } from '@/lib/timezone'
 
@@ -124,3 +125,46 @@ export async function updateEventStatus(
 }
 
 
+export async function adminCancelRegistration(
+  registrationId: string,
+): Promise<{ success: boolean; error?: string; warning?: string }> {
+  await requireAdmin()
+
+  const reg = await db
+    .select()
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.id, registrationId))
+    .then((r) => r[0])
+
+  if (!reg) return { success: false, error: 'registrationNotFound' }
+  if (reg.status === 'cancelled') return { success: false, error: 'registrationAlreadyCancelled' }
+
+  await cancelRegistrationRow(reg)
+
+  // Cancel any unpaid event-fee invoice tied to this registration. A paid
+  // invoice is left untouched and surfaced as a warning so the admin knows a
+  // refund has to be handled manually.
+  const linkedInvoices = await db
+    .select({ id: invoices.id, status: invoices.status })
+    .from(invoices)
+    .where(and(eq(invoices.eventRegistrationId, reg.id), eq(invoices.type, 'event_fee')))
+
+  let warning: string | undefined
+  for (const inv of linkedInvoices) {
+    if (inv.status === 'draft' || inv.status === 'sent') {
+      await db
+        .update(invoices)
+        .set({ status: 'cancelled', updatedAt: new Date() })
+        .where(eq(invoices.id, inv.id))
+    } else if (inv.status === 'paid') {
+      warning = 'registrationRemovedInvoicePaid'
+    }
+  }
+
+  revalidatePath(`/members/admin/events/${reg.eventId}`)
+  revalidatePath('/members/admin/events')
+  revalidatePath('/members/admin/invoices')
+  revalidatePath(`/members/events/${reg.eventId}`)
+  revalidatePath('/members/events')
+  return { success: true, warning }
+}

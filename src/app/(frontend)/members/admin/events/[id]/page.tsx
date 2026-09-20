@@ -11,6 +11,7 @@ import { EventForm } from '@/components/admin/EventForm'
 
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EventStatusActions } from './status-actions'
+import { RegistrationActions } from './registration-actions'
 import { ArrowLeft, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -53,8 +54,8 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       case 'completed': return t('completed')
       case 'cancelled': return t('cancelled')
       case 'registered': return t('active')
-      case 'waitlisted': return 'Waitlisted'
-      case 'pending': return 'Pending'
+      case 'waitlisted': return t('waitlisted')
+      case 'pending': return t('pending')
       default: return s
     }
   }
@@ -147,11 +148,15 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                     <th className="px-4 py-3 font-medium">{t('status')}</th>
                     <th className="px-4 py-3 font-medium">{t('guests')}</th>
                     <th className="px-4 py-3 font-medium">{t('registeredAt')}</th>
+                    <th className="px-4 py-3 font-medium text-right">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {registrations.map((reg) => (
-                    <tr key={reg.id} className="border-b border-input last:border-0">
+                    <tr
+                      key={reg.id}
+                      className={`border-b border-input last:border-0 ${reg.status === 'cancelled' ? 'text-muted-foreground line-through' : ''}`}
+                    >
                       <td className="px-4 py-3">
                         {reg.firstName} {reg.lastName}
                       </td>
@@ -163,6 +168,13 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {formatDateTime(reg.registeredAt, locale)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <RegistrationActions
+                          registrationId={reg.id}
+                          memberName={`${reg.firstName ?? ''} ${reg.lastName ?? ''}`.trim()}
+                          status={reg.status}
+                        />
                       </td>
                     </tr>
                   ))}
