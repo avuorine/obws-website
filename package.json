@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "vercel-build": "drizzle-kit migrate && next build",
     "dev": "docker compose up -d && next dev",
     "devsafe": "rm -rf .next && next dev",
     "lint": "next lint",
