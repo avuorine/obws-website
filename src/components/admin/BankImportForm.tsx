@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert } from '@/components/ui/alert'
 import { Upload, CheckCircle } from 'lucide-react'
 import { applyBankMatches } from '@/app/(frontend)/members/admin/bank-import/actions'
+import { normalizeReferenceNumber } from '@/lib/reference-number'
 
 interface UnpaidInvoice {
   id: string
@@ -101,12 +102,12 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
   const [isPending, startTransition] = useTransition()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Build reference -> invoice map
+  // Build normalised reference -> invoice map so padded and RF-prefixed
+  // references from the bank match the reference as generated.
   const refMap = new Map<string, UnpaidInvoice>()
   for (const inv of unpaidInvoices) {
-    if (inv.referenceNumber) {
-      refMap.set(inv.referenceNumber.replace(/\s/g, ''), inv)
-    }
+    const key = normalizeReferenceNumber(inv.referenceNumber ?? '')
+    if (key) refMap.set(key, inv)
   }
 
   const handleFile = async () => {
@@ -127,7 +128,8 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
 
     // Match entries against invoices
     const matched: ParsedEntry[] = rawEntries.map((entry) => {
-      const inv = refMap.get(entry.reference)
+      const key = normalizeReferenceNumber(entry.reference)
+      const inv = key ? refMap.get(key) : undefined
       return {
         ...entry,
         matchedInvoice: inv ?? null,
@@ -316,6 +318,12 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
                         <td className="px-4 py-3">€{entry.amount.toFixed(2)}</td>
                         <td className="px-4 py-3 font-mono text-xs">
                           {entry.reference || '—'}
+                          {entry.matchedInvoice &&
+                            entry.reference !== entry.matchedInvoice.referenceNumber && (
+                              <span className="block text-muted-foreground">
+                                → {entry.matchedInvoice.referenceNumber}
+                              </span>
+                            )}
                         </td>
                         <td className="px-4 py-3">
                           {entry.matchedInvoice ? (
