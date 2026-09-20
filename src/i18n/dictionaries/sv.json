@@ -107,8 +107,6 @@
     "lottery": "Lottning",
     "lotteryPending": "Lottning inväntas — anmälan öppen",
     "lotteryCompleted": "Lottning genomförd",
-    "runLottery": "Genomför lottning",
-    "runningLottery": "Lottar...",
     "participants": "deltagare",
     "waitlist": "på väntelista",
     "cancellationNotAllowed": "Avbokning är inte möjlig för detta evenemang",
@@ -418,7 +416,18 @@
     "confirmRemoveRegistration": "Ta bort anmälan för {name}? Platsen frigörs och eventuella reservplatser flyttas upp.",
     "registrationRemovedInvoicePaid": "Anmälan borttagen. Medlemmen har redan betalat sin faktura – hantera återbetalning manuellt.",
     "registrationNotFound": "Anmälan hittades inte.",
-    "registrationAlreadyCancelled": "Anmälan är redan annullerad."
+    "registrationAlreadyCancelled": "Anmälan är redan annullerad.",
+    "eventAdministration": "Administration",
+    "viewAsMember": "Visa som medlem",
+    "runLottery": "Genomför lottning",
+    "runningLottery": "Lottar...",
+    "lotteryPendingCount": "{count, plural, =0 {Inga anmälningar väntar på lottning.} =1 {1 anmälan väntar på lottning.} other {# anmälningar väntar på lottning.}}",
+    "lotteryDone": "Lottning genomförd: {registered} anmälda, {waitlisted} på reservplats.",
+    "confirmRunLottery": "Genomför lottningen nu? Detta kan inte ångras.",
+    "lotteryRun": "Lottningen är genomförd.",
+    "invoicing": "Fakturering",
+    "invoicedCount": "{invoiced} av {registered} anmälda har fakturerats.",
+    "eventInvoicesCreated": "{count, plural, =0 {Inga nya fakturor skapades.} =1 {1 faktura skapad.} other {# fakturor skapade.}}"
   },
   "rules": {
     "title": "Stadgar",

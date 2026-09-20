@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { getMember } from '@/lib/auth-server'
@@ -8,15 +9,16 @@ import { getLocalized } from '@/lib/localize'
 import { formatDateTime, formatTime } from '@/lib/format-date'
 import { getDatePartsInTz } from '@/lib/timezone'
 import { EventRsvp } from '@/components/EventRsvp'
-import { EventInvoiceButton } from '@/components/admin/EventInvoiceButton'
+import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { registerForEvent, cancelRegistration, runLottery, addGuest, removeGuest } from './actions'
+import { registerForEvent, cancelRegistration, addGuest, removeGuest } from './actions'
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const member = await getMember()
   const t = await getTranslations('events')
+  const tAdmin = await getTranslations('admin')
   const locale = await getLocale()
 
   const event = await db.select().from(events).where(eq(events.id, id)).then((r) => r[0])
@@ -61,8 +63,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div>
-      <div className="mb-2 flex items-center gap-2">
-        {category && <Badge>{getLocalized(category.nameLocales, locale)}</Badge>}
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {category && <Badge>{getLocalized(category.nameLocales, locale)}</Badge>}
+        </div>
+        {isAdmin && (
+          <Link
+            href={`/members/admin/events/${id}`}
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <Pencil className="h-4 w-4" />
+            {tAdmin('editEvent')}
+          </Link>
+        )}
       </div>
 
       <h1 className="mb-4 font-serif text-3xl font-bold">
@@ -154,7 +167,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             isRegistrationNotOpenYet={isRegistrationNotOpenYet}
             registrationOpensAt={event.registrationOpensAt?.toISOString() ?? null}
             canCancel={canCancel}
-            isAdmin={isAdmin}
             guestAllowed={event.guestAllowed}
             guestCount={userReg?.guestCount ?? 0}
             maxGuestsPerMember={event.maxGuestsPerMember}
@@ -162,20 +174,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             guestRegistrationOpensAt={event.guestRegistrationOpensAt?.toISOString() ?? null}
             registerAction={registerForEvent}
             cancelAction={cancelRegistration}
-            lotteryAction={runLottery}
             addGuestAction={addGuest}
             removeGuestAction={removeGuest}
           />
         </CardContent>
       </Card>
-
-      {isAdmin && event.price && Number(event.price) > 0 && (
-        <Card className="mt-4">
-          <CardContent className="p-5">
-            <EventInvoiceButton eventId={id} />
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }

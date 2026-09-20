@@ -16,7 +16,6 @@ interface EventRsvpProps {
   isRegistrationNotOpenYet: boolean
   registrationOpensAt: string | null
   canCancel: boolean
-  isAdmin: boolean
   guestAllowed: boolean
   guestCount: number
   maxGuestsPerMember: number
@@ -24,7 +23,6 @@ interface EventRsvpProps {
   guestRegistrationOpensAt: string | null
   registerAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
   cancelAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
-  lotteryAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
   addGuestAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
   removeGuestAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
 }
@@ -78,7 +76,6 @@ export function EventRsvp({
   isRegistrationNotOpenYet,
   registrationOpensAt,
   canCancel,
-  isAdmin,
   guestAllowed,
   guestCount,
   maxGuestsPerMember,
@@ -86,7 +83,6 @@ export function EventRsvp({
   guestRegistrationOpensAt,
   registerAction,
   cancelAction,
-  lotteryAction,
   addGuestAction,
   removeGuestAction,
 }: EventRsvpProps) {
@@ -110,14 +106,6 @@ export function EventRsvp({
     setError('')
     startTransition(async () => {
       const result = await cancelAction(eventId)
-      if (!result.success) setError(result.error ?? 'Something went wrong')
-    })
-  }
-
-  function handleLottery() {
-    setError('')
-    startTransition(async () => {
-      const result = await lotteryAction(eventId)
       if (!result.success) setError(result.error ?? 'Something went wrong')
     })
   }
@@ -193,12 +181,6 @@ export function EventRsvp({
         {showCancel && (
           <Button variant="destructive" onClick={handleCancel} disabled={isPending}>
             {isPending ? t('cancelling') : t('cancel')}
-          </Button>
-        )}
-
-        {isAdmin && isLottery && !lotteryCompleted && (
-          <Button variant="outline" onClick={handleLottery} disabled={isPending}>
-            {isPending ? t('runningLottery') : t('runLottery')}
           </Button>
         )}
       </div>

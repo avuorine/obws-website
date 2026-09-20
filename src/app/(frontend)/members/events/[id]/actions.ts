@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { getMember } from '@/lib/auth-server'
-import { requireAdmin } from '@/lib/admin-guard'
 import { cancelRegistrationRow } from '@/lib/registrations'
 import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
@@ -235,63 +234,6 @@ export async function cancelRegistration(
   if (!reg) return { success: false, error: 'No registration found' }
 
   await cancelRegistrationRow(reg)
-
-  revalidatePath(`/members/events/${eventId}`)
-  revalidatePath('/members/events')
-  return { success: true }
-}
-
-export async function runLottery(
-  eventId: string,
-): Promise<{ success: boolean; error?: string }> {
-  await requireAdmin()
-
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
-  if (event.lotteryCompleted) return { success: false, error: 'Lottery already completed' }
-  if (event.allocationMethod !== 'lottery') return { success: false, error: 'Not a lottery event' }
-
-  // Get all pending registrations
-  const pending = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.status, 'pending'),
-      ),
-    )
-
-  // Fisher-Yates shuffle
-  const shuffled = [...pending]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-
-  const capacity = event.capacity ?? shuffled.length
-  let registeredCount = 0
-  let waitlistCount = 0
-
-  for (let i = 0; i < shuffled.length; i++) {
-    const status = i < capacity ? 'registered' : 'waitlisted'
-    await db
-      .update(eventRegistrations)
-      .set({ status })
-      .where(eq(eventRegistrations.id, shuffled[i].id))
-
-    if (status === 'registered') registeredCount++
-    else waitlistCount++
-  }
-
-  await db
-    .update(events)
-    .set({
-      lotteryCompleted: true,
-      registrationCount: registeredCount,
-      waitlistCount,
-    })
-    .where(eq(events.id, eventId))
 
   revalidatePath(`/members/events/${eventId}`)
   revalidatePath('/members/events')

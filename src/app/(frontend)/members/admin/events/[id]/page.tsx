@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
-import { eq, asc } from 'drizzle-orm'
+import { events, eventCategories, eventRegistrations, invoices, user } from '@/db/schema'
+import { eq, asc, and, ne, count } from 'drizzle-orm'
 import { formatDateTime } from '@/lib/format-date'
 import { toDatetimeLocalString } from '@/lib/timezone'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +12,8 @@ import { EventForm } from '@/components/admin/EventForm'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EventStatusActions } from './status-actions'
 import { RegistrationActions } from './registration-actions'
-import { ArrowLeft, Download } from 'lucide-react'
+import { EventAdminTools } from './admin-tools'
+import { ArrowLeft, Download, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,6 +48,26 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     .where(eq(eventRegistrations.eventId, id))
     .orderBy(asc(eventRegistrations.registeredAt))
 
+  const pendingCount = registrations.filter((r) => r.status === 'pending').length
+  const registeredCount = registrations.filter((r) => r.status === 'registered').length
+  const waitlistedCount = registrations.filter((r) => r.status === 'waitlisted').length
+
+  const hasPrice = event.price != null && Number(event.price) > 0
+  const [{ invoicedCount }] = hasPrice
+    ? await db
+        .select({ invoicedCount: count() })
+        .from(invoices)
+        .innerJoin(eventRegistrations, eq(invoices.eventRegistrationId, eventRegistrations.id))
+        .where(
+          and(
+            eq(eventRegistrations.eventId, id),
+            eq(eventRegistrations.status, 'registered'),
+            eq(invoices.type, 'event_fee'),
+            ne(invoices.status, 'cancelled'),
+          ),
+        )
+    : [{ invoicedCount: 0 }]
+
   const statusLabel = (s: string) => {
     switch (s) {
       case 'draft': return t('draft')
@@ -62,13 +83,22 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/members/admin/events"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t('back')}
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          href="/members/admin/events"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t('back')}
+        </Link>
+        <Link
+          href={`/members/events/${id}`}
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <Eye className="h-4 w-4" />
+          {t('viewAsMember')}
+        </Link>
+      </div>
 
       {/* Event Form Card */}
       <Card>
@@ -114,10 +144,23 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         </CardContent>
       </Card>
 
-      {/* Status Actions */}
+      {/* Event administration */}
       <Card>
-        <CardContent className="p-6">
+        <CardHeader>
+          <CardTitle>{t('eventAdministration')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
           <EventStatusActions eventId={id} currentStatus={event.status ?? 'draft'} />
+          <EventAdminTools
+            eventId={id}
+            isLottery={event.allocationMethod === 'lottery'}
+            lotteryCompleted={event.lotteryCompleted ?? false}
+            pendingCount={pendingCount}
+            registeredCount={registeredCount}
+            waitlistedCount={waitlistedCount}
+            hasPrice={hasPrice}
+            invoicedCount={invoicedCount}
+          />
         </CardContent>
       </Card>
 
