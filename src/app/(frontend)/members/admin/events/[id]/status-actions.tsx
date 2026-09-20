@@ -79,7 +79,7 @@ export function EventStatusActions({ eventId, currentStatus }: EventStatusAction
             {t('cancelEvent')}
           </Button>
         )}
-        {currentStatus === 'draft' && (
+        {(currentStatus === 'draft' || currentStatus === 'cancelled' || currentStatus === 'completed') && (
           <Button size="sm" variant="destructive" disabled={isPending} onClick={handleDelete}>
             {t('delete')}
           </Button>
