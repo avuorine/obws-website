@@ -36,7 +36,7 @@ export async function GET(
     createdAt: invoice.createdAt,
   }, settings)
 
-  return new Response(pdf, {
+  return new Response(new Uint8Array(pdf), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `inline; filename="invoice-${invoice.invoiceNumber}.pdf"`,
