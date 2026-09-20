@@ -198,3 +198,18 @@ export async function reactivateMember(
   revalidatePath(`/members/admin/members/${userId}`)
   return { success: true }
 }
+
+export async function bulkDeactivateMembers(
+  userIds: string[],
+): Promise<{ success: boolean; count: number; error?: string }> {
+  await requireAdmin()
+
+  let count = 0
+  for (const id of userIds) {
+    const result = await deactivateMember(id)
+    if (result.success) count++
+  }
+
+  revalidatePath('/members/admin/fees')
+  return { success: true, count }
+}

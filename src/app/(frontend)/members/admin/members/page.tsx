@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { user } from '@/db/schema'
-import { sql, count } from 'drizzle-orm'
+import { user, feePeriods, memberFees } from '@/db/schema'
+import { sql, count, desc, eq, and, getTableColumns } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/format-date'
@@ -14,24 +14,52 @@ const PAGE_SIZE = 50
 export default async function AdminMembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; fee?: string }>
 }) {
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, fee: feeParam } = await searchParams
+  const feeFilter = feeParam === 'unpaid' || feeParam === 'paid' ? feeParam : 'all'
   const t = await getTranslations('admin')
   const locale = await getLocale()
 
   const currentPage = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
   const offset = (currentPage - 1) * PAGE_SIZE
 
+  const latestPeriod = await db
+    .select({ id: feePeriods.id, name: feePeriods.name })
+    .from(feePeriods)
+    .orderBy(desc(feePeriods.startDate))
+    .limit(1)
+    .then((r) => r[0] ?? null)
+
+  // Left-join the latest period's fee so every member shows a fee status.
+  const feeJoin = latestPeriod
+    ? and(eq(memberFees.userId, user.id), eq(memberFees.feePeriodId, latestPeriod.id))
+    : sql`false`
+  const feeWhere =
+    feeFilter === 'all' || !latestPeriod ? undefined : eq(memberFees.status, feeFilter)
+
   const [members, [{ total }]] = await Promise.all([
     db
-      .select()
+      .select({ ...getTableColumns(user), feeStatus: memberFees.status })
       .from(user)
+      .leftJoin(memberFees, feeJoin)
+      .where(feeWhere)
       .orderBy(sql`${user.memberNumber} ASC NULLS LAST`)
       .limit(PAGE_SIZE)
       .offset(offset),
-    db.select({ total: count() }).from(user),
+    db.select({ total: count() }).from(user).leftJoin(memberFees, feeJoin).where(feeWhere),
   ])
+
+  const feeHref = (f: string) => {
+    const sp = new URLSearchParams()
+    if (f !== 'all') sp.set('fee', f)
+    const qs = sp.toString()
+    return qs ? `/members/admin/members?${qs}` : '/members/admin/members'
+  }
+  const pill = (active: boolean) =>
+    `rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+      active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'
+    }`
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
@@ -61,6 +89,17 @@ export default async function AdminMembersPage({
         </div>
       </div>
 
+      {latestPeriod && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground">{t('feeFilterLabel', { period: latestPeriod.name })}</span>
+          {(['all', 'unpaid', 'paid'] as const).map((f) => (
+            <Link key={f} href={feeHref(f)} className={pill(f === feeFilter)}>
+              {f === 'all' ? t('all') : t(f)}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {members.length === 0 ? (
         <p className="text-muted-foreground">{t('noMembers')}</p>
       ) : (
@@ -75,6 +114,7 @@ export default async function AdminMembersPage({
                     <th className="px-4 py-3 font-medium">{t('email')}</th>
                     <th className="px-4 py-3 font-medium">{t('status')}</th>
                     <th className="px-4 py-3 font-medium">{t('memberSince')}</th>
+                    {latestPeriod && <th className="px-4 py-3 font-medium">{t('feeColumn')}</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -98,6 +138,15 @@ export default async function AdminMembersPage({
                       <td className="px-4 py-3 text-muted-foreground">
                         {formatDate(m.memberSince, locale)}
                       </td>
+                      {latestPeriod && (
+                        <td className="px-4 py-3">
+                          {m.feeStatus ? (
+                            <Badge variant={m.feeStatus === 'paid' ? 'success' : 'warning'}>{t(m.feeStatus)}</Badge>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -112,14 +161,14 @@ export default async function AdminMembersPage({
                 <div className="flex gap-2">
                   {currentPage > 1 && (
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/members/admin/members?page=${currentPage - 1}`}>
+                      <Link href={`${feeHref(feeFilter)}${feeFilter === 'all' ? '?' : '&'}page=${currentPage - 1}`}>
                         {t('previous')}
                       </Link>
                     </Button>
                   )}
                   {currentPage < totalPages && (
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/members/admin/members?page=${currentPage + 1}`}>
+                      <Link href={`${feeHref(feeFilter)}${feeFilter === 'all' ? '?' : '&'}page=${currentPage + 1}`}>
                         {t('next')}
                       </Link>
                     </Button>
