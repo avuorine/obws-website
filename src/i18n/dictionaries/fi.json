@@ -107,8 +107,6 @@
     "lottery": "Arvonta",
     "lotteryPending": "Arvonta odottaa — ilmoittautuminen auki",
     "lotteryCompleted": "Arvonta suoritettu",
-    "runLottery": "Suorita arvonta",
-    "runningLottery": "Arvotaan...",
     "participants": "osallistujaa",
     "waitlist": "jonotuslistalla",
     "cancellationNotAllowed": "Peruutus ei ole mahdollinen tälle tapahtumalle",
@@ -418,7 +416,18 @@
     "confirmRemoveRegistration": "Poistetaanko ilmoittautuminen: {name}? Paikka vapautuu ja mahdolliset varasijalla olevat siirtyvät ylöspäin.",
     "registrationRemovedInvoicePaid": "Ilmoittautuminen poistettu. Jäsen on jo maksanut laskunsa – hoida palautus manuaalisesti.",
     "registrationNotFound": "Ilmoittautumista ei löytynyt.",
-    "registrationAlreadyCancelled": "Ilmoittautuminen on jo peruttu."
+    "registrationAlreadyCancelled": "Ilmoittautuminen on jo peruttu.",
+    "eventAdministration": "Hallinta",
+    "viewAsMember": "Näytä jäsenenä",
+    "runLottery": "Suorita arvonta",
+    "runningLottery": "Arvotaan...",
+    "lotteryPendingCount": "{count, plural, =0 {Ei arvontaa odottavia ilmoittautumisia.} =1 {1 ilmoittautuminen odottaa arvontaa.} other {# ilmoittautumista odottaa arvontaa.}}",
+    "lotteryDone": "Arvonta suoritettu: {registered} ilmoittautunutta, {waitlisted} varasijalla.",
+    "confirmRunLottery": "Suoritetaanko arvonta nyt? Tätä ei voi perua.",
+    "lotteryRun": "Arvonta on suoritettu.",
+    "invoicing": "Laskutus",
+    "invoicedCount": "{invoiced} / {registered} ilmoittautuneesta on laskutettu.",
+    "eventInvoicesCreated": "{count, plural, =0 {Uusia laskuja ei luotu.} =1 {1 lasku luotu.} other {# laskua luotu.}}"
   },
   "rules": {
     "title": "Säännöt",
