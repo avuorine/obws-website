@@ -426,8 +426,16 @@
     "confirmRunLottery": "Suoritetaanko arvonta nyt? Tätä ei voi perua.",
     "lotteryRun": "Arvonta on suoritettu.",
     "invoicing": "Laskutus",
-    "invoicedCount": "{invoiced} / {registered} ilmoittautuneesta on laskutettu.",
-    "eventInvoicesCreated": "{count, plural, =0 {Uusia laskuja ei luotu.} =1 {1 lasku luotu.} other {# laskua luotu.}}"
+    "cancelInvoice": "Peru lasku",
+    "confirmCancelSentInvoice": "Lasku on jo lähetetty jäsenelle. Perutaanko se silti?",
+    "invoiceNotFound": "Laskua ei löytynyt.",
+    "invoicePaidNotCancellable": "Maksettua laskua ei voi perua.",
+    "billingSummary": "{registered} ilmoittautunutta: {invoiced} laskutettu, {needs} ilman laskua kaikista paikoista.",
+    "overbilledHint": "{count, plural, =1 {1 ilmoittautumisella} other {# ilmoittautumisella}} on laskutettu enemmän paikkoja kuin varattu. Peru lasku käsin ja luo laskut uudelleen.",
+    "eventInvoicesResult": "{created, plural, =0 {Ei uusia laskuja} =1 {1 uusi lasku} other {# uutta laskua}}, {updated, plural, =0 {ei päivitettyjä luonnoksia} =1 {1 luonnos päivitetty} other {# luonnosta päivitetty}}.",
+    "seatsBilled": "{count, plural, =1 {1 paikka} other {# paikkaa}}",
+    "event": "Tapahtuma",
+    "viewEvent": "Näytä tapahtuma"
   },
   "rules": {
     "title": "Säännöt",

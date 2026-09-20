@@ -426,8 +426,16 @@
     "confirmRunLottery": "Run the lottery now? This cannot be undone.",
     "lotteryRun": "Lottery completed.",
     "invoicing": "Invoicing",
-    "invoicedCount": "{invoiced} of {registered} registered members invoiced.",
-    "eventInvoicesCreated": "{count, plural, =0 {No new invoices created.} =1 {1 invoice created.} other {# invoices created.}}"
+    "cancelInvoice": "Cancel invoice",
+    "confirmCancelSentInvoice": "This invoice has already been sent to the member. Cancel it anyway?",
+    "invoiceNotFound": "Invoice not found.",
+    "invoicePaidNotCancellable": "A paid invoice cannot be cancelled.",
+    "billingSummary": "{registered} registered: {invoiced} fully invoiced, {needs} missing an invoice for all seats.",
+    "overbilledHint": "{count, plural, =1 {1 registration has} other {# registrations have}} more seats invoiced than booked. Cancel the invoice manually and generate again.",
+    "eventInvoicesResult": "{created, plural, =0 {No new invoices} =1 {1 new invoice} other {# new invoices}}, {updated, plural, =0 {no drafts updated} =1 {1 draft updated} other {# drafts updated}}.",
+    "seatsBilled": "{count, plural, =1 {1 seat} other {# seats}}",
+    "event": "Event",
+    "viewEvent": "View event"
   },
   "rules": {
     "title": "Rules",

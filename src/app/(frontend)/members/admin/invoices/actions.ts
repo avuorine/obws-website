@@ -12,6 +12,7 @@ import { invoiceEmailHtml } from '@/lib/invoice-email'
 import { sendEmail } from '@/lib/email-sender'
 import { getLocalized } from '@/lib/localize'
 import { getSettings } from '@/lib/settings'
+import { getEventBillingSummary } from '@/lib/event-billing'
 
 const DUE_DATE_DAYS = 14
 
@@ -134,54 +135,53 @@ export async function bulkCreateMembershipInvoices(
 
 export async function createEventInvoices(
   eventId: string,
-): Promise<{ success: boolean; count?: number; error?: string }> {
+): Promise<{ success: boolean; created?: number; updated?: number; overbilled?: number; error?: string }> {
   await requireAdmin()
 
   const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
   if (!event) return { success: false, error: 'Event not found' }
   if (!event.price || Number(event.price) <= 0) return { success: false, error: 'Event has no price' }
 
-  // Get registered participants without existing invoices
-  const registrations = await db
-    .select({
-      regId: eventRegistrations.id,
-      userId: eventRegistrations.userId,
-      userName: user.name,
-      userEmail: user.email,
-      guestCount: eventRegistrations.guestCount,
-    })
-    .from(eventRegistrations)
-    .innerJoin(user, eq(eventRegistrations.userId, user.id))
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.status, 'registered'),
-      ),
-    )
-
-  // Filter out those with existing invoices
-  const existingInvoices = await db
-    .select({ eventRegistrationId: invoices.eventRegistrationId })
-    .from(invoices)
-    .where(eq(invoices.type, 'event_fee'))
-
-  const existingRegIds = new Set(
-    existingInvoices.map((i) => i.eventRegistrationId).filter(Boolean),
-  )
-  const regsToInvoice = registrations.filter((r) => !existingRegIds.has(r.regId))
-
+  const price = Number(event.price)
   const eventTitle = getLocalized(event.titleLocales, 'en') || 'Event'
   const dueDate = computeDueDate()
-  let count = 0
+  const summary = await getEventBillingSummary(eventId)
 
-  for (const reg of regsToInvoice) {
+  let created = 0
+  let updated = 0
+
+  for (const reg of summary.registrations) {
+    // Sent and paid invoices are immutable. Anything still owed beyond them
+    // goes on a draft: amended in place if one exists, otherwise a new one.
+    const owedSeats = reg.currentSeats - reg.issuedSeats
+    if (owedSeats < 0) continue // overbilled; reported, handled manually
+
+    if (reg.draft) {
+      if (owedSeats === 0) {
+        await db
+          .update(invoices)
+          .set({ status: 'cancelled', updatedAt: new Date() })
+          .where(eq(invoices.id, reg.draft.id))
+        updated++
+      } else if (reg.draft.seatCount !== owedSeats) {
+        await db
+          .update(invoices)
+          .set({
+            seatCount: owedSeats,
+            amount: String(price * owedSeats),
+            description: eventFeeDescription(eventTitle, owedSeats, reg.issuedSeats > 0),
+            updatedAt: new Date(),
+          })
+          .where(eq(invoices.id, reg.draft.id))
+        updated++
+      }
+      continue
+    }
+
+    if (owedSeats === 0) continue
+
     const invoiceNumber = await getNextInvoiceNumber()
     const referenceNumber = generateReferenceNumber(invoiceNumber)
-    const totalSeats = 1 + reg.guestCount
-    const amount = String(Number(event.price!) * totalSeats)
-    const description = reg.guestCount > 0
-      ? `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle} (1 + ${reg.guestCount} guest(s))`
-      : `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle}`
 
     try {
       await db.insert(invoices).values({
@@ -189,25 +189,41 @@ export async function createEventInvoices(
         type: 'event_fee',
         userId: reg.userId,
         eventRegistrationId: reg.regId,
+        seatCount: owedSeats,
         recipientName: reg.userName,
         recipientEmail: reg.userEmail,
-        description,
-        amount,
+        description: eventFeeDescription(eventTitle, owedSeats, reg.issuedSeats > 0),
+        amount: String(price * owedSeats),
         dueDate,
         referenceNumber,
       })
-      count++
+      created++
     } catch (error) {
       if (isDuplicateInvoiceNumber(error)) {
         await resyncInvoiceCounter()
-        return { success: false, error: `Invoice number ${invoiceNumber} already exists. The counter has been corrected — please try again.`, count }
+        return { success: false, error: `Invoice number ${invoiceNumber} already exists. The counter has been corrected — please try again.`, created, updated }
       }
       throw error
     }
   }
 
   revalidatePath('/members/admin/invoices')
-  return { success: true, count }
+  revalidatePath(`/members/admin/events/${eventId}`)
+  return { success: true, created, updated, overbilled: summary.overbilled }
+}
+
+/**
+ * Trilingual description line. A supplementary invoice (issued after the
+ * member's original one) covers only the additional guest seats.
+ */
+function eventFeeDescription(eventTitle: string, seats: number, supplementary: boolean): string {
+  if (supplementary) {
+    return `Additional guest(s) / Extra gäst(er) / Lisävieraat — ${eventTitle} (${seats} seat(s))`
+  }
+  const guests = seats - 1
+  return guests > 0
+    ? `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle} (1 + ${guests} guest(s))`
+    : `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle}`
 }
 
 export async function sendInvoice(
@@ -319,12 +335,26 @@ export async function cancelInvoice(
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()
 
+  const invoice = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).then((r) => r[0])
+  if (!invoice) return { success: false, error: 'invoiceNotFound' }
+  if (invoice.status === 'paid') return { success: false, error: 'invoicePaidNotCancellable' }
+  if (invoice.status === 'cancelled') return { success: true }
+
   await db
     .update(invoices)
     .set({ status: 'cancelled', updatedAt: new Date() })
     .where(eq(invoices.id, invoiceId))
 
   revalidatePath('/members/admin/invoices')
+  revalidatePath(`/members/admin/invoices/${invoiceId}`)
+  if (invoice.eventRegistrationId) {
+    const reg = await db
+      .select({ eventId: eventRegistrations.eventId })
+      .from(eventRegistrations)
+      .where(eq(eventRegistrations.id, invoice.eventRegistrationId))
+      .then((r) => r[0])
+    if (reg) revalidatePath(`/members/admin/events/${reg.eventId}`)
+  }
   return { success: true }
 }
 

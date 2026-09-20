@@ -426,8 +426,16 @@
     "confirmRunLottery": "Genomför lottningen nu? Detta kan inte ångras.",
     "lotteryRun": "Lottningen är genomförd.",
     "invoicing": "Fakturering",
-    "invoicedCount": "{invoiced} av {registered} anmälda har fakturerats.",
-    "eventInvoicesCreated": "{count, plural, =0 {Inga nya fakturor skapades.} =1 {1 faktura skapad.} other {# fakturor skapade.}}"
+    "cancelInvoice": "Annullera faktura",
+    "confirmCancelSentInvoice": "Fakturan är redan skickad till medlemmen. Annullera den ändå?",
+    "invoiceNotFound": "Fakturan hittades inte.",
+    "invoicePaidNotCancellable": "En betald faktura kan inte annulleras.",
+    "billingSummary": "{registered} anmälda: {invoiced} fakturerade, {needs} saknar faktura för alla platser.",
+    "overbilledHint": "{count, plural, =1 {1 anmälan har} other {# anmälningar har}} fler fakturerade platser än bokade. Annullera fakturan manuellt och generera igen.",
+    "eventInvoicesResult": "{created, plural, =0 {Inga nya fakturor} =1 {1 ny faktura} other {# nya fakturor}}, {updated, plural, =0 {inga utkast uppdaterade} =1 {1 utkast uppdaterat} other {# utkast uppdaterade}}.",
+    "seatsBilled": "{count, plural, =1 {1 plats} other {# platser}}",
+    "event": "Evenemang",
+    "viewEvent": "Visa evenemang"
   },
   "rules": {
     "title": "Stadgar",

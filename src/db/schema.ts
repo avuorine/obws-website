@@ -219,6 +219,8 @@ export const invoices = pgTable('invoices', {
     .references(() => user.id, { onDelete: 'cascade' }),
   feePeriodId: text('fee_period_id').references(() => feePeriods.id),
   eventRegistrationId: text('event_registration_id').references(() => eventRegistrations.id),
+  // Number of seats billed on an event-fee invoice (1 + guests). Null for membership fees.
+  seatCount: integer('seat_count'),
   recipientName: text('recipient_name').notNull(),
   recipientEmail: text('recipient_email').notNull(),
   description: text('description').notNull(),
