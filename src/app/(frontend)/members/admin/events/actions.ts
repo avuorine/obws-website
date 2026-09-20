@@ -139,27 +139,37 @@ export async function adminCancelRegistration(
   if (!reg) return { success: false, error: 'registrationNotFound' }
   if (reg.status === 'cancelled') return { success: false, error: 'registrationAlreadyCancelled' }
 
-  await cancelRegistrationRow(reg)
+  // Registration cancel, seat release, waitlist promotion and invoice
+  // cleanup commit together, so a failure cannot leave a cancelled
+  // registration with a live invoice.
+  const result = await db.transaction(async (tx) => {
+    const cancelled = await cancelRegistrationRow(reg, tx)
+    if (!cancelled) return { cancelled: false as const }
 
-  // Cancel any unpaid event-fee invoice tied to this registration. A paid
-  // invoice is left untouched and surfaced as a warning so the admin knows a
-  // refund has to be handled manually.
-  const linkedInvoices = await db
-    .select({ id: invoices.id, status: invoices.status })
-    .from(invoices)
-    .where(and(eq(invoices.eventRegistrationId, reg.id), eq(invoices.type, 'event_fee')))
+    // Cancel any unpaid event-fee invoice tied to this registration. A paid
+    // invoice is left untouched and surfaced as a warning so the admin knows a
+    // refund has to be handled manually.
+    const linkedInvoices = await tx
+      .select({ id: invoices.id, status: invoices.status })
+      .from(invoices)
+      .where(and(eq(invoices.eventRegistrationId, reg.id), eq(invoices.type, 'event_fee')))
 
-  let warning: string | undefined
-  for (const inv of linkedInvoices) {
-    if (inv.status === 'draft' || inv.status === 'sent') {
-      await db
-        .update(invoices)
-        .set({ status: 'cancelled', updatedAt: new Date() })
-        .where(eq(invoices.id, inv.id))
-    } else if (inv.status === 'paid') {
-      warning = 'registrationRemovedInvoicePaid'
+    let warning: string | undefined
+    for (const inv of linkedInvoices) {
+      if (inv.status === 'draft' || inv.status === 'sent') {
+        await tx
+          .update(invoices)
+          .set({ status: 'cancelled', updatedAt: new Date() })
+          .where(eq(invoices.id, inv.id))
+      } else if (inv.status === 'paid') {
+        warning = 'registrationRemovedInvoicePaid'
+      }
     }
-  }
+    return { cancelled: true as const, warning }
+  })
+
+  if (!result.cancelled) return { success: false, error: 'registrationAlreadyCancelled' }
+  const { warning } = result
 
   revalidatePath(`/members/admin/events/${reg.eventId}`)
   revalidatePath('/members/admin/events')
