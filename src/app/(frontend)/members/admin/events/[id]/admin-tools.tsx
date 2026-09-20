@@ -18,7 +18,9 @@ interface EventAdminToolsProps {
   registeredCount: number
   waitlistedCount: number
   hasPrice: boolean
-  invoicedCount: number
+  fullyInvoiced: number
+  needsInvoice: number
+  overbilled: number
 }
 
 type Message = { type: 'success' | 'error'; text: string }
@@ -31,7 +33,9 @@ export function EventAdminTools({
   registeredCount,
   waitlistedCount,
   hasPrice,
-  invoicedCount,
+  fullyInvoiced,
+  needsInvoice,
+  overbilled,
 }: EventAdminToolsProps) {
   const t = useTranslations('admin')
   const router = useRouter()
@@ -60,7 +64,10 @@ export function EventAdminTools({
     startTransition(async () => {
       const result = await createEventInvoices(eventId)
       if (result.success) {
-        setInvoiceMessage({ type: 'success', text: t('eventInvoicesCreated', { count: result.count ?? 0 }) })
+        setInvoiceMessage({
+          type: 'success',
+          text: t('eventInvoicesResult', { created: result.created ?? 0, updated: result.updated ?? 0 }),
+        })
         router.refresh()
       } else {
         setInvoiceMessage({ type: 'error', text: result.error ?? t('error') })
@@ -110,14 +117,17 @@ export function EventAdminTools({
             {t('invoicing')}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t('invoicedCount', { invoiced: invoicedCount, registered: registeredCount })}
+            {t('billingSummary', { registered: registeredCount, invoiced: fullyInvoiced, needs: needsInvoice })}
           </p>
+          {overbilled > 0 && (
+            <p className="text-sm text-amber-600">{t('overbilledHint', { count: overbilled })}</p>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
               variant="outline"
               onClick={handleInvoices}
-              disabled={isPending || registeredCount === 0 || invoicedCount >= registeredCount}
+              disabled={isPending || needsInvoice === 0}
             >
               {isPending ? t('generating') : t('generateEventInvoices')}
             </Button>

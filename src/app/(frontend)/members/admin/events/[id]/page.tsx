@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { events, eventCategories, eventRegistrations, invoices, user } from '@/db/schema'
-import { eq, asc, and, ne, count } from 'drizzle-orm'
+import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
+import { eq, asc } from 'drizzle-orm'
+import { getEventBillingSummary } from '@/lib/event-billing'
 import { formatDateTime } from '@/lib/format-date'
 import { toDatetimeLocalString } from '@/lib/timezone'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,20 +54,9 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const waitlistedCount = registrations.filter((r) => r.status === 'waitlisted').length
 
   const hasPrice = event.price != null && Number(event.price) > 0
-  const [{ invoicedCount }] = hasPrice
-    ? await db
-        .select({ invoicedCount: count() })
-        .from(invoices)
-        .innerJoin(eventRegistrations, eq(invoices.eventRegistrationId, eventRegistrations.id))
-        .where(
-          and(
-            eq(eventRegistrations.eventId, id),
-            eq(eventRegistrations.status, 'registered'),
-            eq(invoices.type, 'event_fee'),
-            ne(invoices.status, 'cancelled'),
-          ),
-        )
-    : [{ invoicedCount: 0 }]
+  const billing = hasPrice
+    ? await getEventBillingSummary(id)
+    : { registered: 0, fullyInvoiced: 0, needsInvoice: 0, overbilled: 0 }
 
   const statusLabel = (s: string) => {
     switch (s) {
@@ -159,7 +149,9 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
             registeredCount={registeredCount}
             waitlistedCount={waitlistedCount}
             hasPrice={hasPrice}
-            invoicedCount={invoicedCount}
+            fullyInvoiced={billing.fullyInvoiced}
+            needsInvoice={billing.needsInvoice}
+            overbilled={billing.overbilled}
           />
         </CardContent>
       </Card>

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { invoices } from '@/db/schema'
+import { invoices, eventRegistrations } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { requireAdmin } from '@/lib/admin-guard'
 import { formatReferenceNumber } from '@/lib/reference-number'
@@ -30,6 +30,14 @@ export default async function InvoiceDetailPage({
     .then((r) => r[0])
 
   if (!invoice) notFound()
+
+  const eventId = invoice.eventRegistrationId
+    ? await db
+        .select({ eventId: eventRegistrations.eventId })
+        .from(eventRegistrations)
+        .where(eq(eventRegistrations.id, invoice.eventRegistrationId))
+        .then((r) => r[0]?.eventId ?? null)
+    : null
 
   const statusVariant = (status: string) => {
     switch (status) {
@@ -123,7 +131,20 @@ export default async function InvoiceDetailPage({
             <div>
               <dt className="text-sm font-medium text-muted-foreground">{t('amount')}</dt>
               <dd className="mt-1 text-lg font-semibold">&euro;{invoice.amount}</dd>
+              {invoice.seatCount != null && (
+                <dd className="text-sm text-muted-foreground">{t('seatsBilled', { count: invoice.seatCount })}</dd>
+              )}
             </div>
+            {eventId && (
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">{t('event')}</dt>
+                <dd className="mt-1">
+                  <Link href={`/members/admin/events/${eventId}`} className="text-primary hover:underline">
+                    {t('viewEvent')}
+                  </Link>
+                </dd>
+              </div>
+            )}
             <div>
               <dt className="text-sm font-medium text-muted-foreground">{t('referenceNumber')}</dt>
               <dd className="mt-1 font-mono text-sm">{formatReferenceNumber(invoice.referenceNumber)}</dd>
