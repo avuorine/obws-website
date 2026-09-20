@@ -1,17 +1,17 @@
 'use client'
 
 import PhoneInputWithCountry from 'react-phone-number-input/react-hook-form'
-import type { Control } from 'react-hook-form'
+import type { Control, FieldValues, Path } from 'react-hook-form'
 import type { E164Number } from 'libphonenumber-js'
 import 'react-phone-number-input/style.css'
 
-type Props = {
-  control: Control<any>
-  name: string
+type Props<T extends FieldValues> = {
+  control: Control<T>
+  name: Path<T>
   error?: boolean
 }
 
-export function PhoneInput({ control, name, error }: Props) {
+export function PhoneInput<T extends FieldValues>({ control, name, error }: Props<T>) {
   return (
     <PhoneInputWithCountry
       name={name}
