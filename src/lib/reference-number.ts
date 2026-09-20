@@ -22,3 +22,17 @@ export function formatReferenceNumber(ref: string): string {
   }
   return parts.join(' ')
 }
+
+/**
+ * Normalise a reference number for matching. Banks deliver the same
+ * reference in several shapes: as generated ("102542"), zero-padded to
+ * 20 digits ("00000000000000102542") or as the international RF variant
+ * ("RF18000000000000102542"). All of these collapse to "102542".
+ */
+export function normalizeReferenceNumber(raw: string): string {
+  let ref = raw.replace(/[^0-9A-Za-z]/g, '').toUpperCase()
+  // RF creditor reference: "RF" + 2 check digits + national reference
+  if (ref.startsWith('RF') && ref.length > 4) ref = ref.slice(4)
+  ref = ref.replace(/^0+/, '')
+  return ref
+}
