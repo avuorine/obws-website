@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { invoices, eventRegistrations } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { invoices, eventRegistrations, invoicePayments } from '@/db/schema'
+import { eq, desc } from 'drizzle-orm'
+import { remainingAmount } from '@/lib/invoice-status'
 import { requireAdmin } from '@/lib/admin-guard'
 import { formatReferenceNumber } from '@/lib/reference-number'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,6 +31,13 @@ export default async function InvoiceDetailPage({
     .then((r) => r[0])
 
   if (!invoice) notFound()
+
+  const payments = await db
+    .select()
+    .from(invoicePayments)
+    .where(eq(invoicePayments.invoiceId, id))
+    .orderBy(desc(invoicePayments.paidAt))
+  const remaining = remainingAmount(invoice)
 
   const eventId = invoice.eventRegistrationId
     ? await db
@@ -131,6 +139,9 @@ export default async function InvoiceDetailPage({
             <div>
               <dt className="text-sm font-medium text-muted-foreground">{t('amount')}</dt>
               <dd className="mt-1 text-lg font-semibold">&euro;{invoice.amount}</dd>
+              {Number(invoice.paidAmount) > 0 && invoice.status !== 'paid' && (
+                <dd className="text-sm text-[#8b6914]">{t('paidOfTotal', { paid: invoice.paidAmount, total: invoice.amount })}</dd>
+              )}
               {invoice.seatCount != null && (
                 <dd className="text-sm text-muted-foreground">{t('seatsBilled', { count: invoice.seatCount })}</dd>
               )}
@@ -170,6 +181,50 @@ export default async function InvoiceDetailPage({
               </div>
             )}
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>{t('payments')}</CardTitle>
+            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+              <span className="text-sm text-muted-foreground">{t('remainingAmount', { amount: remaining.toFixed(2) })}</span>
+            )}
+            {Number(invoice.paidAmount) > Number(invoice.amount) + 0.005 && (
+              <span className="text-sm text-[#a63d2a]">
+                {t('overpaidBy', { amount: (Number(invoice.paidAmount) - Number(invoice.amount)).toFixed(2) })}
+              </span>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {payments.length === 0 ? (
+            <p className="px-6 pb-6 text-sm text-muted-foreground">{t('noPayments')}</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-input text-left">
+                  <th className="px-6 py-3 font-medium">{t('paidAt')}</th>
+                  <th className="px-6 py-3 font-medium">{t('amount')}</th>
+                  <th className="px-6 py-3 font-medium">{t('referenceNumber')}</th>
+                  <th className="px-6 py-3 font-medium">{t('paymentSource')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((p) => (
+                  <tr key={p.id} className="border-b border-input last:border-0">
+                    <td className="px-6 py-3">{fmtDate(p.paidAt)}</td>
+                    <td className="px-6 py-3">&euro;{p.amount}</td>
+                    <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{p.reference ?? '—'}</td>
+                    <td className="px-6 py-3">
+                      <Badge variant="outline">{p.source === 'bank_import' ? t('sourceBank') : t('sourceManual')}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </CardContent>
       </Card>
     </div>

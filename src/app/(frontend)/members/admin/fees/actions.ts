@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
 import { feePeriods, memberFees, user, invoices } from '@/db/schema'
-import { eq, and, inArray } from 'drizzle-orm'
+import { eq, and, inArray, ne, desc } from 'drizzle-orm'
+import { recordRemainingAsManual, removeManualPayments } from '@/lib/payments'
 import { feePeriodSchema, type FeePeriodFormData } from '@/lib/validation'
 import { parseDatetimeLocal } from '@/lib/timezone'
 
@@ -67,31 +68,27 @@ export async function markFeeAsPaid(
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()
 
-  const now = new Date()
-  await db
-    .update(memberFees)
-    .set({ status: 'paid', paidAt: now, updatedAt: now })
-    .where(eq(memberFees.id, memberFeeId))
-
-  // Also update related invoice if exists
   const fee = await db
     .select({ userId: memberFees.userId, feePeriodId: memberFees.feePeriodId })
     .from(memberFees)
     .where(eq(memberFees.id, memberFeeId))
     .then((r) => r[0])
+  if (!fee) return { success: false, error: 'Fee not found' }
 
-  if (fee) {
-    await db
-      .update(invoices)
-      .set({ status: 'paid', paidAt: now, updatedAt: now })
-      .where(
-        and(
-          eq(invoices.userId, fee.userId),
-          eq(invoices.feePeriodId, fee.feePeriodId),
-          eq(invoices.type, 'membership_fee'),
-        ),
-      )
-  }
+  const invoice = await membershipInvoiceFor(fee.userId, fee.feePeriodId)
+
+  await db.transaction(async (tx) => {
+    if (invoice) {
+      // Manual payment for the balance; the sync flips the fee to paid.
+      await recordRemainingAsManual(tx, invoice.id)
+    } else {
+      const now = new Date()
+      await tx
+        .update(memberFees)
+        .set({ status: 'paid', paidAt: now, updatedAt: now })
+        .where(eq(memberFees.id, memberFeeId))
+    }
+  })
 
   revalidatePath('/members/admin/fees')
   revalidatePath('/members/admin/invoices')
@@ -103,11 +100,44 @@ export async function markFeeAsUnpaid(
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()
 
-  await db
-    .update(memberFees)
-    .set({ status: 'unpaid', paidAt: null, updatedAt: new Date() })
+  const fee = await db
+    .select({ userId: memberFees.userId, feePeriodId: memberFees.feePeriodId })
+    .from(memberFees)
     .where(eq(memberFees.id, memberFeeId))
+    .then((r) => r[0])
+  if (!fee) return { success: false, error: 'Fee not found' }
+
+  const invoice = await membershipInvoiceFor(fee.userId, fee.feePeriodId)
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(memberFees)
+      .set({ status: 'unpaid', paidAt: null, updatedAt: new Date() })
+      .where(eq(memberFees.id, memberFeeId))
+    // Only manual payments are undone. If bank payments still cover the
+    // invoice, the sync sets the fee back to paid, which reflects reality.
+    if (invoice) await removeManualPayments(tx, invoice.id)
+  })
 
   revalidatePath('/members/admin/fees')
+  revalidatePath('/members/admin/invoices')
   return { success: true }
+}
+
+/** Latest non-cancelled membership invoice for a member and period, if any. */
+async function membershipInvoiceFor(userId: string, feePeriodId: string) {
+  return db
+    .select({ id: invoices.id })
+    .from(invoices)
+    .where(
+      and(
+        eq(invoices.userId, userId),
+        eq(invoices.feePeriodId, feePeriodId),
+        eq(invoices.type, 'membership_fee'),
+        ne(invoices.status, 'cancelled'),
+      ),
+    )
+    .orderBy(desc(invoices.createdAt))
+    .limit(1)
+    .then((r) => r[0] ?? null)
 }

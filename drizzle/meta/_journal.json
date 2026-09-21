@@ -78,6 +78,13 @@
       "when": 1789923256694,
       "tag": "0010_invoice_seat_count",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789975368061,
+      "tag": "0011_invoice_payments",
+      "breakpoints": true
     }
   ]
 }
