@@ -10,9 +10,9 @@ import { BulkSendButton } from './bulk-send-button'
 import { Download, AlertCircle, Clock, FileText, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/format-date'
-import { effectiveInvoiceStatus, daysOverdue, type EffectiveInvoiceStatus } from '@/lib/invoice-status'
+import { effectiveInvoiceStatus, daysOverdue, remainingAmount, type EffectiveInvoiceStatus } from '@/lib/invoice-status'
 
-const STATUSES: Array<'all' | EffectiveInvoiceStatus> = ['all', 'draft', 'sent', 'overdue', 'paid', 'cancelled']
+const STATUSES: Array<'all' | EffectiveInvoiceStatus> = ['all', 'draft', 'sent', 'partial', 'overdue', 'paid', 'cancelled']
 const TYPES = ['all', 'membership_fee', 'event_fee'] as const
 
 export default async function AdminInvoicesPage({
@@ -33,13 +33,19 @@ export default async function AdminInvoicesPage({
   const rows = allInvoices.map((inv) => ({ ...inv, effective: effectiveInvoiceStatus(inv, now) }))
 
   const sum = (list: typeof rows) => list.reduce((acc, inv) => acc + Number(inv.amount), 0)
+  // Open invoices count what is still owed, not face value.
+  const sumRemaining = (list: typeof rows) => list.reduce((acc, inv) => acc + remainingAmount(inv), 0)
   const overdue = rows.filter((r) => r.effective === 'overdue')
-  const outstanding = rows.filter((r) => r.effective === 'sent')
+  const outstanding = rows.filter((r) => r.effective === 'sent' || r.effective === 'partial')
   const drafts = rows.filter((r) => r.effective === 'draft')
   const paidThisYear = rows.filter((r) => r.effective === 'paid' && r.paidAt && r.paidAt >= startOfYear)
 
   const filtered = rows.filter(
-    (r) => (filterStatus === 'all' || r.effective === filterStatus) && (filterType === 'all' || r.type === filterType),
+    (r) =>
+      (filterStatus === 'all' ||
+        r.effective === filterStatus ||
+        (filterStatus === 'sent' && r.effective === 'partial')) &&
+      (filterType === 'all' || r.type === filterType),
   )
   const draftInvoiceIds = drafts.map((inv) => inv.id)
 
@@ -54,8 +60,8 @@ export default async function AdminInvoicesPage({
   }
 
   const tiles = [
-    { key: 'overdue', label: t('overdueInvoices'), count: overdue.length, amount: sum(overdue), icon: AlertCircle, tone: 'text-[#a63d2a]' },
-    { key: 'sent', label: t('outstandingInvoices'), count: outstanding.length, amount: sum(outstanding), icon: Clock, tone: 'text-foreground' },
+    { key: 'overdue', label: t('overdueInvoices'), count: overdue.length, amount: sumRemaining(overdue), icon: AlertCircle, tone: 'text-[#a63d2a]' },
+    { key: 'sent', label: t('outstandingInvoices'), count: outstanding.length, amount: sumRemaining(outstanding), icon: Clock, tone: 'text-foreground' },
     { key: 'draft', label: t('draftInvoices'), count: drafts.length, amount: sum(drafts), icon: FileText, tone: 'text-foreground' },
     { key: 'paid', label: t('paidThisYear'), count: paidThisYear.length, amount: sum(paidThisYear), icon: CheckCircle, tone: 'text-[#4a6741]' },
   ] as const
@@ -64,6 +70,7 @@ export default async function AdminInvoicesPage({
     switch (status) {
       case 'paid': return 'success' as const
       case 'sent': return 'outline' as const
+      case 'partial': return 'warning' as const
       case 'overdue': return 'destructive' as const
       case 'cancelled': return 'destructive' as const
       default: return 'default' as const
@@ -76,6 +83,7 @@ export default async function AdminInvoicesPage({
     switch (status) {
       case 'draft': return t('draft')
       case 'sent': return t('sent')
+      case 'partial': return t('partiallyPaid')
       case 'overdue': return t('overdue')
       case 'paid': return t('paid')
       case 'cancelled': return t('cancelled')
@@ -175,7 +183,12 @@ export default async function AdminInvoicesPage({
                         <Badge variant="outline">{typeLabel(inv.type)}</Badge>
                       </td>
                       <td className="px-4 py-3">{inv.recipientName}</td>
-                      <td className="px-4 py-3">€{inv.amount}</td>
+                      <td className="px-4 py-3">
+                        €{inv.amount}
+                        {Number(inv.paidAmount) > 0 && inv.status !== 'paid' && (
+                          <span className="block text-xs text-[#8b6914]">{t('paidOfTotal', { paid: inv.paidAmount, total: inv.amount })}</span>
+                        )}
+                      </td>
                       <td className={`px-4 py-3 ${inv.effective === 'overdue' ? 'text-[#a63d2a]' : 'text-muted-foreground'}`}>
                         {formatDate(inv.dueDate, locale)}
                         {inv.effective === 'overdue' && (

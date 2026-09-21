@@ -43,7 +43,14 @@ export default async function FeePeriodDetailPage({
 
   // Latest non-cancelled membership invoice per member for this period.
   const periodInvoices = await db
-    .select({ id: invoices.id, userId: invoices.userId, status: invoices.status, dueDate: invoices.dueDate })
+    .select({
+      id: invoices.id,
+      userId: invoices.userId,
+      status: invoices.status,
+      dueDate: invoices.dueDate,
+      amount: invoices.amount,
+      paidAmount: invoices.paidAmount,
+    })
     .from(invoices)
     .where(
       and(eq(invoices.feePeriodId, id), eq(invoices.type, 'membership_fee'), ne(invoices.status, 'cancelled')),

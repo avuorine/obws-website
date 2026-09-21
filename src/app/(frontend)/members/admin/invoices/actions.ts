@@ -13,6 +13,7 @@ import { sendEmail } from '@/lib/email-sender'
 import { getLocalized } from '@/lib/localize'
 import { getSettings } from '@/lib/settings'
 import { getEventBillingSummary } from '@/lib/event-billing'
+import { recordRemainingAsManual } from '@/lib/payments'
 
 const DUE_DATE_DAYS = 14
 
@@ -306,26 +307,12 @@ export async function markInvoicePaid(
   const invoice = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).then((r) => r[0])
   if (!invoice) return { success: false, error: 'Invoice not found' }
 
-  const now = new Date()
-  await db
-    .update(invoices)
-    .set({ status: 'paid', paidAt: now, updatedAt: now })
-    .where(eq(invoices.id, invoiceId))
-
-  // If membership fee, also mark memberFee as paid
-  if (invoice.type === 'membership_fee' && invoice.feePeriodId) {
-    await db
-      .update(memberFees)
-      .set({ status: 'paid', paidAt: now, updatedAt: now })
-      .where(
-        and(
-          eq(memberFees.userId, invoice.userId),
-          eq(memberFees.feePeriodId, invoice.feePeriodId),
-        ),
-      )
-  }
+  // Records a manual payment for the outstanding balance; the linked
+  // membership fee is updated by the payment sync.
+  await db.transaction((tx) => recordRemainingAsManual(tx, invoiceId))
 
   revalidatePath('/members/admin/invoices')
+  revalidatePath(`/members/admin/invoices/${invoiceId}`)
   revalidatePath('/members/admin/fees')
   return { success: true }
 }

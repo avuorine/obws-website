@@ -13,6 +13,7 @@ export default async function BankImportPage() {
       invoiceNumber: invoices.invoiceNumber,
       referenceNumber: invoices.referenceNumber,
       amount: invoices.amount,
+      paidAmount: invoices.paidAmount,
       recipientName: invoices.recipientName,
       status: invoices.status,
     })

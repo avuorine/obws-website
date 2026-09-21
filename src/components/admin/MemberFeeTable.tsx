@@ -58,6 +58,7 @@ export function MemberFeeTable({ fees }: MemberFeeTableProps) {
       case 'paid': return 'success' as const
       case 'overdue': return 'destructive' as const
       case 'sent': return 'outline' as const
+      case 'partial': return 'warning' as const
       case 'draft': return 'default' as const
       default: return 'outline' as const
     }
@@ -67,6 +68,7 @@ export function MemberFeeTable({ fees }: MemberFeeTableProps) {
     switch (status) {
       case 'draft': return t('draft')
       case 'sent': return t('sent')
+      case 'partial': return t('partiallyPaid')
       case 'overdue': return t('overdue')
       case 'paid': return t('paid')
       case 'cancelled': return t('cancelled')

@@ -32,6 +32,8 @@ export const invoiceTypeEnum = pgEnum('invoice_type', ['membership_fee', 'event_
 
 export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'sent', 'paid', 'cancelled'])
 
+export const paymentSourceEnum = pgEnum('payment_source', ['bank_import', 'manual'])
+
 // --- Localized JSON type helper ---
 export type LocalizedText = { sv?: string; fi?: string; en?: string }
 
@@ -227,10 +229,28 @@ export const invoices = pgTable('invoices', {
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
   dueDate: timestamp('due_date').notNull(),
   referenceNumber: text('reference_number').notNull(),
+  // Sum of invoice_payments; kept denormalised so lists and dashboards don't need a join.
+  paidAmount: numeric('paid_amount', { precision: 10, scale: 2 }).notNull().default('0'),
   paidAt: timestamp('paid_at'),
   sentAt: timestamp('sent_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// Individual payments against an invoice. Several rows may sum to one
+// invoice (split payments); bank_entry_ref makes re-importing a statement
+// idempotent.
+export const invoicePayments = pgTable('invoice_payments', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  invoiceId: text('invoice_id')
+    .notNull()
+    .references(() => invoices.id, { onDelete: 'cascade' }),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  paidAt: timestamp('paid_at').notNull(),
+  reference: text('reference'),
+  bankEntryRef: text('bank_entry_ref').unique(),
+  source: paymentSourceEnum('source').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 export const invoiceCounter = pgTable('invoice_counter', {

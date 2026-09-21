@@ -44,14 +44,14 @@ export default async function AdminDashboardPage() {
     db
       .select({
         unpaidCount: sql<number>`count(*)::int`,
-        unpaidSum: sql<string>`coalesce(sum(${invoices.amount}), 0)`,
+        unpaidSum: sql<string>`coalesce(sum(${invoices.amount} - ${invoices.paidAmount}), 0)`,
       })
       .from(invoices)
       .where(eq(invoices.status, 'sent')),
     db
       .select({
         overdueCount: sql<number>`count(*)::int`,
-        overdueSum: sql<string>`coalesce(sum(${invoices.amount}), 0)`,
+        overdueSum: sql<string>`coalesce(sum(${invoices.amount} - ${invoices.paidAmount}), 0)`,
       })
       .from(invoices)
       .where(and(eq(invoices.status, 'sent'), lt(invoices.dueDate, sql`now()`))),
