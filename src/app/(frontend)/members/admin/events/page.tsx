@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { Download } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 const STATUSES = ['all', 'draft', 'published', 'completed', 'cancelled'] as const
 
@@ -17,6 +18,7 @@ export default async function AdminEventsPage({
 }: {
   searchParams: Promise<{ status?: string }>
 }) {
+  await requireAdmin()
   const { status: filterStatus } = await searchParams
   const t = await getTranslations('admin')
   const locale = await getLocale()

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/format-date'
 import { Card, CardContent } from '@/components/ui/card'
 import { Download } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 const PAGE_SIZE = 50
 
@@ -16,6 +17,7 @@ export default async function AdminMembersPage({
 }: {
   searchParams: Promise<{ page?: string; fee?: string }>
 }) {
+  await requireAdmin()
   const { page: pageParam, fee: feeParam } = await searchParams
   const feeFilter = feeParam === 'unpaid' || feeParam === 'paid' ? feeParam : 'all'
   const t = await getTranslations('admin')

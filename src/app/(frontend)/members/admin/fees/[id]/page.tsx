@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MemberFeeTable, type MemberFeeRow } from '@/components/admin/MemberFeeTable'
 import { FeePeriodActions } from './fee-period-actions'
 import { ArrowLeft } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function FeePeriodDetailPage({
   params,
@@ -18,6 +19,7 @@ export default async function FeePeriodDetailPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ filter?: string }>
 }) {
+  await requireAdmin()
   const { id } = await params
   const { filter } = await searchParams
   const showUnpaidOnly = filter === 'unpaid'

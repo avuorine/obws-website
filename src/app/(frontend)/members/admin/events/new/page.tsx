@@ -5,8 +5,10 @@ import { eventCategories } from '@/db/schema'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EventForm } from '@/components/admin/EventForm'
 import { ArrowLeft } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function NewEventPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
 
   const categories = await db

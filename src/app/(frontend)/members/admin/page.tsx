@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Users, UserPlus, Calendar, FileText, Receipt, Mail } from 'lucide-react'
 import { formatDate } from '@/lib/format-date'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function AdminDashboardPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
   const locale = await getLocale()
 

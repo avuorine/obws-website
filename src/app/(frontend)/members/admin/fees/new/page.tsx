@@ -3,8 +3,10 @@ import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FeePeriodForm } from '@/components/admin/FeePeriodForm'
 import { ArrowLeft } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function NewFeePeriodPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
 
   return (
