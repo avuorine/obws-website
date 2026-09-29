@@ -9,6 +9,8 @@ import { getLocalized } from '@/lib/localize'
 import { formatDateTime, formatTime } from '@/lib/format-date'
 import { getDatePartsInTz } from '@/lib/timezone'
 import { EventRsvp } from '@/components/EventRsvp'
+import { getOverdueBalance } from '@/lib/overdue-balance'
+import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
 import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -45,19 +47,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         .then((r) => r.find((reg) => reg.status !== 'cancelled'))
     : null
 
+  const hasOverdueInvoices = member ? (await getOverdueBalance(member.id)) !== null : false
+
   const isFull = event.capacity
     ? (event.registrationCount ?? 0) >= event.capacity
     : false
   const isRegistrationNotOpenYet = event.registrationOpensAt
     ? new Date() < event.registrationOpensAt
     : false
-  const isDeadlinePassed = event.registrationDeadline
-    ? new Date() > event.registrationDeadline
-    : false
+  const isDeadlinePassed = isRegistrationClosed(event)
   const isLottery = event.allocationMethod === 'lottery'
   const isAdmin = member?.role === 'admin'
-  const canCancel = event.cancellationAllowed !== false &&
-    (!event.cancellationDeadline || new Date() <= event.cancellationDeadline)
+  const cancelBlockReason = cancellationBlockReason(event)
+  const canCancel = cancelBlockReason === null
   const isGuestRegistrationOpen = event.guestAllowed &&
     (!event.guestRegistrationOpensAt || new Date() >= event.guestRegistrationOpensAt)
 
@@ -167,11 +169,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             isRegistrationNotOpenYet={isRegistrationNotOpenYet}
             registrationOpensAt={event.registrationOpensAt?.toISOString() ?? null}
             canCancel={canCancel}
+            cancelBlockReason={cancelBlockReason}
             guestAllowed={event.guestAllowed}
             guestCount={userReg?.guestCount ?? 0}
             maxGuestsPerMember={event.maxGuestsPerMember}
             isGuestRegistrationOpen={isGuestRegistrationOpen}
             guestRegistrationOpensAt={event.guestRegistrationOpensAt?.toISOString() ?? null}
+            hasOverdueInvoices={hasOverdueInvoices}
             registerAction={registerForEvent}
             cancelAction={cancelRegistration}
             addGuestAction={addGuest}

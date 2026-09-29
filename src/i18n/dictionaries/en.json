@@ -122,7 +122,12 @@
     "mustRegisterFirst": "You must register first to add guests",
     "time": "Time",
     "registrationDeadline": "Registration deadline",
-    "cancellationDeadline": "Cancellation deadline"
+    "cancellationDeadline": "Cancellation deadline",
+    "overdueBlockedShort": "Event booking is paused because you have overdue invoices.",
+    "overdueContact": "Questions? Contact",
+    "guestRegistrationClosed": "Guest registration is closed",
+    "overdueBannerTitle": "You have {count, plural, one {# overdue invoice} other {# overdue invoices}} — {total} EUR outstanding",
+    "overdueBannerBody": "Until the balance is paid you can’t sign up for events or add guests. Your existing bookings are not affected. Registration opens again as soon as the payment has been recorded."
   },
   "profile": {
     "title": "Profile",

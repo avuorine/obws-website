@@ -122,7 +122,12 @@
     "mustRegisterFirst": "Du måste anmäla dig först för att lägga till gäster",
     "time": "Tid",
     "registrationDeadline": "Sista anmälningsdag",
-    "cancellationDeadline": "Sista avbokningsdag"
+    "cancellationDeadline": "Sista avbokningsdag",
+    "overdueBlockedShort": "Anmälan till evenemang är pausad eftersom du har förfallna fakturor.",
+    "overdueContact": "Frågor? Kontakta",
+    "guestRegistrationClosed": "Anmälan av gäster är stängd",
+    "overdueBannerTitle": "Du har {count, plural, one {# förfallen faktura} other {# förfallna fakturor}} — {total} EUR obetalt",
+    "overdueBannerBody": "Tills saldot är betalt kan du inte anmäla dig till evenemang eller lägga till gäster. Dina befintliga anmälningar påverkas inte. Anmälan öppnas igen så snart betalningen har registrerats."
   },
   "profile": {
     "title": "Profil",
