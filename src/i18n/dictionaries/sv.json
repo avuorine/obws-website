@@ -475,7 +475,18 @@
     "bankEntries": "Transaktioner",
     "total": "Totalt",
     "paymentsRecorded": "{count, plural, =1 {1 betalning registrerad} other {# betalningar registrerade}}, {fullyPaid, plural, =0 {inga fakturor helt betalda} =1 {1 faktura helt betald} other {# fakturor helt betalda}}.",
-    "duplicatesSkipped": "{count, plural, =1 {1 redan registrerad betalning hoppades över.} other {# redan registrerade betalningar hoppades över.}}"
+    "duplicatesSkipped": "{count, plural, =1 {1 redan registrerad betalning hoppades över.} other {# redan registrerade betalningar hoppades över.}}",
+    "payment": "Betalning",
+    "expectedRevenue": "Förväntat",
+    "invoicedTotal": "Fakturerat",
+    "outstandingTotal": "Obetalt",
+    "participantsPdf": "Deltagarlista (PDF)",
+    "participants": "Deltagare",
+    "seatsCount": "{count, plural, =1 {1 plats} other {# platser}}",
+    "paidOfAmount": "Betalt / totalt",
+    "present": "Närvarande",
+    "generatedAt": "Skapad",
+    "page": "Sida"
   },
   "rules": {
     "title": "Stadgar",

@@ -5,16 +5,18 @@ import { db } from '@/db'
 import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { getEventBillingSummary } from '@/lib/event-billing'
+import { getEventPayments, PAYMENT_STATUS_KEY, type RegistrationPaymentStatus } from '@/lib/event-payments'
 import { formatDateTime } from '@/lib/format-date'
 import { toDatetimeLocalString } from '@/lib/timezone'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { EventForm } from '@/components/admin/EventForm'
 
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { EventStatusActions } from './status-actions'
 import { RegistrationActions } from './registration-actions'
 import { EventAdminTools } from './admin-tools'
-import { ArrowLeft, Download, Eye } from 'lucide-react'
+import { ArrowLeft, Download, Eye, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +45,8 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       registeredAt: eventRegistrations.registeredAt,
       firstName: user.firstName,
       lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
     })
     .from(eventRegistrations)
     .innerJoin(user, eq(eventRegistrations.userId, user.id))
@@ -57,6 +61,18 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const billing = hasPrice
     ? await getEventBillingSummary(id)
     : { registered: 0, fullyInvoiced: 0, needsInvoice: 0, overbilled: 0 }
+
+  const payments = hasPrice ? await getEventPayments(id, registrations, Number(event.price)) : null
+
+  const paymentVariant = (s: RegistrationPaymentStatus) => {
+    switch (s) {
+      case 'paid': return 'success' as const
+      case 'partial': return 'warning' as const
+      case 'overdue': return 'destructive' as const
+      case 'sent': return 'outline' as const
+      default: return 'default' as const
+    }
+  }
 
   const statusLabel = (s: string) => {
     switch (s) {
@@ -156,18 +172,59 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         </CardContent>
       </Card>
 
+      {payments && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('payments')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {[
+                { label: t('expectedRevenue'), amount: payments.stats.expected, tone: '' },
+                { label: t('invoicedTotal'), amount: payments.stats.invoiced, tone: '' },
+                { label: t('paid'), amount: payments.stats.paid, tone: 'text-[#4a6741]' },
+                { label: t('outstandingTotal'), amount: payments.stats.outstanding, tone: '' },
+                { label: t('overdue'), amount: payments.stats.overdue, tone: payments.stats.overdue > 0 ? 'text-[#a63d2a]' : '' },
+              ].map((tile) => (
+                <div key={tile.label} className="rounded-lg bg-muted p-3">
+                  <p className="text-sm text-muted-foreground">{tile.label}</p>
+                  <p className={`text-xl font-bold ${tile.tone}`}>€{tile.amount.toFixed(2)}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {(Object.keys(PAYMENT_STATUS_KEY) as RegistrationPaymentStatus[])
+                .filter((s) => payments.stats.counts[s] > 0)
+                .map((s) => (
+                  <Badge key={s} variant={paymentVariant(s)}>
+                    {t(PAYMENT_STATUS_KEY[s])}: {payments.stats.counts[s]}
+                  </Badge>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Registrations Card */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{t('registrations')}</CardTitle>
             {registrations.length > 0 && (
-              <Button variant="outline" size="sm" asChild>
-                <a href={`/api/export/events/${id}/registrations`}>
-                  <Download className="mr-1 h-4 w-4" />
-                  {t('export')}
-                </a>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <a href={`/api/export/events/${id}/participants`} target="_blank" rel="noopener">
+                    <FileText className="mr-1 h-4 w-4" />
+                    {t('participantsPdf')}
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href={`/api/export/events/${id}/registrations`}>
+                    <Download className="mr-1 h-4 w-4" />
+                    {t('export')}
+                  </a>
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>
@@ -182,6 +239,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                     <th className="px-4 py-3 font-medium">{t('name')}</th>
                     <th className="px-4 py-3 font-medium">{t('status')}</th>
                     <th className="px-4 py-3 font-medium">{t('guests')}</th>
+                    {payments && <th className="px-4 py-3 font-medium">{t('payment')}</th>}
                     <th className="px-4 py-3 font-medium">{t('registeredAt')}</th>
                     <th className="px-4 py-3 font-medium text-right">{t('actions')}</th>
                   </tr>
@@ -194,6 +252,10 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                     >
                       <td className="px-4 py-3">
                         {reg.firstName} {reg.lastName}
+                        <span className="block text-xs text-muted-foreground">
+                          {reg.email}
+                          {reg.phone && <> · {reg.phone}</>}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={reg.status} label={statusLabel(reg.status)} />
@@ -201,6 +263,26 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                       <td className="px-4 py-3 text-muted-foreground">
                         {reg.guestCount > 0 ? reg.guestCount : '—'}
                       </td>
+                      {payments && (() => {
+                        const pay = payments.byRegistration.get(reg.id)!
+                        const badge = (
+                          <Badge variant={paymentVariant(pay.status)}>{t(PAYMENT_STATUS_KEY[pay.status])}</Badge>
+                        )
+                        return (
+                          <td className="px-4 py-3">
+                            {pay.invoiceId ? (
+                              <Link href={`/members/admin/invoices/${pay.invoiceId}`}>{badge}</Link>
+                            ) : (
+                              badge
+                            )}
+                            {pay.status !== 'not_invoiced' && (
+                              <span className="block text-xs text-muted-foreground">
+                                €{pay.paid.toFixed(2)} / €{pay.amount.toFixed(2)}
+                              </span>
+                            )}
+                          </td>
+                        )
+                      })()}
                       <td className="px-4 py-3 text-muted-foreground">
                         {formatDateTime(reg.registeredAt, locale)}
                       </td>
