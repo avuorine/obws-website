@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { getMember } from '@/lib/auth-server'
 import { cancelRegistrationRow } from '@/lib/registrations'
+import { getOverdueBalance } from '@/lib/overdue-balance'
+import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
 import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
@@ -13,6 +15,9 @@ export async function registerForEvent(
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
 
+  // Members with overdue invoices can't book until the balance is cleared
+  if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
+
   const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
   if (!event) return { success: false, error: 'Event not found' }
 
@@ -20,8 +25,8 @@ export async function registerForEvent(
     return { success: false, error: 'Registration not open yet' }
   }
 
-  if (event.registrationDeadline && new Date() > event.registrationDeadline) {
-    return { success: false, error: 'Registration closed' }
+  if (isRegistrationClosed(event)) {
+    return { success: false, error: 'registrationClosed' }
   }
 
   // Check for existing non-cancelled registration
@@ -80,6 +85,9 @@ export async function addGuest(
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
 
+  // Members with overdue invoices can't book until the balance is cleared
+  if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
+
   const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
   if (!event) return { success: false, error: 'Event not found' }
   if (!event.guestAllowed) return { success: false, error: 'Guests not allowed' }
@@ -88,8 +96,8 @@ export async function addGuest(
     return { success: false, error: 'Guest registration not open yet' }
   }
 
-  if (event.registrationDeadline && new Date() > event.registrationDeadline) {
-    return { success: false, error: 'Registration closed' }
+  if (isRegistrationClosed(event)) {
+    return { success: false, error: 'registrationClosed' }
   }
 
   if (event.allocationMethod === 'lottery' && !event.lotteryCompleted) {
@@ -142,6 +150,12 @@ export async function removeGuest(
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
 
+  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
+  if (!event) return { success: false, error: 'Event not found' }
+
+  const blockReason = cancellationBlockReason(event)
+  if (blockReason) return { success: false, error: blockReason }
+
   const reg = await db
     .select()
     .from(eventRegistrations)
@@ -168,8 +182,8 @@ export async function removeGuest(
       .where(eq(events.id, eventId))
 
     // Promote from waitlist if a seat freed up
-    const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-    if (event && event.capacity && (event.registrationCount ?? 0) < event.capacity) {
+    const updated = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
+    if (updated && updated.capacity && (updated.registrationCount ?? 0) < updated.capacity) {
       const nextWaitlisted = await db
         .select()
         .from(eventRegistrations)
@@ -185,7 +199,7 @@ export async function removeGuest(
 
       if (nextWaitlisted) {
         const seatsNeeded = 1 + nextWaitlisted.guestCount
-        const seatsAvailable = event.capacity - (event.registrationCount ?? 0)
+        const seatsAvailable = updated.capacity - (updated.registrationCount ?? 0)
         if (seatsNeeded <= seatsAvailable) {
           await db
             .update(eventRegistrations)
@@ -219,6 +233,12 @@ export async function cancelRegistration(
 ): Promise<{ success: boolean; error?: string }> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
+
+  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
+  if (!event) return { success: false, error: 'Event not found' }
+
+  const blockReason = cancellationBlockReason(event)
+  if (blockReason) return { success: false, error: blockReason }
 
   const reg = await db
     .select()

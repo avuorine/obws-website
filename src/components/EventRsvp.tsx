@@ -16,11 +16,13 @@ interface EventRsvpProps {
   isRegistrationNotOpenYet: boolean
   registrationOpensAt: string | null
   canCancel: boolean
+  cancelBlockReason: 'cancellationNotAllowed' | 'cancellationDeadlinePassed' | null
   guestAllowed: boolean
   guestCount: number
   maxGuestsPerMember: number
   isGuestRegistrationOpen: boolean
   guestRegistrationOpensAt: string | null
+  hasOverdueInvoices: boolean
   registerAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
   cancelAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
   addGuestAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
@@ -76,11 +78,13 @@ export function EventRsvp({
   isRegistrationNotOpenYet,
   registrationOpensAt,
   canCancel,
+  cancelBlockReason,
   guestAllowed,
   guestCount,
   maxGuestsPerMember,
   isGuestRegistrationOpen,
   guestRegistrationOpensAt,
+  hasOverdueInvoices,
   registerAction,
   cancelAction,
   addGuestAction,
@@ -94,11 +98,23 @@ export function EventRsvp({
     guestAllowed && !isGuestRegistrationOpen ? guestRegistrationOpensAt : null,
   )
 
+  function errorMessage(error?: string) {
+    if (error === 'overdueInvoices') return t('overdueBlockedShort')
+    if (
+      error === 'registrationClosed' ||
+      error === 'cancellationNotAllowed' ||
+      error === 'cancellationDeadlinePassed'
+    ) {
+      return t(error)
+    }
+    return error ?? 'Something went wrong'
+  }
+
   function handleRegister() {
     setError('')
     startTransition(async () => {
       const result = await registerAction(eventId)
-      if (!result.success) setError(result.error ?? 'Something went wrong')
+      if (!result.success) setError(errorMessage(result.error))
     })
   }
 
@@ -106,7 +122,7 @@ export function EventRsvp({
     setError('')
     startTransition(async () => {
       const result = await cancelAction(eventId)
-      if (!result.success) setError(result.error ?? 'Something went wrong')
+      if (!result.success) setError(errorMessage(result.error))
     })
   }
 
@@ -114,7 +130,7 @@ export function EventRsvp({
     setError('')
     startTransition(async () => {
       const result = await addGuestAction(eventId)
-      if (!result.success) setError(result.error ?? 'Something went wrong')
+      if (!result.success) setError(errorMessage(result.error))
     })
   }
 
@@ -122,15 +138,18 @@ export function EventRsvp({
     setError('')
     startTransition(async () => {
       const result = await removeGuestAction(eventId)
-      if (!result.success) setError(result.error ?? 'Something went wrong')
+      if (!result.success) setError(errorMessage(result.error))
     })
   }
 
-  const canRegister =
+  const isBlocked = hasOverdueInvoices
+
+  const couldRegister =
     !isRegistrationNotOpenYet &&
     !isDeadlinePassed &&
     !userStatus &&
     (!isFull || isLottery)
+  const canRegister = couldRegister && !isBlocked
 
   const showCancel =
     canCancel &&
@@ -141,12 +160,15 @@ export function EventRsvp({
 
   const showGuestSection = guestAllowed && hasActiveRegistration
 
-  const canAddGuest =
+  const couldAddGuest =
     isGuestRegistrationOpen &&
     guestCount < maxGuestsPerMember &&
     !isDeadlinePassed &&
     !(isLottery && !lotteryCompleted) &&
     !(userStatus === 'registered' && isFull)
+  const canAddGuest = couldAddGuest && !isBlocked
+
+  const showOverdueNotice = isBlocked && (couldRegister || (showGuestSection && couldAddGuest))
 
   return (
     <div className="space-y-3">
@@ -170,6 +192,12 @@ export function EventRsvp({
       {isDeadlinePassed && !userStatus && (
         <p className="text-sm text-muted-foreground">{t('registrationClosed')}</p>
       )}
+      {cancelBlockReason &&
+        (userStatus === 'registered' || userStatus === 'waitlisted' || userStatus === 'pending') && (
+          <p className="text-sm text-muted-foreground">{t(cancelBlockReason)}</p>
+        )}
+
+      {showOverdueNotice && <Alert variant="warning">{t('overdueBlockedShort')}</Alert>}
 
       <div className="flex gap-3">
         {canRegister && (
@@ -201,6 +229,9 @@ export function EventRsvp({
           {isGuestRegistrationOpen && userStatus === 'registered' && isFull && guestCount >= maxGuestsPerMember && (
             <p className="text-sm text-muted-foreground">{t('eventFullNoGuests')}</p>
           )}
+          {isDeadlinePassed && guestCount < maxGuestsPerMember && (
+            <p className="text-sm text-muted-foreground">{t('guestRegistrationClosed')}</p>
+          )}
           {isGuestRegistrationOpen && guestCount >= maxGuestsPerMember && !(userStatus === 'registered' && isFull) && (
             <p className="text-sm text-muted-foreground">{t('guestLimitReached')}</p>
           )}
@@ -210,7 +241,7 @@ export function EventRsvp({
                 {t('addGuest')}
               </Button>
             )}
-            {guestCount > 0 && (
+            {guestCount > 0 && canCancel && (
               <Button variant="outline" size="sm" onClick={handleRemoveGuest} disabled={isPending}>
                 {t('removeGuest')}
               </Button>

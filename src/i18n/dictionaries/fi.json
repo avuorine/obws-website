@@ -122,7 +122,12 @@
     "mustRegisterFirst": "Sinun täytyy ilmoittautua ensin lisätäksesi vieraita",
     "time": "Aika",
     "registrationDeadline": "Ilmoittautumisen takaraja",
-    "cancellationDeadline": "Peruutuksen takaraja"
+    "cancellationDeadline": "Peruutuksen takaraja",
+    "overdueBlockedShort": "Tapahtumiin ilmoittautuminen on estetty, koska sinulla on erääntyneitä laskuja.",
+    "overdueContact": "Kysyttävää? Ota yhteyttä:",
+    "guestRegistrationClosed": "Vieraiden ilmoittautuminen on päättynyt",
+    "overdueBannerTitle": "Sinulla on {count, plural, one {# erääntynyt lasku} other {# erääntynyttä laskua}} — {total} EUR maksamatta",
+    "overdueBannerBody": "Et voi ilmoittautua tapahtumiin tai lisätä vieraita ennen kuin laskut on maksettu. Nykyiset ilmoittautumisesi pysyvät voimassa. Ilmoittautuminen avautuu uudelleen heti, kun maksu on kirjattu."
   },
   "profile": {
     "title": "Profiili",
