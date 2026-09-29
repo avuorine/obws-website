@@ -6,7 +6,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-4 px-6 py-6 text-center text-sm text-muted-foreground">
+      <div className="mx-auto flex max-w-5xl wide:max-w-7xl flex-wrap items-center justify-center gap-x-4 px-6 py-6 text-center text-sm text-muted-foreground">
         <span>{t('footer', { year: new Date().getFullYear() })}</span>
         <Link href="/privacy" className="underline hover:text-foreground">
           {t('privacyPolicy')}

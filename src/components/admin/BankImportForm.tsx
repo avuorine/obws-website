@@ -314,7 +314,7 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="data-table w-full text-sm">
                   <thead>
                     <tr className="border-b border-input text-left">
                       <th className="px-4 py-3">

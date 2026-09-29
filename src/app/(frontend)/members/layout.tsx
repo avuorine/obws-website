@@ -10,7 +10,7 @@ export default async function MembersLayout({ children }: { children: React.Reac
   const isAdmin = member.role === 'admin'
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="wide-layout flex flex-col gap-6">
       <OverdueBanner userId={member.id} />
       <div className="flex flex-col gap-6 md:flex-row">
         <MembersNav isAdmin={isAdmin} />

@@ -158,49 +158,47 @@ export default async function AdminInvoicesPage({
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="data-table w-full text-sm">
                 <thead>
                   <tr className="border-b border-input text-left">
-                    <th className="px-4 py-3 font-medium">{t('invoiceNumber')}</th>
-                    <th className="px-4 py-3 font-medium">{t('type')}</th>
-                    <th className="px-4 py-3 font-medium">{t('recipient')}</th>
-                    <th className="px-4 py-3 font-medium">{t('amount')}</th>
-                    <th className="px-4 py-3 font-medium">{t('dueDate')}</th>
-                    <th className="px-4 py-3 font-medium">{t('referenceNumber')}</th>
-                    <th className="px-4 py-3 font-medium">{t('invoiceStatus')}</th>
-                    <th className="px-4 py-3 font-medium"></th>
+                    <th className="px-3 py-3 font-medium">{t('invoiceNumber')}</th>
+                    <th className="px-3 py-3 font-medium">{t('recipient')}</th>
+                    <th className="px-3 py-3 font-medium">{t('amount')}</th>
+                    <th className="px-3 py-3 font-medium">{t('dueDate')}</th>
+                    <th className="px-3 py-3 font-medium">{t('invoiceStatus')}</th>
+                    <th className="px-3 py-3 font-medium"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((inv) => (
                     <tr key={inv.id} className="border-b border-input last:border-0">
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <Link href={`/members/admin/invoices/${inv.id}`} className="font-medium text-primary hover:underline">
                           #{inv.invoiceNumber}
                         </Link>
+                        <Badge variant="outline" className="mt-1 block w-fit">{typeLabel(inv.type)}</Badge>
                       </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="outline">{typeLabel(inv.type)}</Badge>
+                      <td className="px-3 py-3">
+                        {inv.recipientName}
+                        <span className="block font-mono text-xs text-muted-foreground">{inv.referenceNumber}</span>
                       </td>
-                      <td className="px-4 py-3">{inv.recipientName}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         €{inv.amount}
                         {Number(inv.paidAmount) > 0 && inv.status !== 'paid' && (
                           <span className="block text-xs text-[#8b6914]">{t('paidOfTotal', { paid: inv.paidAmount, total: inv.amount })}</span>
                         )}
                       </td>
-                      <td className={`px-4 py-3 ${inv.effective === 'overdue' ? 'text-[#a63d2a]' : 'text-muted-foreground'}`}>
+                      <td className={`px-3 py-3 ${inv.effective === 'overdue' ? 'text-[#a63d2a]' : 'text-muted-foreground'}`}>
                         {formatDate(inv.dueDate, locale)}
                         {inv.effective === 'overdue' && (
                           <span className="block text-xs">{t('daysOverdue', { count: daysOverdue(inv.dueDate, now) })}</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs">{inv.referenceNumber}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <Badge variant={statusVariant(inv.effective)}>{statusLabel(inv.effective)}</Badge>
                       </td>
-                      <td className="px-4 py-3">
-                        <InvoiceActions invoiceId={inv.id} status={inv.status} />
+                      <td className="px-3 py-3">
+                        <InvoiceActions invoiceId={inv.id} status={inv.status} stacked />
                       </td>
                     </tr>
                   ))}
