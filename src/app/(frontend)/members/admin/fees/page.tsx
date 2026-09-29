@@ -6,8 +6,10 @@ import { eq, sql, desc } from 'drizzle-orm'
 import { formatDate } from '@/lib/format-date'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function AdminFeesPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
   const locale = await getLocale()
 

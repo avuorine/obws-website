@@ -5,8 +5,10 @@ import { eventCategories } from '@/db/schema'
 import { getLocalized } from '@/lib/localize'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function AdminCategoriesPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
   const locale = await getLocale()
 

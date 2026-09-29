@@ -11,6 +11,7 @@ import { Download, AlertCircle, Clock, FileText, CheckCircle } from 'lucide-reac
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/format-date'
 import { effectiveInvoiceStatus, daysOverdue, remainingAmount, type EffectiveInvoiceStatus } from '@/lib/invoice-status'
+import { requireAdmin } from '@/lib/admin-guard'
 
 const STATUSES: Array<'all' | EffectiveInvoiceStatus> = ['all', 'draft', 'sent', 'partial', 'overdue', 'paid', 'cancelled']
 const TYPES = ['all', 'membership_fee', 'event_fee'] as const
@@ -20,6 +21,7 @@ export default async function AdminInvoicesPage({
 }: {
   searchParams: Promise<{ status?: string; type?: string }>
 }) {
+  await requireAdmin()
   const { status: statusParam, type: typeParam } = await searchParams
   const t = await getTranslations('admin')
   const locale = await getLocale()

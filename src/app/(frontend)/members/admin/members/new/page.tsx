@@ -6,8 +6,10 @@ import { max } from 'drizzle-orm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreateMemberForm } from '@/components/admin/CreateMemberForm'
 import { ArrowLeft } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function NewMemberPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
 
   const [{ maxNum }] = await db

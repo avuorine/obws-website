@@ -3,8 +3,10 @@ import { db } from '@/db'
 import { invoices } from '@/db/schema'
 import { inArray } from 'drizzle-orm'
 import { BankImportForm } from '@/components/admin/BankImportForm'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function BankImportPage() {
+  await requireAdmin()
   const t = await getTranslations('admin')
 
   const unpaidInvoices = await db

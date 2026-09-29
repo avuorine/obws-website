@@ -7,8 +7,10 @@ import { eq } from 'drizzle-orm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CategoryForm } from '@/components/admin/CategoryForm'
 import { ArrowLeft } from 'lucide-react'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin()
   const { id } = await params
   const t = await getTranslations('admin')
 

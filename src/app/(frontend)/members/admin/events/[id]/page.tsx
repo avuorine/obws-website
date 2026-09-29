@@ -18,8 +18,10 @@ import { RegistrationActions } from './registration-actions'
 import { EventAdminTools } from './admin-tools'
 import { ArrowLeft, Download, Eye, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { requireAdmin } from '@/lib/admin-guard'
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin()
   const { id } = await params
   const t = await getTranslations('admin')
   const locale = await getLocale()
