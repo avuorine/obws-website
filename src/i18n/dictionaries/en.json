@@ -475,7 +475,18 @@
     "bankEntries": "Transactions",
     "total": "Total",
     "paymentsRecorded": "{count, plural, =1 {1 payment recorded} other {# payments recorded}}, {fullyPaid, plural, =0 {no invoices fully paid} =1 {1 invoice fully paid} other {# invoices fully paid}}.",
-    "duplicatesSkipped": "{count, plural, =1 {1 previously recorded payment skipped.} other {# previously recorded payments skipped.}}"
+    "duplicatesSkipped": "{count, plural, =1 {1 previously recorded payment skipped.} other {# previously recorded payments skipped.}}",
+    "payment": "Payment",
+    "expectedRevenue": "Expected",
+    "invoicedTotal": "Invoiced",
+    "outstandingTotal": "Outstanding",
+    "participantsPdf": "Participants PDF",
+    "participants": "Participants",
+    "seatsCount": "{count, plural, =1 {1 seat} other {# seats}}",
+    "paidOfAmount": "Paid / total",
+    "present": "Present",
+    "generatedAt": "Generated",
+    "page": "Page"
   },
   "rules": {
     "title": "Rules",

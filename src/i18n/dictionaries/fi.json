@@ -475,7 +475,18 @@
     "bankEntries": "Tapahtumat",
     "total": "Yhteensä",
     "paymentsRecorded": "{count, plural, =1 {1 maksu kirjattu} other {# maksua kirjattu}}, {fullyPaid, plural, =0 {ei kokonaan maksettuja laskuja} =1 {1 lasku kokonaan maksettu} other {# laskua kokonaan maksettu}}.",
-    "duplicatesSkipped": "{count, plural, =1 {1 aiemmin kirjattu maksu ohitettiin.} other {# aiemmin kirjattua maksua ohitettiin.}}"
+    "duplicatesSkipped": "{count, plural, =1 {1 aiemmin kirjattu maksu ohitettiin.} other {# aiemmin kirjattua maksua ohitettiin.}}",
+    "payment": "Maksu",
+    "expectedRevenue": "Odotettu",
+    "invoicedTotal": "Laskutettu",
+    "outstandingTotal": "Avoinna",
+    "participantsPdf": "Osallistujalista (PDF)",
+    "participants": "Osallistujat",
+    "seatsCount": "{count, plural, =1 {1 paikka} other {# paikkaa}}",
+    "paidOfAmount": "Maksettu / yhteensä",
+    "present": "Paikalla",
+    "generatedAt": "Luotu",
+    "page": "Sivu"
   },
   "rules": {
     "title": "Säännöt",
