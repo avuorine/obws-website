@@ -37,7 +37,7 @@ export function Header() {
 
   return (
     <header className="border-b border-input">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-5xl wide:max-w-7xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <Link href="/" className="transition-opacity hover:opacity-80">
             <Image

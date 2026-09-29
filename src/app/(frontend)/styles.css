@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Pages that render a `.wide-layout` element (the members area) widen the
+   site container so admin tables have room. */
+@custom-variant wide (body:has(.wide-layout) &);
+
 @theme {
   /* Brand palette */
   --color-parchment: #f4e6ce;
@@ -39,6 +43,16 @@
 
 body {
   @apply bg-background text-foreground antialiased;
+}
+
+/* Admin data tables: cells stay on one line so a wide table scrolls inside
+   its overflow-x-auto wrapper instead of squashing columns. Free-text
+   columns opt back in with `whitespace-normal`. */
+@layer components {
+  .data-table th,
+  .data-table td {
+    white-space: nowrap;
+  }
 }
 
 /* Phone input styling */

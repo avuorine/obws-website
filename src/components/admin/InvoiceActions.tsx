@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button'
 interface InvoiceActionsProps {
   invoiceId: string
   status: string
+  /** Stack the buttons vertically, for narrow table cells. */
+  stacked?: boolean
 }
 
-export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
+export function InvoiceActions({ invoiceId, status, stacked = false }: InvoiceActionsProps) {
   const t = useTranslations('admin')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -38,7 +40,7 @@ export function InvoiceActions({ invoiceId, status }: InvoiceActionsProps) {
 
   return (
     <div className="flex flex-col items-start gap-1">
-      <div className="flex gap-2">
+      <div className={stacked ? 'flex flex-col items-stretch gap-1' : 'flex gap-2'}>
         {status === 'draft' && (
           <Button variant="outline" size="sm" onClick={() => run(() => sendInvoice(invoiceId))} disabled={isPending}>
             {isPending ? t('sending') : t('sendInvoice')}

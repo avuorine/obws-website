@@ -112,7 +112,7 @@ export default async function AdminEventsPage({
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="data-table w-full text-sm">
                 <thead>
                   <tr className="border-b border-input text-left">
                     <th className="px-4 py-3 font-medium">{t('status')}</th>
@@ -131,7 +131,7 @@ export default async function AdminEventsPage({
                           label={statusLabel(event.status ?? 'draft')}
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="min-w-48 whitespace-normal px-4 py-3">
                         <Link
                           href={`/members/admin/events/${event.id}`}
                           className="font-medium text-primary hover:underline"

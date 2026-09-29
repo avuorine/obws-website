@@ -176,7 +176,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
             <p className="text-sm text-muted-foreground">{t('noRegistrations')}</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="data-table w-full text-sm">
                 <thead>
                   <tr className="border-b border-input text-left">
                     <th className="px-4 py-3 font-medium">{t('name')}</th>

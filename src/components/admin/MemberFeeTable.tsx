@@ -140,7 +140,7 @@ export function MemberFeeTable({ fees }: MemberFeeTableProps) {
         </div>
       )}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="data-table w-full text-sm">
           <thead>
             <tr className="border-b border-input text-left">
               <th className="w-10 px-4 py-3">

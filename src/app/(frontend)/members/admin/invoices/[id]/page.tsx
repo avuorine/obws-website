@@ -202,28 +202,30 @@ export default async function InvoiceDetailPage({
           {payments.length === 0 ? (
             <p className="px-6 pb-6 text-sm text-muted-foreground">{t('noPayments')}</p>
           ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-input text-left">
-                  <th className="px-6 py-3 font-medium">{t('paidAt')}</th>
-                  <th className="px-6 py-3 font-medium">{t('amount')}</th>
-                  <th className="px-6 py-3 font-medium">{t('referenceNumber')}</th>
-                  <th className="px-6 py-3 font-medium">{t('paymentSource')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((p) => (
-                  <tr key={p.id} className="border-b border-input last:border-0">
-                    <td className="px-6 py-3">{fmtDate(p.paidAt)}</td>
-                    <td className="px-6 py-3">&euro;{p.amount}</td>
-                    <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{p.reference ?? '—'}</td>
-                    <td className="px-6 py-3">
-                      <Badge variant="outline">{p.source === 'bank_import' ? t('sourceBank') : t('sourceManual')}</Badge>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="data-table w-full text-sm">
+                <thead>
+                  <tr className="border-b border-input text-left">
+                    <th className="px-6 py-3 font-medium">{t('paidAt')}</th>
+                    <th className="px-6 py-3 font-medium">{t('amount')}</th>
+                    <th className="px-6 py-3 font-medium">{t('referenceNumber')}</th>
+                    <th className="px-6 py-3 font-medium">{t('paymentSource')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {payments.map((p) => (
+                    <tr key={p.id} className="border-b border-input last:border-0">
+                      <td className="px-6 py-3">{fmtDate(p.paidAt)}</td>
+                      <td className="px-6 py-3">&euro;{p.amount}</td>
+                      <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{p.reference ?? '—'}</td>
+                      <td className="px-6 py-3">
+                        <Badge variant="outline">{p.source === 'bank_import' ? t('sourceBank') : t('sourceManual')}</Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardContent>
       </Card>
