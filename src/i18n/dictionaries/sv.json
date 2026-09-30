@@ -564,7 +564,9 @@
     "bankMatch_exact": "Exakt",
     "bankMatch_split": "Uppdelad",
     "bankTransactionNotFound": "Betalningen har redan hanterats.",
-    "sourceBankSync": "Bank (automatisk)"
+    "sourceBankSync": "Bank (automatisk)",
+    "bankNoBanks": "Enable Banking returnerade inga banker. Kontrollera att applikationen är aktiv (begränsat läge: ett konto länkat i kontrollpanelen).",
+    "bankNoMatch": "Ingen bank matchar sökningen."
   },
   "rules": {
     "title": "Stadgar",
