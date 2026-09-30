@@ -199,7 +199,8 @@
     "inactiveNotice": "Jäsenyytesi ei ole aktiivinen. Ota yhteyttä hallitukseen, jos tämä on virhe.",
     "addToApple": "Lisää Apple Walletiin",
     "addToGoogle": "Lisää Google Walletiin",
-    "qrHelp": "QR-koodi tunnistaa sinut tapahtumien sisäänkirjautumisessa."
+    "qrHelp": "QR-koodi tunnistaa sinut tapahtumien sisäänkirjautumisessa.",
+    "discountsLink": "Jäsenalennukset →"
   },
   "board": {
     "title": "Hallitus",
@@ -566,7 +567,24 @@
     "bankTransactionNotFound": "Maksu on jo käsitelty.",
     "sourceBankSync": "Pankki (automaattinen)",
     "bankNoBanks": "Enable Banking ei palauttanut yhtään pankkia. Tarkista, että sovellus on aktiivinen (rajoitettu tila: tili linkitetty hallintapaneelissa).",
-    "bankNoMatch": "Haulla ei löytynyt pankkia."
+    "bankNoMatch": "Haulla ei löytynyt pankkia.",
+    "discounts": "Alennukset",
+    "addDiscount": "Uusi alennus",
+    "editDiscount": "Muokkaa alennusta",
+    "noDiscounts": "Ei alennuksia vielä.",
+    "discountName": "Paikka",
+    "discountOffer": "Alennus",
+    "discountOfferPlaceholder": "esim. 10 % alennus viskeistä",
+    "discountDetails": "Ehdot",
+    "discountDetailsPlaceholder": "esim. Näytä jäsenkorttisi",
+    "discountAddress": "Osoite",
+    "discountUrl": "Verkkosivut",
+    "discountActive": "Näkyy jäsenille",
+    "discountVisible": "Näkyvissä",
+    "discountHidden": "Piilotettu",
+    "discountSaved": "Alennus tallennettu.",
+    "discountConfirmDelete": "Poistetaanko tämä alennus?",
+    "required": "Pakollinen"
   },
   "rules": {
     "title": "Säännöt",
@@ -759,5 +777,13 @@
         "content": "Näitä ehtoja koskevat kysymykset voi lähettää hallitukselle sähköpostitse. Yhteystiedot löytyvät hallitussivulta. Henkilötietojen käsittelystä kerrotaan tietosuojaselosteessa."
       }
     }
+  },
+  "discounts": {
+    "title": "Alennukset",
+    "intro": "Paikat, jotka antavat alennusta kerhon jäsenille.",
+    "showCard": "Näytä jäsenkorttisi →",
+    "empty": "Jäsenalennuksia ei ole tällä hetkellä.",
+    "requiresValidCard": "Jäsenalennukset edellyttävät voimassa olevaa jäsenkorttia. Jäsenyytesi ei ole aktiivinen; ota yhteyttä hallitukseen, jos tämä on virhe.",
+    "website": "Verkkosivut"
   }
 }

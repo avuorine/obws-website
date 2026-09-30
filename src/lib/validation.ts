@@ -62,6 +62,30 @@ export const categorySchema = z.object({
 
 export type CategoryFormData = z.infer<typeof categorySchema>
 
+const optionalHttpUrl = z
+  .string()
+  .trim()
+  .optional()
+  .refine((v) => !v || /^https?:\/\/[^\s]+$/i.test(v), { message: 'Must start with http:// or https://' })
+
+export const discountSchema = z.object({
+  nameSv: z.string().trim().min(1),
+  nameFi: z.string().optional(),
+  nameEn: z.string().optional(),
+  offerSv: z.string().trim().min(1),
+  offerFi: z.string().optional(),
+  offerEn: z.string().optional(),
+  detailsSv: z.string().optional(),
+  detailsFi: z.string().optional(),
+  detailsEn: z.string().optional(),
+  address: z.string().optional(),
+  url: optionalHttpUrl,
+  sortOrder: z.string().optional(),
+  active: z.boolean(),
+})
+
+export type DiscountFormData = z.infer<typeof discountSchema>
+
 export const feePeriodSchema = z.object({
   name: z.string().min(1),
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {

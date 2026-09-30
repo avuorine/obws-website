@@ -370,3 +370,21 @@ export const bankTransactions = pgTable('bank_transactions', {
   resolvedBy: text('resolved_by').references(() => user.id, { onDelete: 'set null' }),
   resolvedAt: timestamp('resolved_at'),
 })
+
+// --- Member discounts ---
+
+// Places that give members a discount on showing a valid membership card.
+export const memberDiscounts = pgTable('member_discounts', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  nameLocales: jsonb('name_locales').$type<LocalizedText>().notNull(),
+  // The offer itself, e.g. "10 % off whiskies and cocktails".
+  offerLocales: jsonb('offer_locales').$type<LocalizedText>().notNull(),
+  // Conditions, e.g. "Show your membership card at the till".
+  detailsLocales: jsonb('details_locales').$type<LocalizedText>(),
+  address: text('address'),
+  url: text('url'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})

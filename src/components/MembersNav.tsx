@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark, CreditCard, Link2 } from 'lucide-react'
+import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark, CreditCard, Link2, Percent } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 interface MembersNavProps {
@@ -19,6 +19,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
     { href: '/members', label: t('membersDashboard.title'), icon: LayoutDashboard },
     { href: '/members/events', label: t('events.title'), icon: Calendar },
     { href: '/members/card', label: t('membershipCard.title'), icon: CreditCard },
+    { href: '/members/discounts', label: t('discounts.title'), icon: Percent },
     { href: '/members/invoices', label: t('invoices.title'), icon: Receipt },
     { href: '/members/profile', label: t('profile.title'), icon: UserCircle },
   ]
@@ -28,6 +29,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
     { href: '/members/admin/members', label: t('admin.members'), icon: UserPlus },
     { href: '/members/admin/events', label: t('admin.allEvents'), icon: Calendar },
     { href: '/members/admin/categories', label: t('admin.categories'), icon: Tags },
+    { href: '/members/admin/discounts', label: t('admin.discounts'), icon: Percent },
     { href: '/members/admin/fees', label: t('admin.fees'), icon: Receipt },
     { href: '/members/admin/invoices', label: t('admin.invoices'), icon: FileText },
     { href: '/members/admin/bank-import', label: t('admin.bankImport'), icon: Landmark },
