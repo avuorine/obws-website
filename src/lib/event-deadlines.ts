@@ -21,3 +21,19 @@ export function cancellationBlockReason(
   if (event.cancellationDeadline && now > event.cancellationDeadline) return 'cancellationDeadlinePassed'
   return null
 }
+
+/**
+ * Which binding rule a member signs up under, for the confirmation dialog,
+ * the note on the event page and the confirmation email:
+ * - freeCancelUntil: free cancellation until the deadline, binding after
+ * - bindingNow: the deadline has already passed, binding immediately
+ * - noCancellation: the event never allows cancelling
+ * - cancelAnytime: cancellation allowed with no deadline (not binding)
+ */
+export type BindingRule = 'freeCancelUntil' | 'bindingNow' | 'noCancellation' | 'cancelAnytime'
+
+export function bindingRule(event: EventDeadlines, now: Date = new Date()): BindingRule {
+  if (event.cancellationAllowed === false) return 'noCancellation'
+  if (!event.cancellationDeadline) return 'cancelAnytime'
+  return now > event.cancellationDeadline ? 'bindingNow' : 'freeCancelUntil'
+}

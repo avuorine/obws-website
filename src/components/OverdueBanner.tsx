@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'
 import { Alert } from '@/components/ui/alert'
 import { getOverdueBalance } from '@/lib/overdue-balance'
@@ -20,6 +21,11 @@ export async function OverdueBanner({ userId }: { userId: string }) {
           {t('overdueBannerTitle', { count: balance.count, total: balance.total.toFixed(2) })}
         </p>
         <p>{t('overdueBannerBody')}</p>
+        <p>
+          <Link href="/members/invoices" className="font-medium underline">
+            {t('overdueViewInvoices')}
+          </Link>
+        </p>
         {contactEmail && (
           <p>
             {t('overdueContact')}{' '}

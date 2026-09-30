@@ -127,7 +127,26 @@
     "overdueContact": "Kysyttävää? Ota yhteyttä:",
     "guestRegistrationClosed": "Vieraiden ilmoittautuminen on päättynyt",
     "overdueBannerTitle": "Sinulla on {count, plural, one {# erääntynyt lasku} other {# erääntynyttä laskua}} — {total} EUR maksamatta",
-    "overdueBannerBody": "Et voi ilmoittautua tapahtumiin tai lisätä vieraita ennen kuin laskut on maksettu. Nykyiset ilmoittautumisesi pysyvät voimassa. Ilmoittautuminen avautuu uudelleen heti, kun maksu on kirjattu."
+    "overdueBannerBody": "Et voi ilmoittautua tapahtumiin tai lisätä vieraita ennen kuin laskut on maksettu. Nykyiset ilmoittautumisesi pysyvät voimassa. Ilmoittautuminen avautuu uudelleen heti, kun maksu on kirjattu.",
+    "bindingTitle": "Vahvista ilmoittautumisesi",
+    "bindingGuestTitle": "Lisää vieras",
+    "bindingLotteryIntro": "Osallistut arvontaan. Alla olevat ehdot koskevat sinua, jos saat paikan.",
+    "bindingWaitlistIntro": "Tapahtuma on täynnä, joten sinut lisätään jonotuslistalle. Alla olevat ehdot koskevat sinua, jos sinulle vapautuu paikka.",
+    "bindingGuestIntro": "{paid, select, yes {Vieraasta veloitetaan {price} €, joka lisätään maksuusi. } other {}}Samat ehdot koskevat vierastasi.",
+    "bindingRule_freeCancelUntil": "Voit perua maksutta {deadline} asti. Sen jälkeen ilmoittautumisesi on sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
+    "bindingRule_bindingNow": "Peruutuksen takaraja on umpeutunut, joten ilmoittautumisesi on heti sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
+    "bindingRule_noCancellation": "Tätä tapahtumaa ei voi perua. Ilmoittautumisesi on sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
+    "bindingRule_cancelAnytime": "Voit perua ilmoittautumisesi tällä sivulla.{paid, select, yes { Maksu on {price} € / henkilö.} other {}}",
+    "bindingAccept": "Ymmärrän, että ilmoittautumiseni on sitova",
+    "bindingConfirm": "Vahvista ilmoittautuminen",
+    "bindingGuestConfirm": "Lisää vieras",
+    "bindingBack": "Takaisin",
+    "bindingNote_freeCancelUntil": "Maksuton peruutus {deadline} asti. Sen jälkeen ilmoittautumisesi on sitova{paid, select, yes {, ja maksu on maksettava} other {}}.",
+    "bindingNote_bindingNow": "Peruutuksen takaraja on umpeutunut — ilmoittautumisesi on sitova{paid, select, yes {, ja maksu on maksettava} other {}}.",
+    "bindingNote_noCancellation": "Peruutus ei ole mahdollinen — ilmoittautumisesi on sitova{paid, select, yes {, ja maksu on maksettava} other {}}.",
+    "termsNotAccepted": "Vahvista, että ymmärrät ilmoittautumisen olevan sitova.",
+    "perPerson": "hlö",
+    "overdueViewInvoices": "Näytä laskusi →"
   },
   "profile": {
     "title": "Profiili",
@@ -486,7 +505,10 @@
     "paidOfAmount": "Maksettu / yhteensä",
     "present": "Paikalla",
     "generatedAt": "Luotu",
-    "page": "Sivu"
+    "page": "Sivu",
+    "lateRemovalExplanation": "Peruutuksen takaraja on umpeutunut, joten ilmoittautuminen on sitova ja tapahtumamaksu on edelleen voimassa. Pidä maksu (lasku luodaan, jos sitä ei vielä ole) tai jätä se perimättä (maksamattomat laskut perutaan).",
+    "lateRemovalKeepFee": "Poista, pidä maksu",
+    "lateRemovalWaiveFee": "Poista ja jätä maksu perimättä"
   },
   "rules": {
     "title": "Säännöt",
@@ -614,5 +636,33 @@
         "content": "Tietosuojaan liittyvissä kysymyksissä ota yhteyttä hallitukseen sähköpostitse. Yhteystiedot löytyvät hallitussivulta."
       }
     }
+  },
+  "registrationEmail": {
+    "subject_registered": "Ilmoittautuminen vahvistettu: {title}",
+    "subject_waitlisted": "Olet jonotuslistalla: {title}",
+    "subject_pending": "Arvontailmoittautuminen vastaanotettu: {title}",
+    "subjectGuest": "Vieras lisätty: {title}",
+    "greeting": "Hei {name},",
+    "intro_registered": "Ilmoittautumisesi tapahtumaan {title} on vahvistettu.",
+    "intro_waitlisted": "Tapahtuma on täynnä, joten olet jonotuslistalla tapahtumaan {title}.",
+    "intro_pending": "Osallistut arvontaan tapahtumaan {title}.",
+    "guestAdded": "Ilmoittautumiseesi on lisätty vieras. Sinulla on nyt {seats} paikkaa.",
+    "seats": "Paikat",
+    "viewEvent": "Näytä tapahtuma ja ilmoittautumisesi"
+  },
+  "invoices": {
+    "title": "Laskut",
+    "empty": "Sinulla ei ole laskuja.",
+    "outstanding": "Avoinna",
+    "overdue": "Erääntynyt",
+    "howToPay": "Näin maksat",
+    "howToPayBody": "Maksa tilisiirrolla ja käytä aina laskun viitenumeroa.",
+    "recipient": "Saaja",
+    "invoiceNumber": "Lasku nro {number}",
+    "amount": "Summa",
+    "toPay": "Maksettavaa",
+    "dueDate": "Eräpäivä",
+    "reference": "Viite",
+    "downloadPdf": "Lasku (PDF)"
   }
 }

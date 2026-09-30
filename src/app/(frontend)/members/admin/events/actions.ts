@@ -3,9 +3,14 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
-import { events, eventRegistrations, invoices } from '@/db/schema'
+import { events, eventRegistrations, invoices, user } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { cancelRegistrationRow } from '@/lib/registrations'
+import { eventFeeDescription } from '@/lib/event-billing'
+import { eventInvoiceDueDate } from '@/lib/event-due-date'
+import { getNextInvoiceNumber } from '@/lib/invoice-number'
+import { generateReferenceNumber } from '@/lib/reference-number'
+import { getLocalized } from '@/lib/localize'
 import { eventSchema, type EventFormData } from '@/lib/validation'
 import { parseDatetimeLocal } from '@/lib/timezone'
 
@@ -125,8 +130,15 @@ export async function updateEventStatus(
 }
 
 
+/**
+ * Remove a registration. By default unpaid event-fee invoices are cancelled.
+ * With `keepFee` (used after the cancellation deadline, when the signup is
+ * binding) live invoices stay, and a draft for the member's seats is created
+ * if none has been issued yet.
+ */
 export async function adminCancelRegistration(
   registrationId: string,
+  { keepFee = false }: { keepFee?: boolean } = {},
 ): Promise<{ success: boolean; error?: string; warning?: string }> {
   await requireAdmin()
 
@@ -138,6 +150,9 @@ export async function adminCancelRegistration(
 
   if (!reg) return { success: false, error: 'registrationNotFound' }
   if (reg.status === 'cancelled') return { success: false, error: 'registrationAlreadyCancelled' }
+
+  const event = await db.select().from(events).where(eq(events.id, reg.eventId)).then((r) => r[0])
+  const price = Number(event?.price ?? 0)
 
   // Registration cancel, seat release, waitlist promotion and invoice
   // cleanup commit together, so a failure cannot leave a cancelled
@@ -155,6 +170,32 @@ export async function adminCancelRegistration(
       .where(and(eq(invoices.eventRegistrationId, reg.id), eq(invoices.type, 'event_fee')))
 
     let warning: string | undefined
+
+    if (keepFee) {
+      // Binding signup: only waitlisted/pending members never had a seat to pay for.
+      const hadSeat = reg.status === 'registered'
+      const hasLiveInvoice = linkedInvoices.some((inv) => inv.status !== 'cancelled')
+      if (event && price > 0 && hadSeat && !hasLiveInvoice) {
+        const member = await tx.select().from(user).where(eq(user.id, reg.userId)).then((r) => r[0])
+        const seats = 1 + reg.guestCount
+        const invoiceNumber = await getNextInvoiceNumber(tx)
+        await tx.insert(invoices).values({
+          invoiceNumber,
+          type: 'event_fee',
+          userId: reg.userId,
+          eventRegistrationId: reg.id,
+          seatCount: seats,
+          recipientName: member.name,
+          recipientEmail: member.email,
+          description: eventFeeDescription(getLocalized(event.titleLocales, 'en') || 'Event', seats, false),
+          amount: String(price * seats),
+          dueDate: eventInvoiceDueDate(event.date),
+          referenceNumber: generateReferenceNumber(invoiceNumber),
+        })
+      }
+      return { cancelled: true as const, warning }
+    }
+
     for (const inv of linkedInvoices) {
       if (inv.status === 'draft' || inv.status === 'sent') {
         await tx

@@ -19,6 +19,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
     { href: '/members', label: t('membersDashboard.title'), icon: LayoutDashboard },
     { href: '/members/events', label: t('events.title'), icon: Calendar },
     { href: '/members/card', label: t('membershipCard.title'), icon: CreditCard },
+    { href: '/members/invoices', label: t('invoices.title'), icon: Receipt },
     { href: '/members/profile', label: t('profile.title'), icon: UserCircle },
   ]
 

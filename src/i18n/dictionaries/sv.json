@@ -127,7 +127,26 @@
     "overdueContact": "Frågor? Kontakta",
     "guestRegistrationClosed": "Anmälan av gäster är stängd",
     "overdueBannerTitle": "Du har {count, plural, one {# förfallen faktura} other {# förfallna fakturor}} — {total} EUR obetalt",
-    "overdueBannerBody": "Tills saldot är betalt kan du inte anmäla dig till evenemang eller lägga till gäster. Dina befintliga anmälningar påverkas inte. Anmälan öppnas igen så snart betalningen har registrerats."
+    "overdueBannerBody": "Tills saldot är betalt kan du inte anmäla dig till evenemang eller lägga till gäster. Dina befintliga anmälningar påverkas inte. Anmälan öppnas igen så snart betalningen har registrerats.",
+    "bindingTitle": "Bekräfta din anmälan",
+    "bindingGuestTitle": "Lägg till en gäst",
+    "bindingLotteryIntro": "Du deltar i lottningen. Villkoren nedan gäller om du får en plats.",
+    "bindingWaitlistIntro": "Evenemanget är fullt, så du placeras på väntelistan. Villkoren nedan gäller om en plats blir ledig för dig.",
+    "bindingGuestIntro": "{paid, select, yes {Gästen debiteras {price} €, som läggs till din avgift. } other {}}Samma villkor gäller för din gäst.",
+    "bindingRule_freeCancelUntil": "Du kan avboka kostnadsfritt fram till {deadline}. Därefter är din anmälan bindande{paid, select, yes { och avgiften på {price} € per person ska betalas även om du inte kan delta} other {}}.",
+    "bindingRule_bindingNow": "Avbokningsfristen har passerat, så din anmälan är bindande direkt{paid, select, yes { och avgiften på {price} € per person ska betalas även om du inte kan delta} other {}}.",
+    "bindingRule_noCancellation": "Detta evenemang kan inte avbokas. Din anmälan är bindande{paid, select, yes { och avgiften på {price} € per person ska betalas även om du inte kan delta} other {}}.",
+    "bindingRule_cancelAnytime": "Du kan avboka din anmälan på den här sidan.{paid, select, yes { Avgiften är {price} € per person.} other {}}",
+    "bindingAccept": "Jag förstår att min anmälan är bindande",
+    "bindingConfirm": "Bekräfta anmälan",
+    "bindingGuestConfirm": "Lägg till gäst",
+    "bindingBack": "Tillbaka",
+    "bindingNote_freeCancelUntil": "Kostnadsfri avbokning fram till {deadline}. Därefter är din anmälan bindande{paid, select, yes { och avgiften ska betalas} other {}}.",
+    "bindingNote_bindingNow": "Avbokningsfristen har passerat — din anmälan är bindande{paid, select, yes { och avgiften ska betalas} other {}}.",
+    "bindingNote_noCancellation": "Avbokning är inte möjlig — din anmälan är bindande{paid, select, yes { och avgiften ska betalas} other {}}.",
+    "termsNotAccepted": "Bekräfta att du förstår att anmälan är bindande.",
+    "perPerson": "person",
+    "overdueViewInvoices": "Visa dina fakturor →"
   },
   "profile": {
     "title": "Profil",
@@ -486,7 +505,10 @@
     "paidOfAmount": "Betalt / totalt",
     "present": "Närvarande",
     "generatedAt": "Skapad",
-    "page": "Sida"
+    "page": "Sida",
+    "lateRemovalExplanation": "Avbokningsfristen har passerat, så anmälan är bindande och evenemangsavgiften gäller fortfarande. Behåll avgiften (en faktura skapas om det inte redan finns en) eller efterskänk den (obetalda fakturor annulleras).",
+    "lateRemovalKeepFee": "Ta bort, behåll avgiften",
+    "lateRemovalWaiveFee": "Ta bort och efterskänk avgiften"
   },
   "rules": {
     "title": "Stadgar",
@@ -614,5 +636,33 @@
         "content": "För frågor om integritet, kontakta styrelsen per e-post. Kontaktuppgifter finns på styrelsesidan."
       }
     }
+  },
+  "registrationEmail": {
+    "subject_registered": "Anmälan bekräftad: {title}",
+    "subject_waitlisted": "Du står på väntelistan: {title}",
+    "subject_pending": "Lottningsanmälan mottagen: {title}",
+    "subjectGuest": "Gäst tillagd: {title}",
+    "greeting": "Hej {name},",
+    "intro_registered": "Din anmälan till {title} är bekräftad.",
+    "intro_waitlisted": "Evenemanget är fullt, så du står på väntelistan till {title}.",
+    "intro_pending": "Du deltar i lottningen till {title}.",
+    "guestAdded": "En gäst har lagts till din anmälan. Du har nu {seats} platser.",
+    "seats": "Platser",
+    "viewEvent": "Visa evenemanget och din anmälan"
+  },
+  "invoices": {
+    "title": "Fakturor",
+    "empty": "Du har inga fakturor.",
+    "outstanding": "Obetalt",
+    "overdue": "Förfallet",
+    "howToPay": "Så betalar du",
+    "howToPayBody": "Betala med banköverföring och ange alltid fakturans referensnummer.",
+    "recipient": "Mottagare",
+    "invoiceNumber": "Faktura nr {number}",
+    "amount": "Belopp",
+    "toPay": "Att betala",
+    "dueDate": "Förfallodag",
+    "reference": "Referens",
+    "downloadPdf": "Faktura (PDF)"
   }
 }

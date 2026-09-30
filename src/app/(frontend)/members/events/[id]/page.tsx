@@ -10,7 +10,7 @@ import { formatDateTime, formatTime } from '@/lib/format-date'
 import { getDatePartsInTz } from '@/lib/timezone'
 import { EventRsvp } from '@/components/EventRsvp'
 import { getOverdueBalance } from '@/lib/overdue-balance'
-import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
+import { bindingRule, cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
 import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -58,8 +58,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const isDeadlinePassed = isRegistrationClosed(event)
   const isLottery = event.allocationMethod === 'lottery'
   const isAdmin = member?.role === 'admin'
-  const cancelBlockReason = cancellationBlockReason(event)
-  const canCancel = cancelBlockReason === null
+  const canCancel = cancellationBlockReason(event) === null
   const isGuestRegistrationOpen = event.guestAllowed &&
     (!event.guestRegistrationOpensAt || new Date() >= event.guestRegistrationOpensAt)
 
@@ -169,13 +168,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             isRegistrationNotOpenYet={isRegistrationNotOpenYet}
             registrationOpensAt={event.registrationOpensAt?.toISOString() ?? null}
             canCancel={canCancel}
-            cancelBlockReason={cancelBlockReason}
             guestAllowed={event.guestAllowed}
             guestCount={userReg?.guestCount ?? 0}
             maxGuestsPerMember={event.maxGuestsPerMember}
             isGuestRegistrationOpen={isGuestRegistrationOpen}
             guestRegistrationOpensAt={event.guestRegistrationOpensAt?.toISOString() ?? null}
             hasOverdueInvoices={hasOverdueInvoices}
+            eventTitle={getLocalized(event.titleLocales, locale)}
+            eventDate={event.date.toISOString()}
+            price={event.price != null && Number(event.price) > 0 ? event.price : null}
+            bindingRule={bindingRule(event)}
+            cancellationDeadline={event.cancellationDeadline?.toISOString() ?? null}
             registerAction={registerForEvent}
             cancelAction={cancelRegistration}
             addGuestAction={addGuest}

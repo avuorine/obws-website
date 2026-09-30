@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
 import { invoices } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { generateInvoicePdf } from '@/lib/invoice-pdf'
+import { invoicePdfBuffer } from '@/lib/invoice-pdf'
 import { getSettings } from '@/lib/settings'
 
 export async function GET(
@@ -25,16 +25,7 @@ export async function GET(
 
   const settings = await getSettings()
 
-  const pdf = await generateInvoicePdf({
-    invoiceNumber: invoice.invoiceNumber,
-    recipientName: invoice.recipientName,
-    recipientEmail: invoice.recipientEmail,
-    description: invoice.description,
-    amount: invoice.amount,
-    dueDate: invoice.dueDate,
-    referenceNumber: invoice.referenceNumber,
-    createdAt: invoice.createdAt,
-  }, settings)
+  const pdf = await invoicePdfBuffer(invoice, settings)
 
   return new Response(new Uint8Array(pdf), {
     headers: {
