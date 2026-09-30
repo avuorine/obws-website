@@ -2,6 +2,7 @@
 
 import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
 import { bankAuthStates, bankConnections } from '@/db/schema'
@@ -13,15 +14,22 @@ import { syncBankConnection } from '@/lib/bank-sync'
 const STATE_TTL_MS = 15 * 60 * 1000
 const SYNC_NOW_INTERVAL_MS = 30 * 60 * 1000
 
-/** Start the bank consent flow; the client navigates to the returned bank URL. */
+/**
+ * Start the bank consent flow and redirect to the bank. Redirecting from the
+ * action (instead of returning the URL for the client to navigate to) stops
+ * Next from re-rendering this page first: the admin check refreshes the
+ * session cookie, and a cookie write in an action triggers a page refresh
+ * that would otherwise race the navigation and flash an error.
+ */
 export async function startBankConnection(
   aspspName: string,
   aspspCountry: string,
   psuType: 'business' | 'personal',
-): Promise<{ url?: string; error?: string }> {
+): Promise<{ error?: string }> {
   const admin = await requireAdmin()
   if (!isConfigured()) return { error: 'bankNotConfigured' }
 
+  let bankUrl: string
   try {
     const aspsp = (await listAspsps(aspspCountry)).find((a) => a.name === aspspName)
     if (!aspsp) return { error: 'bankNotFound' }
@@ -46,11 +54,13 @@ export async function startBankConnection(
       state,
       redirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/api/bank/callback`,
     })
-    return { url }
+    bankUrl = url
   } catch (error) {
     console.error('Bank auth start failed', error instanceof EnableBankingError ? error.message : error)
     return { error: 'bankProviderError' }
   }
+  // Outside the try: redirect() works by throwing.
+  redirect(bankUrl)
 }
 
 /** Finish a connection when the bank returned several accounts. */

@@ -47,9 +47,9 @@ export function BankConnectionPanel({ banks, defaultBank, connected, pick }: Pro
   function connect() {
     setMessage(null)
     startTransition(async () => {
+      // On success the action redirects to the bank and never returns here.
       const res = await startBankConnection(bank, 'FI', psuType)
-      if (res.url) window.location.href = res.url
-      else setMessage({ tone: 'destructive', text: known(res.error) })
+      if (res?.error) setMessage({ tone: 'destructive', text: known(res.error) })
     })
   }
 
