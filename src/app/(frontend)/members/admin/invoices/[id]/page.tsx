@@ -219,7 +219,7 @@ export default async function InvoiceDetailPage({
                       <td className="px-6 py-3">&euro;{p.amount}</td>
                       <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{p.reference ?? '—'}</td>
                       <td className="px-6 py-3">
-                        <Badge variant="outline">{p.source === 'bank_import' ? t('sourceBank') : t('sourceManual')}</Badge>
+                        <Badge variant="outline">{p.source === 'bank_import' ? t('sourceBank') : p.source === 'bank_sync' ? t('sourceBankSync') : t('sourceManual')}</Badge>
                       </td>
                     </tr>
                   ))}

@@ -10,7 +10,8 @@
     "logout": "Log out",
     "members": "Members",
     "menu": "Menu",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
   },
   "landing": {
     "associationName": "Österbottens Whiskysällskap rf.",
@@ -508,7 +509,62 @@
     "page": "Page",
     "lateRemovalExplanation": "The cancellation deadline has passed, so the registration is binding and the event fee still applies. Keep the fee (an invoice is created if none exists yet) or waive it (unpaid invoices are cancelled).",
     "lateRemovalKeepFee": "Remove, keep fee",
-    "lateRemovalWaiveFee": "Remove and waive fee"
+    "lateRemovalWaiveFee": "Remove and waive fee",
+    "bankConnection": "Bank connection",
+    "bankAccount": "Account",
+    "bankAccountType": "Account type",
+    "bankBusiness": "Business",
+    "bankPersonal": "Personal",
+    "bankChoose": "Bank",
+    "bankSearch": "Search banks…",
+    "bankConnect": "Connect bank",
+    "bankRenew": "Renew connection",
+    "bankConnectTitle": "Connect the association’s bank account",
+    "bankRenewTitle": "Renew or change the connection",
+    "bankConsentHelp": "You will be sent to the bank to log in and approve read-only access. The approval lasts up to 180 days (EU PSD2 rules) and must then be renewed here. In restricted mode the account must first be linked in the Enable Banking control panel.",
+    "bankConnected": "Bank connected. Payments will be fetched every night.",
+    "bankConnectionEnded": "The bank connection has ended. Payments are no longer fetched automatically — renew the connection.",
+    "bankExpiringSoon": "The bank connection expires in {days, plural, =1 {1 day} other {# days}}. Renew it to keep fetching payments.",
+    "bankValidUntil": "Valid until",
+    "bankDaysLeft": "{days, plural, =1 {1 day left} other {# days left}}",
+    "bankLastSync": "Last sync",
+    "bankLastError": "Last error",
+    "bankSyncNow": "Sync now",
+    "bankSyncing": "Syncing…",
+    "bankSyncResult": "{fetched} incoming payments checked: {new} new, {autoRecorded} recorded automatically, {needsReview} to review.",
+    "bankDisconnect": "Disconnect",
+    "bankConfirmDisconnect": "Disconnect the bank? Payments will no longer be fetched automatically.",
+    "bankPickAccount": "The bank returned several accounts. Choose the association’s account:",
+    "bankUseAccount": "Use this account",
+    "bankStatus_active": "Active",
+    "bankStatus_expired": "Expired",
+    "bankStatus_revoked": "Disconnected",
+    "bankStatus_error": "Error",
+    "bankNotConfigured": "Bank connection is not configured on the server.",
+    "bankNotConfiguredHelp": "Automatic bank sync is not set up yet. The server needs ENABLEBANKING_APP_ID and ENABLEBANKING_PRIVATE_KEY (see README). Until then, import bank statements manually.",
+    "bankNotFound": "That bank is no longer available.",
+    "bankProviderError": "The bank connection service could not be reached. Try again later.",
+    "bankStateInvalid": "The bank approval link has expired or was already used. Start again.",
+    "bankAuthCancelled": "The approval at the bank was cancelled.",
+    "bankNoAccounts": "No accounts were shared. In restricted mode, link the account in the Enable Banking control panel first.",
+    "bankNotConnected": "No active bank connection.",
+    "bankSyncTooSoon": "Payments were fetched less than 30 minutes ago. Banks limit how often data can be fetched; try again later.",
+    "bankSyncFailed": "Fetching payments failed. See the last error on this page.",
+    "bankSyncStatus": "Automatic sync from {bank} · last {lastSync} · consent valid until {until}.",
+    "bankSyncOff": "Automatic bank sync is not active.",
+    "bankManageConnection": "Manage bank connection",
+    "bankReviewTitle": "Bank payments to review ({count})",
+    "bankReviewNotice": "{count, plural, =1 {1 bank payment needs} other {# bank payments need}} review →",
+    "bankAutoRecordedTitle": "Recorded automatically (last 30 days)",
+    "bankPayer": "Payer / reference",
+    "bankRecord": "Record",
+    "bankIgnore": "Ignore",
+    "bankMatch_partial": "Partial",
+    "bankMatch_overpaid": "Overpaid",
+    "bankMatch_exact": "Exact",
+    "bankMatch_split": "Split",
+    "bankTransactionNotFound": "This payment was already handled.",
+    "sourceBankSync": "Bank (automatic)"
   },
   "rules": {
     "title": "Rules",
@@ -609,7 +665,7 @@
       },
       "2": {
         "title": "2. Personal data collected",
-        "content": "We collect the following personal data: name, email address, phone number, municipality, and date of birth when you apply for membership. When you use the member section, we store event registrations, invoices, and session data (including IP address and user agent)."
+        "content": "We collect the following personal data: name, email address, phone number, municipality, and date of birth when you apply for membership. When you use the member section, we store event registrations, invoices, and session data (including IP address and user agent). When a payment reaches the association’s bank account, we store the payer’s name, the amount, date, reference number and message to match it to an invoice."
       },
       "3": {
         "title": "3. Purpose and legal basis",
@@ -617,11 +673,11 @@
       },
       "4": {
         "title": "4. Third-party processors",
-        "content": "We use the following third-party service providers: Resend (transactional email delivery), Vercel (website hosting and optional analytics), and BotId (bot detection on the membership application form). These service providers process data on our behalf and according to our instructions."
+        "content": "We use the following third-party service providers: Resend (transactional email delivery), Vercel (website hosting and optional analytics), BotId (bot detection on the membership application form) and Enable Banking Oy (read-only access to the association’s own bank account to match incoming payments to invoices). These service providers process data on our behalf and according to our instructions."
       },
       "5": {
         "title": "5. Data retention",
-        "content": "Member data is retained for the duration of membership plus one year after resignation. Invoices, including recipient name and email, are retained for 6 years in accordance with Finnish accounting law even if the account is deleted. Session data expires automatically after 7 days."
+        "content": "Member data is retained for the duration of membership plus one year after resignation. Invoices, including recipient name and email, are retained for 6 years in accordance with Finnish accounting law even if the account is deleted. Fetched bank transactions used for payment matching are deleted after 13 months; recorded payments are kept with the invoice. Session data expires automatically after 7 days."
       },
       "6": {
         "title": "6. Your rights",
@@ -664,5 +720,42 @@
     "dueDate": "Due date",
     "reference": "Reference",
     "downloadPdf": "Invoice (PDF)"
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "sections": {
+      "1": {
+        "title": "1. Service",
+        "content": "This website and its member section are provided by Österbottens Whiskysällskap rf (the association). The member section is used to manage memberships, event registrations, invoices and payments."
+      },
+      "2": {
+        "title": "2. Accounts",
+        "content": "Access to the member section is personal and intended for members of the association. Keep your sign-in methods (email link, password, passkey) to yourself. The association may restrict or close an account if the terms are breached or the membership ends."
+      },
+      "3": {
+        "title": "3. Event registrations",
+        "content": "Each event states its price, capacity and cancellation deadline. You can cancel free of charge until the cancellation deadline; after that your registration, including any guests, is binding and the event fee must be paid even if you cannot attend. If no cancellation is allowed for an event, the registration is binding when made. Lottery and waitlist places become binding when a seat is allocated to you."
+      },
+      "4": {
+        "title": "4. Fees and invoices",
+        "content": "Membership and event fees are invoiced by email and can be viewed in the member section. Pay by the due date using the invoice’s reference number. While a member has overdue invoices, new event registrations and guest additions are paused until the balance is paid."
+      },
+      "5": {
+        "title": "5. Payment matching and bank connection",
+        "content": "To confirm payments, the association reads incoming transactions on its own bank account and matches them to invoices by reference number. This is done either by importing bank statements or through a read-only connection provided by Enable Banking Oy, a licensed account information service provider. The connection can only read the association’s account; it cannot make payments. It is authorised by a board member and renewed at least every 180 days."
+      },
+      "6": {
+        "title": "6. Availability and liability",
+        "content": "The service is run by a voluntary association and provided as is. We aim to keep it available and correct but cannot guarantee uninterrupted operation. The association is not liable for indirect damage caused by interruptions or errors in the service."
+      },
+      "7": {
+        "title": "7. Changes",
+        "content": "The association may update these terms. Material changes are announced to members by email or in the member section."
+      },
+      "8": {
+        "title": "8. Contact",
+        "content": "Questions about these terms can be sent to the board by email. Contact details can be found on the board page. How personal data is processed is described in the privacy policy."
+      }
+    }
   }
 }

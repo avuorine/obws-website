@@ -96,6 +96,53 @@ external accounts are provisioned and the env vars in `.env.example` are set.
 
 The `GenericClass` is created automatically (idempotently) on first save.
 
+## Automatic bank sync (Enable Banking)
+
+Incoming payments on the association's bank account can be fetched every night and
+matched to invoices by reference number. Exact matches are recorded automatically;
+partial, overpaid and unmatched payments appear for review on
+`/members/admin/bank-import`. The camt.052 upload there keeps working as a fallback,
+and a payment arriving both ways is recorded once.
+
+It uses [Enable Banking](https://enablebanking.com/docs), a licensed PSD2 account
+information provider. Access is read-only; it can't make payments.
+
+### Setup
+
+1. In the [Enable Banking control panel](https://enablebanking.com/cp/applications)
+   add a **Production** application:
+   - Redirect URL: `https://obws.fi/api/bank/callback` (for a local sandbox app:
+     `http://localhost:3000/api/bank/callback`)
+   - Privacy URL `https://obws.fi/privacy`, terms URL `https://obws.fi/terms`
+   - Let the browser generate the key; the downloaded `<application id>.pem` is the
+     private key.
+2. Set `ENABLEBANKING_APP_ID` (the file name without `.pem`) and
+   `ENABLEBANKING_PRIVATE_KEY` (the PEM, or it base64-encoded) and `CRON_SECRET` in
+   Vercel. Never commit the key or expose it to the browser.
+3. **Restricted mode (free):** without a contract the application can only read
+   accounts linked in the control panel. An admin with the bank login links the
+   account there once ("Activate by linking accounts").
+4. In the site: **Admin → Bank connection → Connect bank**, choose the bank and
+   approve at the bank.
+
+### Renewal
+
+PSD2 consent lasts at most 180 days (Delegated Regulation (EU) 2018/389, art. 10a);
+the site requests each bank's own maximum. Admins get an email 14 and 3 days before
+it expires, the dashboard shows a notice, and **Renew connection** repeats the bank
+approval. Banks allow about four background fetches a day (art. 36(5)); the site
+syncs once a night (`vercel.json`, 01:00 UTC) and allows a manual "Sync now" every
+30 minutes.
+
+For the first production run, set `BANK_SYNC_AUTO_RECORD=false`, sync once and check
+that a known payment's archive id matches the `AcctSvcrRef` in a camt export before
+enabling automatic recording.
+
+### Other organisations
+
+Restricted mode is for the association's own account. Serving other organisations'
+accounts requires a contract and KYB with Enable Banking; the code stays the same.
+
 ## Questions
 
 If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).

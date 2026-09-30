@@ -10,7 +10,8 @@
     "logout": "Logga ut",
     "members": "Medlemmar",
     "menu": "Meny",
-    "privacyPolicy": "Integritetspolicy"
+    "privacyPolicy": "Integritetspolicy",
+    "termsOfUse": "Användarvillkor"
   },
   "landing": {
     "associationName": "Österbottens Whiskysällskap rf.",
@@ -508,7 +509,62 @@
     "page": "Sida",
     "lateRemovalExplanation": "Avbokningsfristen har passerat, så anmälan är bindande och evenemangsavgiften gäller fortfarande. Behåll avgiften (en faktura skapas om det inte redan finns en) eller efterskänk den (obetalda fakturor annulleras).",
     "lateRemovalKeepFee": "Ta bort, behåll avgiften",
-    "lateRemovalWaiveFee": "Ta bort och efterskänk avgiften"
+    "lateRemovalWaiveFee": "Ta bort och efterskänk avgiften",
+    "bankConnection": "Bankkoppling",
+    "bankAccount": "Konto",
+    "bankAccountType": "Kontotyp",
+    "bankBusiness": "Företag",
+    "bankPersonal": "Privat",
+    "bankChoose": "Bank",
+    "bankSearch": "Sök bank…",
+    "bankConnect": "Anslut bank",
+    "bankRenew": "Förnya koppling",
+    "bankConnectTitle": "Anslut föreningens bankkonto",
+    "bankRenewTitle": "Förnya eller byt koppling",
+    "bankConsentHelp": "Du skickas till banken för att logga in och godkänna läsbehörighet. Godkännandet gäller högst 180 dagar (EU:s PSD2-regler) och ska sedan förnyas här. I begränsat läge måste kontot först länkas i Enable Bankings kontrollpanel.",
+    "bankConnected": "Banken är ansluten. Betalningar hämtas varje natt.",
+    "bankConnectionEnded": "Bankkopplingen har upphört. Betalningar hämtas inte längre automatiskt — förnya kopplingen.",
+    "bankExpiringSoon": "Bankkopplingen upphör om {days, plural, =1 {1 dag} other {# dagar}}. Förnya den för att fortsätta hämta betalningar.",
+    "bankValidUntil": "Giltig till",
+    "bankDaysLeft": "{days, plural, =1 {1 dag kvar} other {# dagar kvar}}",
+    "bankLastSync": "Senaste hämtning",
+    "bankLastError": "Senaste fel",
+    "bankSyncNow": "Hämta nu",
+    "bankSyncing": "Hämtar…",
+    "bankSyncResult": "{fetched} inbetalningar kontrollerade: {new} nya, {autoRecorded} registrerade automatiskt, {needsReview} att granska.",
+    "bankDisconnect": "Koppla från",
+    "bankConfirmDisconnect": "Koppla från banken? Betalningar hämtas inte längre automatiskt.",
+    "bankPickAccount": "Banken returnerade flera konton. Välj föreningens konto:",
+    "bankUseAccount": "Använd detta konto",
+    "bankStatus_active": "Aktiv",
+    "bankStatus_expired": "Upphört",
+    "bankStatus_revoked": "Frånkopplad",
+    "bankStatus_error": "Fel",
+    "bankNotConfigured": "Bankkopplingen är inte konfigurerad på servern.",
+    "bankNotConfiguredHelp": "Automatisk bankhämtning är inte inställd ännu. Servern behöver ENABLEBANKING_APP_ID och ENABLEBANKING_PRIVATE_KEY (se README). Importera kontoutdrag manuellt tills vidare.",
+    "bankNotFound": "Banken finns inte längre tillgänglig.",
+    "bankProviderError": "Tjänsten för bankkoppling kunde inte nås. Försök igen senare.",
+    "bankStateInvalid": "Bankens godkännandelänk har gått ut eller redan använts. Börja om.",
+    "bankAuthCancelled": "Godkännandet i banken avbröts.",
+    "bankNoAccounts": "Inga konton delades. I begränsat läge ska kontot först länkas i Enable Bankings kontrollpanel.",
+    "bankNotConnected": "Ingen aktiv bankkoppling.",
+    "bankSyncTooSoon": "Betalningar hämtades för mindre än 30 minuter sedan. Bankerna begränsar hur ofta data får hämtas; försök senare.",
+    "bankSyncFailed": "Hämtningen av betalningar misslyckades. Se senaste fel på sidan.",
+    "bankSyncStatus": "Automatisk hämtning från {bank} · senast {lastSync} · godkännandet gäller till {until}.",
+    "bankSyncOff": "Automatisk bankhämtning är inte aktiv.",
+    "bankManageConnection": "Hantera bankkoppling",
+    "bankReviewTitle": "Bankbetalningar att granska ({count})",
+    "bankReviewNotice": "{count, plural, =1 {1 bankbetalning behöver} other {# bankbetalningar behöver}} granskas →",
+    "bankAutoRecordedTitle": "Automatiskt registrerade (senaste 30 dagarna)",
+    "bankPayer": "Betalare / referens",
+    "bankRecord": "Registrera",
+    "bankIgnore": "Ignorera",
+    "bankMatch_partial": "Delbetalning",
+    "bankMatch_overpaid": "Överbetalt",
+    "bankMatch_exact": "Exakt",
+    "bankMatch_split": "Uppdelad",
+    "bankTransactionNotFound": "Betalningen har redan hanterats.",
+    "sourceBankSync": "Bank (automatisk)"
   },
   "rules": {
     "title": "Stadgar",
@@ -609,7 +665,7 @@
       },
       "2": {
         "title": "2. Insamlade personuppgifter",
-        "content": "Vi samlar in följande personuppgifter: namn, e-postadress, telefonnummer, hemkommun och födelsedatum när du ansöker om medlemskap. I medlemssektionen lagrar vi evenemangsanmälningar, fakturor och sessionsdata (inklusive IP-adress och webbläsarinfo)."
+        "content": "Vi samlar in följande personuppgifter: namn, e-postadress, telefonnummer, hemkommun och födelsedatum när du ansöker om medlemskap. När du använder medlemssidorna lagrar vi evenemangsanmälningar, fakturor och sessionsdata (inklusive IP-adress och webbläsare). När en betalning kommer in på föreningens bankkonto lagrar vi betalarens namn, belopp, datum, referensnummer och meddelande för att matcha den mot en faktura."
       },
       "3": {
         "title": "3. Syfte och rättslig grund",
@@ -617,11 +673,11 @@
       },
       "4": {
         "title": "4. Tredjepartsleverantörer",
-        "content": "Vi använder följande tredjepartsleverantörer: Resend (e-postleverans), Vercel (webbhotell och valfri analys) och BotId (botdetektering på medlemsansökan). Dessa leverantörer behandlar data på vårt uppdrag och enligt våra instruktioner."
+        "content": "Vi använder följande tredjepartsleverantörer: Resend (utskick av e-post), Vercel (webbhotell och valfri analys), BotId (botskydd på medlemsansökan) och Enable Banking Oy (läsbehörighet till föreningens eget bankkonto för att matcha inkommande betalningar mot fakturor). Dessa leverantörer behandlar uppgifter för vår räkning och enligt våra instruktioner."
       },
       "5": {
         "title": "5. Lagring av data",
-        "content": "Medlemsdata sparas under medlemskapet plus ett år efter utträde. Fakturor, inklusive mottagarnamn och e-post, sparas i 6 år enligt finsk bokföringslag även om kontot raderas. Sessionsdata upphör automatiskt efter 7 dagar."
+        "content": "Medlemsuppgifter sparas under medlemskapet och ett år efter utträde. Fakturor, inklusive mottagarens namn och e-post, sparas i 6 år enligt bokföringslagen även om kontot raderas. Hämtade banktransaktioner som används för betalningsmatchning raderas efter 13 månader; registrerade betalningar sparas med fakturan. Sessionsdata upphör automatiskt efter 7 dagar."
       },
       "6": {
         "title": "6. Dina rättigheter",
@@ -664,5 +720,42 @@
     "dueDate": "Förfallodag",
     "reference": "Referens",
     "downloadPdf": "Faktura (PDF)"
+  },
+  "terms": {
+    "title": "Användarvillkor",
+    "sections": {
+      "1": {
+        "title": "1. Tjänsten",
+        "content": "Denna webbplats och dess medlemssidor tillhandahålls av Österbottens Whiskysällskap rf (föreningen). Medlemssidorna används för att hantera medlemskap, evenemangsanmälningar, fakturor och betalningar."
+      },
+      "2": {
+        "title": "2. Konton",
+        "content": "Tillgången till medlemssidorna är personlig och avsedd för föreningens medlemmar. Håll dina inloggningsmetoder (e-postlänk, lösenord, passkey) för dig själv. Föreningen kan begränsa eller stänga ett konto om villkoren bryts eller medlemskapet upphör."
+      },
+      "3": {
+        "title": "3. Evenemangsanmälningar",
+        "content": "Varje evenemang anger pris, antal platser och avbokningsfrist. Du kan avboka kostnadsfritt fram till avbokningsfristen; därefter är din anmälan, inklusive eventuella gäster, bindande och evenemangsavgiften ska betalas även om du inte kan delta. Om avbokning inte är möjlig för ett evenemang är anmälan bindande när den görs. Platser via lottning och väntelista blir bindande när du tilldelas en plats."
+      },
+      "4": {
+        "title": "4. Avgifter och fakturor",
+        "content": "Medlems- och evenemangsavgifter faktureras per e-post och kan ses på medlemssidorna. Betala senast på förfallodagen med fakturans referensnummer. Så länge en medlem har förfallna fakturor pausas nya evenemangsanmälningar och tillägg av gäster tills saldot är betalt."
+      },
+      "5": {
+        "title": "5. Betalningsmatchning och bankkoppling",
+        "content": "För att bekräfta betalningar läser föreningen inkommande transaktioner på sitt eget bankkonto och matchar dem mot fakturor med referensnummer. Det sker antingen genom import av kontoutdrag eller via en läsbehörighet som tillhandahålls av Enable Banking Oy, en auktoriserad kontoinformationstjänstleverantör. Kopplingen kan endast läsa föreningens konto; den kan inte göra betalningar. Den godkänns av en styrelsemedlem och förnyas minst var 180:e dag."
+      },
+      "6": {
+        "title": "6. Tillgänglighet och ansvar",
+        "content": "Tjänsten drivs av en ideell förening och tillhandahålls i befintligt skick. Vi strävar efter att hålla den tillgänglig och korrekt men kan inte garantera oavbruten drift. Föreningen ansvarar inte för indirekta skador orsakade av avbrott eller fel i tjänsten."
+      },
+      "7": {
+        "title": "7. Ändringar",
+        "content": "Föreningen kan uppdatera dessa villkor. Väsentliga ändringar meddelas medlemmarna per e-post eller på medlemssidorna."
+      },
+      "8": {
+        "title": "8. Kontakt",
+        "content": "Frågor om dessa villkor kan skickas till styrelsen per e-post. Kontaktuppgifter finns på styrelsesidan. Hur personuppgifter behandlas beskrivs i integritetspolicyn."
+      }
+    }
   }
 }

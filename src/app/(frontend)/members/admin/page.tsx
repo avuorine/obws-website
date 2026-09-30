@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { db } from '@/db'
-import { user, events, invoices, feePeriods, memberFees } from '@/db/schema'
+import { user, events, invoices, feePeriods, memberFees, bankTransactions } from '@/db/schema'
 import { sql, eq, lt, and, inArray, desc } from 'drizzle-orm'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { Users, UserPlus, Calendar, FileText, Receipt, Mail } from 'lucide-react'
 import { formatDate } from '@/lib/format-date'
 import { requireAdmin } from '@/lib/admin-guard'
+import { currentConnection } from '@/lib/bank-connection'
+import { Alert } from '@/components/ui/alert'
 
 export default async function AdminDashboardPage() {
   await requireAdmin()
@@ -105,6 +107,28 @@ export default async function AdminDashboardPage() {
     periodStats = { id: latestPeriod.id, name: latestPeriod.name, paid: Number(paid), total: Number(total) }
   }
 
+  // Bank sync needs attention: items to review, or consent expiring/ended.
+  const bankConnection = await currentConnection()
+  const [{ reviewCount }] = bankConnection
+    ? await db
+        .select({ reviewCount: sql<number>`count(*)::int` })
+        .from(bankTransactions)
+        .where(eq(bankTransactions.status, 'needs_review'))
+    : [{ reviewCount: 0 }]
+  const bankDaysLeft = bankConnection
+    ? Math.ceil((bankConnection.validUntil.getTime() - Date.now()) / 86_400_000)
+    : null
+  const bankNotices = [
+    ...(reviewCount > 0
+      ? [{ text: t('bankReviewNotice', { count: reviewCount }), href: '/members/admin/bank-import' }]
+      : []),
+    ...(bankConnection && bankConnection.status !== 'active'
+      ? [{ text: t('bankConnectionEnded'), href: '/members/admin/bank' }]
+      : bankConnection && bankDaysLeft !== null && bankDaysLeft <= 14
+        ? [{ text: t('bankExpiringSoon', { days: bankDaysLeft }), href: '/members/admin/bank' }]
+        : []),
+  ]
+
   const statCards = [
     { label: t('totalActiveMembers'), value: activeCount, icon: Users, href: '/members/admin/members' },
     { label: t('newMembersThisYear'), value: newThisYear, icon: UserPlus, href: '/members/admin/members' },
@@ -127,6 +151,14 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl font-bold">{t('dashboard')}</h1>
+
+      {bankNotices.map((n) => (
+        <Alert key={n.href + n.text} variant="warning">
+          <Link href={n.href} className="font-medium underline">
+            {n.text}
+          </Link>
+        </Alert>
+      ))}
 
       {/* Stats cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
