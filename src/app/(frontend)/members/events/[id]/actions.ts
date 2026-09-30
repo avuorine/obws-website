@@ -1,19 +1,24 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getLocale } from 'next-intl/server'
 import { getMember } from '@/lib/auth-server'
 import { cancelRegistrationRow } from '@/lib/registrations'
 import { getOverdueBalance } from '@/lib/overdue-balance'
 import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
+import { sendRegistrationConfirmation } from '@/lib/registration-email'
 import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 
 export async function registerForEvent(
   eventId: string,
+  acceptedTerms: boolean,
 ): Promise<{ success: boolean; error?: string }> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
+  // The member must have seen and accepted the binding terms dialog.
+  if (acceptedTerms !== true) return { success: false, error: 'termsNotAccepted' }
 
   // Members with overdue invoices can't book until the balance is cleared
   if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
@@ -74,6 +79,15 @@ export async function registerForEvent(
       .where(eq(events.id, eventId))
   }
 
+  await sendRegistrationConfirmation({
+    to: member.email,
+    firstName: member.firstName ?? member.name,
+    locale: await getLocale(),
+    event,
+    status,
+    seats: 1,
+  })
+
   revalidatePath(`/members/events/${eventId}`)
   revalidatePath('/members/events')
   return { success: true }
@@ -81,9 +95,11 @@ export async function registerForEvent(
 
 export async function addGuest(
   eventId: string,
+  acceptedTerms: boolean,
 ): Promise<{ success: boolean; error?: string }> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
+  if (acceptedTerms !== true) return { success: false, error: 'termsNotAccepted' }
 
   // Members with overdue invoices can't book until the balance is cleared
   if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
@@ -138,6 +154,16 @@ export async function addGuest(
       .set({ waitlistCount: sql`${events.waitlistCount} + 1` })
       .where(eq(events.id, eventId))
   }
+
+  await sendRegistrationConfirmation({
+    to: member.email,
+    firstName: member.firstName ?? member.name,
+    locale: await getLocale(),
+    event,
+    status: reg.status as 'registered' | 'waitlisted',
+    seats: reg.guestCount + 2,
+    guestAdded: true,
+  })
 
   revalidatePath(`/members/events/${eventId}`)
   revalidatePath('/members/events')

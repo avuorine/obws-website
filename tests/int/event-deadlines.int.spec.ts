@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
+import { bindingRule, cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
 
 const now = new Date('2026-09-20T12:00:00Z')
 const past = new Date('2026-09-10T12:00:00Z')
@@ -20,5 +20,14 @@ describe('event-deadlines', () => {
   it('blocks cancelling after the cancellation deadline', () => {
     expect(cancellationBlockReason({ ...base, cancellationDeadline: future }, now)).toBeNull()
     expect(cancellationBlockReason({ ...base, cancellationDeadline: past }, now)).toBe('cancellationDeadlinePassed')
+  })
+})
+
+describe('bindingRule', () => {
+  it('picks the rule a member signs up under', () => {
+    expect(bindingRule({ ...base, cancellationAllowed: false }, now)).toBe('noCancellation')
+    expect(bindingRule(base, now)).toBe('cancelAnytime')
+    expect(bindingRule({ ...base, cancellationDeadline: future }, now)).toBe('freeCancelUntil')
+    expect(bindingRule({ ...base, cancellationDeadline: past }, now)).toBe('bindingNow')
   })
 })

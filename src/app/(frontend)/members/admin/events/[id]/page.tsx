@@ -5,6 +5,7 @@ import { db } from '@/db'
 import { events, eventCategories, eventRegistrations, user } from '@/db/schema'
 import { eq, asc } from 'drizzle-orm'
 import { getEventBillingSummary } from '@/lib/event-billing'
+import { cancellationBlockReason } from '@/lib/event-deadlines'
 import { getEventPayments, PAYMENT_STATUS_KEY, type RegistrationPaymentStatus } from '@/lib/event-payments'
 import { formatDateTime } from '@/lib/format-date'
 import { toDatetimeLocalString } from '@/lib/timezone'
@@ -293,6 +294,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                           registrationId={reg.id}
                           memberName={`${reg.firstName ?? ''} ${reg.lastName ?? ''}`.trim()}
                           status={reg.status}
+                          pastCancellationDeadline={cancellationBlockReason(event) !== null}
                         />
                       </td>
                     </tr>

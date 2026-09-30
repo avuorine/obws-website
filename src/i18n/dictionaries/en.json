@@ -127,7 +127,26 @@
     "overdueContact": "Questions? Contact",
     "guestRegistrationClosed": "Guest registration is closed",
     "overdueBannerTitle": "You have {count, plural, one {# overdue invoice} other {# overdue invoices}} — {total} EUR outstanding",
-    "overdueBannerBody": "Until the balance is paid you can’t sign up for events or add guests. Your existing bookings are not affected. Registration opens again as soon as the payment has been recorded."
+    "overdueBannerBody": "Until the balance is paid you can’t sign up for events or add guests. Your existing bookings are not affected. Registration opens again as soon as the payment has been recorded.",
+    "bindingTitle": "Confirm your registration",
+    "bindingGuestTitle": "Add a guest",
+    "bindingLotteryIntro": "You are entering the lottery. The terms below apply if you are allocated a seat.",
+    "bindingWaitlistIntro": "The event is full, so you will be placed on the waitlist. The terms below apply if a seat opens up for you.",
+    "bindingGuestIntro": "{paid, select, yes {The guest is charged {price} €, added to your fee. } other {}}The same terms apply to your guest.",
+    "bindingRule_freeCancelUntil": "You can cancel free of charge until {deadline}. After that your registration is binding{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
+    "bindingRule_bindingNow": "The cancellation deadline has passed, so your registration is binding immediately{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
+    "bindingRule_noCancellation": "This event cannot be cancelled. Your registration is binding{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
+    "bindingRule_cancelAnytime": "You can cancel your registration on this page.{paid, select, yes { The fee is {price} € per person.} other {}}",
+    "bindingAccept": "I understand that my registration is binding",
+    "bindingConfirm": "Confirm registration",
+    "bindingGuestConfirm": "Add guest",
+    "bindingBack": "Back",
+    "bindingNote_freeCancelUntil": "Free cancellation until {deadline}. After that your registration is binding{paid, select, yes { and the fee must be paid} other {}}.",
+    "bindingNote_bindingNow": "The cancellation deadline has passed — your registration is binding{paid, select, yes { and the fee must be paid} other {}}.",
+    "bindingNote_noCancellation": "Cancellation is not available — your registration is binding{paid, select, yes { and the fee must be paid} other {}}.",
+    "termsNotAccepted": "Please confirm that you understand the registration is binding.",
+    "perPerson": "person",
+    "overdueViewInvoices": "View your invoices →"
   },
   "profile": {
     "title": "Profile",
@@ -486,7 +505,10 @@
     "paidOfAmount": "Paid / total",
     "present": "Present",
     "generatedAt": "Generated",
-    "page": "Page"
+    "page": "Page",
+    "lateRemovalExplanation": "The cancellation deadline has passed, so the registration is binding and the event fee still applies. Keep the fee (an invoice is created if none exists yet) or waive it (unpaid invoices are cancelled).",
+    "lateRemovalKeepFee": "Remove, keep fee",
+    "lateRemovalWaiveFee": "Remove and waive fee"
   },
   "rules": {
     "title": "Rules",
@@ -614,5 +636,33 @@
         "content": "For privacy-related inquiries, please contact the board by email. Contact details can be found on the board page."
       }
     }
+  },
+  "registrationEmail": {
+    "subject_registered": "Registration confirmed: {title}",
+    "subject_waitlisted": "You are on the waitlist: {title}",
+    "subject_pending": "Lottery entry received: {title}",
+    "subjectGuest": "Guest added: {title}",
+    "greeting": "Hi {name},",
+    "intro_registered": "Your registration for {title} is confirmed.",
+    "intro_waitlisted": "The event is full, so you are on the waitlist for {title}.",
+    "intro_pending": "You have entered the lottery for {title}.",
+    "guestAdded": "A guest has been added to your registration. You now have {seats} seats.",
+    "seats": "Seats",
+    "viewEvent": "View the event and your registration"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "empty": "You have no invoices.",
+    "outstanding": "Outstanding",
+    "overdue": "Overdue",
+    "howToPay": "How to pay",
+    "howToPayBody": "Pay by bank transfer and always use the invoice’s reference number.",
+    "recipient": "Recipient",
+    "invoiceNumber": "Invoice #{number}",
+    "amount": "Amount",
+    "toPay": "To pay",
+    "dueDate": "Due date",
+    "reference": "Reference",
+    "downloadPdf": "Invoice (PDF)"
   }
 }

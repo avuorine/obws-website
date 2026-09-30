@@ -3,11 +3,14 @@ import { associationSettings, invoices } from '@/db/schema'
 import { sql, eq, max } from 'drizzle-orm'
 import { getSettings } from './settings'
 
-export async function getNextInvoiceNumber(): Promise<number> {
+type Executor = typeof db | Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+/** Pass a transaction to take the number inside it (rolled back with it). */
+export async function getNextInvoiceNumber(executor: Executor = db): Promise<number> {
   // Ensure the settings row exists with a correct seed value
   await getSettings()
 
-  const result = await db
+  const result = await executor
     .update(associationSettings)
     .set({ nextInvoiceNumber: sql`${associationSettings.nextInvoiceNumber} + 1` })
     .where(eq(associationSettings.id, 1))

@@ -1,8 +1,12 @@
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import path from 'path'
+import { Document, Page, Text, View, Image, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
   page: { padding: 36, paddingBottom: 48, fontSize: 9, fontFamily: 'Helvetica' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  headerText: { flex: 1, paddingRight: 24 },
+  logo: { width: 80 },
   society: { fontSize: 9, color: '#666', marginBottom: 4 },
   title: { fontSize: 16, fontFamily: 'Helvetica-Bold', marginBottom: 4 },
   meta: { fontSize: 10, color: '#333', marginBottom: 2 },
@@ -39,6 +43,9 @@ const styles = StyleSheet.create({
     color: '#888',
   },
 })
+
+// Same logo and size as the invoice PDF.
+const logoPath = path.join(process.cwd(), 'public', 'ows_logo_small.png')
 
 export interface ParticipantRow {
   name: string
@@ -80,11 +87,17 @@ function ParticipantsDocument({ data }: { data: ParticipantsPdfData }) {
   return (
     <Document title={data.eventTitle}>
       <Page size="A4" orientation="landscape" style={styles.page}>
-        {data.societyName && <Text style={styles.society}>{data.societyName}</Text>}
-        <Text style={styles.title}>{data.eventTitle}</Text>
-        {data.eventMeta.map((line) => (
-          <Text key={line} style={styles.meta}>{line}</Text>
-        ))}
+        <View style={styles.header}>
+          <View style={styles.headerText}>
+            {data.societyName && <Text style={styles.society}>{data.societyName}</Text>}
+            <Text style={styles.title}>{data.eventTitle}</Text>
+            {data.eventMeta.map((line) => (
+              <Text key={line} style={styles.meta}>{line}</Text>
+            ))}
+          </View>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          <Image src={logoPath} style={styles.logo} />
+        </View>
 
         <View style={styles.summary}>
           {data.summary.map((item) => (

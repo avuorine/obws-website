@@ -7,15 +7,14 @@ import { invoices, memberFees, feePeriods, user, events, eventRegistrations } fr
 import { eq, and } from 'drizzle-orm'
 import { getNextInvoiceNumber, isDuplicateInvoiceNumber, resyncInvoiceCounter } from '@/lib/invoice-number'
 import { generateReferenceNumber } from '@/lib/reference-number'
-import { generateInvoicePdf } from '@/lib/invoice-pdf'
+import { invoicePdfBuffer } from '@/lib/invoice-pdf'
 import { invoiceEmailHtml } from '@/lib/invoice-email'
 import { sendEmail } from '@/lib/email-sender'
 import { getLocalized } from '@/lib/localize'
 import { getSettings } from '@/lib/settings'
-import { getEventBillingSummary } from '@/lib/event-billing'
+import { getEventBillingSummary, eventFeeDescription } from '@/lib/event-billing'
+import { DUE_DATE_DAYS, eventInvoiceDueDate } from '@/lib/event-due-date'
 import { recordRemainingAsManual } from '@/lib/payments'
-
-const DUE_DATE_DAYS = 14
 
 function computeDueDate(): Date {
   return new Date(Date.now() + DUE_DATE_DAYS * 24 * 60 * 60 * 1000)
@@ -145,7 +144,7 @@ export async function createEventInvoices(
 
   const price = Number(event.price)
   const eventTitle = getLocalized(event.titleLocales, 'en') || 'Event'
-  const dueDate = computeDueDate()
+  const dueDate = eventInvoiceDueDate(event.date)
   const summary = await getEventBillingSummary(eventId)
 
   let created = 0
@@ -171,6 +170,7 @@ export async function createEventInvoices(
             seatCount: owedSeats,
             amount: String(price * owedSeats),
             description: eventFeeDescription(eventTitle, owedSeats, reg.issuedSeats > 0),
+            dueDate,
             updatedAt: new Date(),
           })
           .where(eq(invoices.id, reg.draft.id))
@@ -213,41 +213,32 @@ export async function createEventInvoices(
   return { success: true, created, updated, overbilled: summary.overbilled }
 }
 
-/**
- * Trilingual description line. A supplementary invoice (issued after the
- * member's original one) covers only the additional guest seats.
- */
-function eventFeeDescription(eventTitle: string, seats: number, supplementary: boolean): string {
-  if (supplementary) {
-    return `Additional guest(s) / Extra gäst(er) / Lisävieraat — ${eventTitle} (${seats} seat(s))`
-  }
-  const guests = seats - 1
-  return guests > 0
-    ? `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle} (1 + ${guests} guest(s))`
-    : `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle}`
-}
-
 export async function sendInvoice(
   invoiceId: string,
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()
 
-  const invoice = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).then((r) => r[0])
-  if (!invoice) return { success: false, error: 'Invoice not found' }
-  if (invoice.status !== 'draft') return { success: false, error: 'Invoice is not in draft status' }
+  const draft = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).then((r) => r[0])
+  if (!draft) return { success: false, error: 'Invoice not found' }
+  if (draft.status !== 'draft') return { success: false, error: 'Invoice is not in draft status' }
+
+  // A draft may have waited a while: recompute an event fee's due date at
+  // send time so it is neither already overdue nor after the event.
+  let dueDate = draft.dueDate
+  if (draft.type === 'event_fee' && draft.eventRegistrationId) {
+    const event = await db
+      .select({ date: events.date })
+      .from(eventRegistrations)
+      .innerJoin(events, eq(events.id, eventRegistrations.eventId))
+      .where(eq(eventRegistrations.id, draft.eventRegistrationId))
+      .then((r) => r[0])
+    if (event) dueDate = eventInvoiceDueDate(event.date)
+  }
+  const invoice = { ...draft, dueDate }
 
   const settings = await getSettings()
 
-  const pdf = await generateInvoicePdf({
-    invoiceNumber: invoice.invoiceNumber,
-    recipientName: invoice.recipientName,
-    recipientEmail: invoice.recipientEmail,
-    description: invoice.description,
-    amount: invoice.amount,
-    dueDate: invoice.dueDate,
-    referenceNumber: invoice.referenceNumber,
-    createdAt: invoice.createdAt,
-  }, settings)
+  const pdf = await invoicePdfBuffer(invoice, settings)
 
   const html = invoiceEmailHtml({
     invoiceNumber: invoice.invoiceNumber,
@@ -278,7 +269,7 @@ export async function sendInvoice(
   const now = new Date()
   await db
     .update(invoices)
-    .set({ status: 'sent', sentAt: now, updatedAt: now })
+    .set({ status: 'sent', sentAt: now, dueDate, updatedAt: now })
     .where(eq(invoices.id, invoiceId))
 
   revalidatePath('/members/admin/invoices')

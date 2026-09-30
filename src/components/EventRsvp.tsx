@@ -2,9 +2,21 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/ui/alert'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { formatDateTime } from '@/lib/format-date'
+import type { BindingRule } from '@/lib/event-deadlines'
 
 interface EventRsvpProps {
   eventId: string
@@ -16,16 +28,21 @@ interface EventRsvpProps {
   isRegistrationNotOpenYet: boolean
   registrationOpensAt: string | null
   canCancel: boolean
-  cancelBlockReason: 'cancellationNotAllowed' | 'cancellationDeadlinePassed' | null
   guestAllowed: boolean
   guestCount: number
   maxGuestsPerMember: number
   isGuestRegistrationOpen: boolean
   guestRegistrationOpensAt: string | null
   hasOverdueInvoices: boolean
-  registerAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
+  eventTitle: string
+  eventDate: string
+  /** Price per person, or null for a free event. */
+  price: string | null
+  bindingRule: BindingRule
+  cancellationDeadline: string | null
+  registerAction: (eventId: string, acceptedTerms: boolean) => Promise<{ success: boolean; error?: string }>
   cancelAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
-  addGuestAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
+  addGuestAction: (eventId: string, acceptedTerms: boolean) => Promise<{ success: boolean; error?: string }>
   removeGuestAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
 }
 
@@ -78,21 +95,35 @@ export function EventRsvp({
   isRegistrationNotOpenYet,
   registrationOpensAt,
   canCancel,
-  cancelBlockReason,
   guestAllowed,
   guestCount,
   maxGuestsPerMember,
   isGuestRegistrationOpen,
   guestRegistrationOpensAt,
   hasOverdueInvoices,
+  eventTitle,
+  eventDate,
+  price,
+  bindingRule,
+  cancellationDeadline,
   registerAction,
   cancelAction,
   addGuestAction,
   removeGuestAction,
 }: EventRsvpProps) {
   const t = useTranslations('events')
+  const locale = useLocale()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState('')
+  const [dialog, setDialog] = useState<'register' | 'guest' | null>(null)
+  const [accepted, setAccepted] = useState(false)
+  const termValues = {
+    paid: price ? 'yes' : 'no',
+    price: price ?? '',
+    deadline: cancellationDeadline ? formatDateTime(cancellationDeadline, locale) : '',
+  }
+  // Only a rule that makes the signup binding needs an explicit acknowledgement.
+  const needsAcceptance = bindingRule !== 'cancelAnytime'
   const countdown = useCountdown(isRegistrationNotOpenYet ? registrationOpensAt : null)
   const guestCountdown = useCountdown(
     guestAllowed && !isGuestRegistrationOpen ? guestRegistrationOpensAt : null,
@@ -101,6 +132,7 @@ export function EventRsvp({
   function errorMessage(error?: string) {
     if (error === 'overdueInvoices') return t('overdueBlockedShort')
     if (
+      error === 'termsNotAccepted' ||
       error === 'registrationClosed' ||
       error === 'cancellationNotAllowed' ||
       error === 'cancellationDeadlinePassed'
@@ -110,10 +142,18 @@ export function EventRsvp({
     return error ?? 'Something went wrong'
   }
 
-  function handleRegister() {
+  function openDialog(kind: 'register' | 'guest') {
     setError('')
+    setAccepted(false)
+    setDialog(kind)
+  }
+
+  function handleConfirm() {
+    const kind = dialog
+    setDialog(null)
     startTransition(async () => {
-      const result = await registerAction(eventId)
+      const action = kind === 'guest' ? addGuestAction : registerAction
+      const result = await action(eventId, true)
       if (!result.success) setError(errorMessage(result.error))
     })
   }
@@ -122,14 +162,6 @@ export function EventRsvp({
     setError('')
     startTransition(async () => {
       const result = await cancelAction(eventId)
-      if (!result.success) setError(errorMessage(result.error))
-    })
-  }
-
-  function handleAddGuest() {
-    setError('')
-    startTransition(async () => {
-      const result = await addGuestAction(eventId)
       if (!result.success) setError(errorMessage(result.error))
     })
   }
@@ -192,16 +224,16 @@ export function EventRsvp({
       {isDeadlinePassed && !userStatus && (
         <p className="text-sm text-muted-foreground">{t('registrationClosed')}</p>
       )}
-      {cancelBlockReason &&
+      {bindingRule !== 'cancelAnytime' &&
         (userStatus === 'registered' || userStatus === 'waitlisted' || userStatus === 'pending') && (
-          <p className="text-sm text-muted-foreground">{t(cancelBlockReason)}</p>
+          <p className="text-sm text-muted-foreground">{t(`bindingNote_${bindingRule}`, termValues)}</p>
         )}
 
       {showOverdueNotice && <Alert variant="warning">{t('overdueBlockedShort')}</Alert>}
 
       <div className="flex gap-3">
         {canRegister && (
-          <Button onClick={handleRegister} disabled={isPending}>
+          <Button onClick={() => openDialog('register')} disabled={isPending}>
             {isPending ? t('registering') : t('register')}
           </Button>
         )}
@@ -237,7 +269,7 @@ export function EventRsvp({
           )}
           <div className="flex gap-3">
             {canAddGuest && (
-              <Button variant="outline" size="sm" onClick={handleAddGuest} disabled={isPending}>
+              <Button variant="outline" size="sm" onClick={() => openDialog('guest')} disabled={isPending}>
                 {t('addGuest')}
               </Button>
             )}
@@ -251,6 +283,42 @@ export function EventRsvp({
       )}
 
       {error && <Alert variant="destructive">{error}</Alert>}
+
+      <Dialog open={dialog !== null} onOpenChange={(open) => !open && setDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{dialog === 'guest' ? t('bindingGuestTitle') : t('bindingTitle')}</DialogTitle>
+            <DialogDescription>
+              {eventTitle} · {formatDateTime(eventDate, locale)}
+              {price && <> · {price} € / {t('perPerson')}</>}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            {dialog === 'guest' && <p>{t('bindingGuestIntro', termValues)}</p>}
+            {dialog === 'register' && isLottery && !lotteryCompleted && <p>{t('bindingLotteryIntro')}</p>}
+            {dialog === 'register' && !isLottery && isFull && <p>{t('bindingWaitlistIntro')}</p>}
+            <p className="font-medium">{t(`bindingRule_${bindingRule}`, termValues)}</p>
+            {needsAcceptance && (
+              <div className="flex items-start gap-2 rounded-lg border border-input p-3">
+                <Checkbox
+                  id="binding-accept"
+                  checked={accepted}
+                  onCheckedChange={(v) => setAccepted(v === true)}
+                />
+                <Label htmlFor="binding-accept" className="leading-snug">{t('bindingAccept')}</Label>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialog(null)}>
+              {t('bindingBack')}
+            </Button>
+            <Button onClick={handleConfirm} disabled={isPending || (needsAcceptance && !accepted)}>
+              {dialog === 'guest' ? t('bindingGuestConfirm') : t('bindingConfirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

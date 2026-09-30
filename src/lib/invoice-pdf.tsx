@@ -373,3 +373,20 @@ function InvoiceDocument({ invoice, settings }: { invoice: InvoiceData; settings
 export async function generateInvoicePdf(invoice: InvoiceData, settings: InvoiceSettings): Promise<Buffer> {
   return renderToBuffer(<InvoiceDocument invoice={invoice} settings={settings} />)
 }
+
+/** Render an invoice row as its PDF; shared by the admin and member routes and sending. */
+export function invoicePdfBuffer(invoice: InvoiceData, settings: InvoiceSettings): Promise<Buffer> {
+  return generateInvoicePdf(
+    {
+      invoiceNumber: invoice.invoiceNumber,
+      recipientName: invoice.recipientName,
+      recipientEmail: invoice.recipientEmail,
+      description: invoice.description,
+      amount: invoice.amount,
+      dueDate: invoice.dueDate,
+      referenceNumber: invoice.referenceNumber,
+      createdAt: invoice.createdAt,
+    },
+    settings,
+  )
+}

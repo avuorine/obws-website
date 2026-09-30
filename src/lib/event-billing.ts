@@ -97,3 +97,17 @@ export async function getEventBillingSummary(eventId: string): Promise<EventBill
 
   return { registrations, registered: registrations.length, fullyInvoiced, needsInvoice, overbilled }
 }
+
+/**
+ * Trilingual description line. A supplementary invoice (issued after the
+ * member's original one) covers only the additional guest seats.
+ */
+export function eventFeeDescription(eventTitle: string, seats: number, supplementary: boolean): string {
+  if (supplementary) {
+    return `Additional guest(s) / Extra gäst(er) / Lisävieraat — ${eventTitle} (${seats} seat(s))`
+  }
+  const guests = seats - 1
+  return guests > 0
+    ? `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle} (1 + ${guests} guest(s))`
+    : `Event fee / Evenemangsavgift / Tapahtumamaksu — ${eventTitle}`
+}
