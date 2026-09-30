@@ -11,6 +11,9 @@ export function Footer() {
         <Link href="/privacy" className="underline hover:text-foreground">
           {t('privacyPolicy')}
         </Link>
+        <Link href="/terms" className="underline hover:text-foreground">
+          {t('termsOfUse')}
+        </Link>
       </div>
     </footer>
   )

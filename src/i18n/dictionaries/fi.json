@@ -10,7 +10,8 @@
     "logout": "Kirjaudu ulos",
     "members": "Jäsenet",
     "menu": "Valikko",
-    "privacyPolicy": "Tietosuojaseloste"
+    "privacyPolicy": "Tietosuojaseloste",
+    "termsOfUse": "Käyttöehdot"
   },
   "landing": {
     "associationName": "Österbottens Whiskysällskap rf.",
@@ -508,7 +509,62 @@
     "page": "Sivu",
     "lateRemovalExplanation": "Peruutuksen takaraja on umpeutunut, joten ilmoittautuminen on sitova ja tapahtumamaksu on edelleen voimassa. Pidä maksu (lasku luodaan, jos sitä ei vielä ole) tai jätä se perimättä (maksamattomat laskut perutaan).",
     "lateRemovalKeepFee": "Poista, pidä maksu",
-    "lateRemovalWaiveFee": "Poista ja jätä maksu perimättä"
+    "lateRemovalWaiveFee": "Poista ja jätä maksu perimättä",
+    "bankConnection": "Pankkiyhteys",
+    "bankAccount": "Tili",
+    "bankAccountType": "Tilityyppi",
+    "bankBusiness": "Yritys",
+    "bankPersonal": "Henkilö",
+    "bankChoose": "Pankki",
+    "bankSearch": "Hae pankkia…",
+    "bankConnect": "Yhdistä pankki",
+    "bankRenew": "Uusi yhteys",
+    "bankConnectTitle": "Yhdistä yhdistyksen pankkitili",
+    "bankRenewTitle": "Uusi tai vaihda yhteys",
+    "bankConsentHelp": "Sinut ohjataan pankkiin kirjautumaan ja hyväksymään lukuoikeus. Hyväksyntä on voimassa enintään 180 päivää (EU:n PSD2-säännöt), minkä jälkeen se uusitaan täällä. Rajoitetussa tilassa tili on ensin linkitettävä Enable Bankingin hallintapaneelissa.",
+    "bankConnected": "Pankki yhdistetty. Maksut haetaan joka yö.",
+    "bankConnectionEnded": "Pankkiyhteys on päättynyt. Maksuja ei enää haeta automaattisesti — uusi yhteys.",
+    "bankExpiringSoon": "Pankkiyhteys päättyy {days, plural, =1 {1 päivän} other {# päivän}} kuluttua. Uusi se, jotta maksuja haetaan edelleen.",
+    "bankValidUntil": "Voimassa",
+    "bankDaysLeft": "{days, plural, =1 {1 päivä jäljellä} other {# päivää jäljellä}}",
+    "bankLastSync": "Viimeisin haku",
+    "bankLastError": "Viimeisin virhe",
+    "bankSyncNow": "Hae nyt",
+    "bankSyncing": "Haetaan…",
+    "bankSyncResult": "{fetched} saapuvaa maksua tarkistettu: {new} uutta, {autoRecorded} kirjattu automaattisesti, {needsReview} tarkistettavana.",
+    "bankDisconnect": "Katkaise yhteys",
+    "bankConfirmDisconnect": "Katkaistaanko pankkiyhteys? Maksuja ei enää haeta automaattisesti.",
+    "bankPickAccount": "Pankki palautti useita tilejä. Valitse yhdistyksen tili:",
+    "bankUseAccount": "Käytä tätä tiliä",
+    "bankStatus_active": "Aktiivinen",
+    "bankStatus_expired": "Vanhentunut",
+    "bankStatus_revoked": "Katkaistu",
+    "bankStatus_error": "Virhe",
+    "bankNotConfigured": "Pankkiyhteyttä ei ole määritetty palvelimelle.",
+    "bankNotConfiguredHelp": "Automaattista pankkihakua ei ole vielä otettu käyttöön. Palvelin tarvitsee ENABLEBANKING_APP_ID- ja ENABLEBANKING_PRIVATE_KEY-asetukset (ks. README). Tuo tiliotteet toistaiseksi käsin.",
+    "bankNotFound": "Pankki ei ole enää saatavilla.",
+    "bankProviderError": "Pankkiyhteyspalveluun ei saatu yhteyttä. Yritä myöhemmin uudelleen.",
+    "bankStateInvalid": "Pankin hyväksyntälinkki on vanhentunut tai jo käytetty. Aloita alusta.",
+    "bankAuthCancelled": "Hyväksyntä pankissa peruttiin.",
+    "bankNoAccounts": "Tilejä ei jaettu. Rajoitetussa tilassa linkitä tili ensin Enable Bankingin hallintapaneelissa.",
+    "bankNotConnected": "Ei aktiivista pankkiyhteyttä.",
+    "bankSyncTooSoon": "Maksut haettiin alle 30 minuuttia sitten. Pankit rajoittavat hakujen määrää; yritä myöhemmin.",
+    "bankSyncFailed": "Maksujen haku epäonnistui. Katso viimeisin virhe tältä sivulta.",
+    "bankSyncStatus": "Automaattinen haku: {bank} · viimeksi {lastSync} · hyväksyntä voimassa {until} asti.",
+    "bankSyncOff": "Automaattinen pankkihaku ei ole käytössä.",
+    "bankManageConnection": "Hallitse pankkiyhteyttä",
+    "bankReviewTitle": "Tarkistettavat pankkimaksut ({count})",
+    "bankReviewNotice": "{count, plural, =1 {1 pankkimaksu odottaa} other {# pankkimaksua odottaa}} tarkistusta →",
+    "bankAutoRecordedTitle": "Automaattisesti kirjatut (viimeiset 30 päivää)",
+    "bankPayer": "Maksaja / viite",
+    "bankRecord": "Kirjaa",
+    "bankIgnore": "Ohita",
+    "bankMatch_partial": "Osamaksu",
+    "bankMatch_overpaid": "Ylimaksu",
+    "bankMatch_exact": "Täsmää",
+    "bankMatch_split": "Jaettu",
+    "bankTransactionNotFound": "Maksu on jo käsitelty.",
+    "sourceBankSync": "Pankki (automaattinen)"
   },
   "rules": {
     "title": "Säännöt",
@@ -609,7 +665,7 @@
       },
       "2": {
         "title": "2. Kerättävät henkilötiedot",
-        "content": "Keräämme seuraavat henkilötiedot: nimi, sähköpostiosoite, puhelinnumero, kotikunta ja syntymäaika jäsenhakemuksen yhteydessä. Jäsenosiossa tallennamme tapahtumailmoittautumiset, laskut ja istuntotiedot (mukaan lukien IP-osoite ja selaintiedot)."
+        "content": "Keräämme seuraavat henkilötiedot jäsenhakemuksen yhteydessä: nimi, sähköpostiosoite, puhelinnumero, kotikunta ja syntymäaika. Jäsenosion käytön yhteydessä tallennamme tapahtumailmoittautumiset, laskut ja istuntotiedot (mukaan lukien IP-osoite ja selaintiedot). Kun maksu saapuu yhdistyksen pankkitilille, tallennamme maksajan nimen, summan, päivämäärän, viitenumeron ja viestin kohdistaaksemme maksun laskuun."
       },
       "3": {
         "title": "3. Tarkoitus ja oikeusperuste",
@@ -617,11 +673,11 @@
       },
       "4": {
         "title": "4. Kolmannen osapuolen käsittelijät",
-        "content": "Käytämme seuraavia kolmannen osapuolen palveluntarjoajia: Resend (sähköpostin lähetys), Vercel (verkkosivujen isännöinti ja valinnainen analytiikka) ja BotId (bottitunnistus jäsenhakemuslomakkeella). Nämä palveluntarjoajat käsittelevät tietoja puolestamme ja ohjeidemme mukaisesti."
+        "content": "Käytämme seuraavia kolmannen osapuolen palveluntarjoajia: Resend (sähköpostien lähetys), Vercel (verkkosivuston ylläpito ja valinnainen analytiikka), BotId (bottien tunnistus jäsenhakemuslomakkeella) ja Enable Banking Oy (lukuoikeus yhdistyksen omaan pankkitiliin saapuvien maksujen kohdistamiseksi laskuihin). Nämä palveluntarjoajat käsittelevät tietoja puolestamme ja ohjeidemme mukaisesti."
       },
       "5": {
         "title": "5. Tietojen säilytys",
-        "content": "Jäsentiedot säilytetään jäsenyyden ajan ja vuosi eroamisen jälkeen. Laskut, mukaan lukien vastaanottajan nimi ja sähköposti, säilytetään 6 vuotta Suomen kirjanpitolain mukaisesti myös tilin poistamisen jälkeen. Istuntotiedot vanhenevat automaattisesti 7 päivän kuluttua."
+        "content": "Jäsentiedot säilytetään jäsenyyden ajan ja vuoden eroamisen jälkeen. Laskut, mukaan lukien vastaanottajan nimi ja sähköposti, säilytetään kirjanpitolain mukaisesti 6 vuotta, vaikka tili poistettaisiin. Maksujen kohdistukseen haetut pankkitapahtumat poistetaan 13 kuukauden kuluttua; kirjatut maksut säilytetään laskun yhteydessä. Istuntotiedot vanhenevat automaattisesti 7 päivässä."
       },
       "6": {
         "title": "6. Oikeutesi",
@@ -664,5 +720,42 @@
     "dueDate": "Eräpäivä",
     "reference": "Viite",
     "downloadPdf": "Lasku (PDF)"
+  },
+  "terms": {
+    "title": "Käyttöehdot",
+    "sections": {
+      "1": {
+        "title": "1. Palvelu",
+        "content": "Tämän verkkosivuston ja sen jäsenosion tarjoaa Österbottens Whiskysällskap rf (yhdistys). Jäsenosiota käytetään jäsenyyksien, tapahtumailmoittautumisten, laskujen ja maksujen hallintaan."
+      },
+      "2": {
+        "title": "2. Käyttäjätilit",
+        "content": "Pääsy jäsenosioon on henkilökohtainen ja tarkoitettu yhdistyksen jäsenille. Pidä kirjautumistapasi (sähköpostilinkki, salasana, pääsyavain) omana tietonasi. Yhdistys voi rajoittaa tai sulkea tilin, jos ehtoja rikotaan tai jäsenyys päättyy."
+      },
+      "3": {
+        "title": "3. Tapahtumailmoittautumiset",
+        "content": "Jokaisen tapahtuman hinta, paikkamäärä ja peruutuksen takaraja ilmoitetaan tapahtuman yhteydessä. Voit perua maksutta takarajaan asti; sen jälkeen ilmoittautumisesi vieraineen on sitova ja tapahtumamaksu on maksettava, vaikka et pääsisi paikalle. Jos tapahtumaa ei voi perua, ilmoittautuminen on sitova heti. Arvonnan ja jonotuslistan kautta saadut paikat muuttuvat sitoviksi, kun sinulle myönnetään paikka."
+      },
+      "4": {
+        "title": "4. Maksut ja laskut",
+        "content": "Jäsen- ja tapahtumamaksut laskutetaan sähköpostitse, ja laskut näkyvät jäsenosiossa. Maksa eräpäivään mennessä laskun viitenumerolla. Niin kauan kuin jäsenellä on erääntyneitä laskuja, uudet tapahtumailmoittautumiset ja vieraiden lisääminen on estetty, kunnes laskut on maksettu."
+      },
+      "5": {
+        "title": "5. Maksujen kohdistus ja pankkiyhteys",
+        "content": "Maksujen vahvistamiseksi yhdistys lukee oman pankkitilinsä saapuvat tilitapahtumat ja kohdistaa ne laskuihin viitenumeron perusteella. Tämä tehdään joko tiliotteiden tuonnilla tai lukuoikeudella, jonka tarjoaa Enable Banking Oy, toimiluvan saanut tilitietopalvelun tarjoaja. Yhteys voi vain lukea yhdistyksen tiliä; sillä ei voi tehdä maksuja. Yhteyden hyväksyy hallituksen jäsen, ja se uusitaan vähintään 180 päivän välein."
+      },
+      "6": {
+        "title": "6. Saatavuus ja vastuu",
+        "content": "Palvelua ylläpitää vapaaehtoinen yhdistys, ja se tarjotaan sellaisenaan. Pyrimme pitämään palvelun saatavilla ja virheettömänä, mutta emme voi taata keskeytyksetöntä toimintaa. Yhdistys ei vastaa palvelun katkoksista tai virheistä aiheutuvista välillisistä vahingoista."
+      },
+      "7": {
+        "title": "7. Muutokset",
+        "content": "Yhdistys voi päivittää näitä ehtoja. Olennaisista muutoksista ilmoitetaan jäsenille sähköpostitse tai jäsenosiossa."
+      },
+      "8": {
+        "title": "8. Yhteystiedot",
+        "content": "Näitä ehtoja koskevat kysymykset voi lähettää hallitukselle sähköpostitse. Yhteystiedot löytyvät hallitussivulta. Henkilötietojen käsittelystä kerrotaan tietosuojaselosteessa."
+      }
+    }
   }
 }

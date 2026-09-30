@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-guard'
 import { db } from '@/db'
-import { invoices } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { bankTransactions, invoices } from '@/db/schema'
+import { and, eq } from 'drizzle-orm'
 import { z } from 'zod/v4'
 import { recordPayment } from '@/lib/payments'
 
@@ -65,4 +65,58 @@ export async function applyBankMatches(
   revalidatePath('/members/admin')
 
   return { success: true, count, duplicates, fullyPaid }
+}
+
+function revalidateBankPages() {
+  revalidatePath('/members/admin/bank-import')
+  revalidatePath('/members/admin/invoices')
+  revalidatePath('/members/admin/fees')
+  revalidatePath('/members/admin')
+}
+
+/** Record a synced bank transaction from the review queue against an invoice. */
+export async function recordBankTransaction(
+  transactionId: string,
+  invoiceId: string,
+): Promise<{ success: boolean; error?: string }> {
+  const admin = await requireAdmin()
+
+  const row = await db
+    .select()
+    .from(bankTransactions)
+    .where(and(eq(bankTransactions.id, transactionId), eq(bankTransactions.status, 'needs_review')))
+    .then((r) => r[0])
+  if (!row) return { success: false, error: 'bankTransactionNotFound' }
+
+  const result = await db.transaction(async (tx) => {
+    const recorded = await recordPayment(tx, {
+      invoiceId,
+      amount: Number(row.amount),
+      paidAt: row.bookingDate,
+      reference: row.reference,
+      bankEntryRef: row.bankEntryRef,
+      source: 'bank_sync',
+    })
+    if (recorded === 'invoice_not_found') return recorded
+    await tx
+      .update(bankTransactions)
+      .set({ status: 'recorded', invoiceId, resolvedBy: admin.id, resolvedAt: new Date() })
+      .where(eq(bankTransactions.id, row.id))
+    return recorded
+  })
+  if (result === 'invoice_not_found') return { success: false, error: 'invoiceNotFound' }
+
+  revalidateBankPages()
+  return { success: true }
+}
+
+/** Dismiss a synced transaction that isn't an invoice payment (e.g. a donation). */
+export async function ignoreBankTransaction(transactionId: string): Promise<{ success: boolean }> {
+  const admin = await requireAdmin()
+  await db
+    .update(bankTransactions)
+    .set({ status: 'ignored', resolvedBy: admin.id, resolvedAt: new Date() })
+    .where(and(eq(bankTransactions.id, transactionId), eq(bankTransactions.status, 'needs_review')))
+  revalidateBankPages()
+  return { success: true }
 }

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark, CreditCard } from 'lucide-react'
+import { LayoutDashboard, Calendar, UserCircle, UserPlus, Receipt, FileText, Tags, Mail, Settings, Landmark, CreditCard, Link2 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
 interface MembersNavProps {
@@ -31,6 +31,7 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
     { href: '/members/admin/fees', label: t('admin.fees'), icon: Receipt },
     { href: '/members/admin/invoices', label: t('admin.invoices'), icon: FileText },
     { href: '/members/admin/bank-import', label: t('admin.bankImport'), icon: Landmark },
+    { href: '/members/admin/bank', label: t('admin.bankConnection'), icon: Link2 },
     { href: '/members/admin/mass-email', label: t('admin.massEmail'), icon: Mail },
     { href: '/members/admin/settings', label: t('admin.settings'), icon: Settings },
   ]
@@ -38,7 +39,8 @@ export function MembersNav({ isAdmin }: MembersNavProps) {
   const isActive = (href: string) =>
     href === '/members' || href === '/members/admin'
       ? pathname === href
-      : pathname.startsWith(href)
+      : // Whole segments only, so /admin/bank doesn't light up on /admin/bank-import.
+        pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <nav className="flex gap-1 overflow-x-auto border-b border-input pb-3 md:w-48 md:shrink-0 md:flex-col md:gap-0 md:border-b-0 md:border-r md:pb-0 md:pr-6">

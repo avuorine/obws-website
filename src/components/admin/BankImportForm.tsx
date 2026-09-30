@@ -10,20 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert } from '@/components/ui/alert'
 import { Upload, CheckCircle } from 'lucide-react'
 import { applyBankMatches, type BankMatch } from '@/app/(frontend)/members/admin/bank-import/actions'
-import { normalizeReferenceNumber } from '@/lib/reference-number'
-
-interface OpenInvoice {
-  id: string
-  invoiceNumber: number
-  referenceNumber: string
-  amount: string
-  paidAmount: string
-  recipientName: string
-  status: string
-}
-
-/** How a matched statement row relates to what the invoice still owes. */
-type MatchKind = 'exact' | 'split' | 'partial' | 'overpaid'
+import { matchEntries, remainingOf, type Matched, type OpenInvoice } from '@/lib/bank-matching'
 
 interface RawEntry {
   bookingDate: string
@@ -33,14 +20,7 @@ interface RawEntry {
   bankEntryRef: string
 }
 
-interface ParsedEntry extends RawEntry {
-  matchedInvoice: OpenInvoice | null
-  kind: MatchKind | null
-  /** Total of all rows in this statement that hit the same invoice. */
-  groupTotal: number
-  groupSize: number
-  alreadyPaid: boolean
-}
+type ParsedEntry = Matched<RawEntry>
 
 interface BankImportFormProps {
   unpaidInvoices: OpenInvoice[]
@@ -113,8 +93,6 @@ function parseCamt052(xmlText: string): RawEntry[] | null {
   return entries
 }
 
-const CENT = 0.01
-
 export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
   const t = useTranslations('admin')
   const [results, setResults] = useState<ParsedEntry[] | null>(null)
@@ -124,15 +102,6 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
   const [isPending, startTransition] = useTransition()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Normalised reference -> invoice, so padded and RF-prefixed bank
-  // references match the reference as generated.
-  const refMap = new Map<string, OpenInvoice>()
-  for (const inv of unpaidInvoices) {
-    const key = normalizeReferenceNumber(inv.referenceNumber ?? '')
-    if (key) refMap.set(key, inv)
-  }
-
-  const remainingOf = (inv: OpenInvoice) => Math.max(0, parseFloat(inv.amount) - parseFloat(inv.paidAmount))
 
   const handleFile = async () => {
     const file = fileRef.current?.files?.[0]
@@ -149,40 +118,7 @@ export function BankImportForm({ unpaidInvoices }: BankImportFormProps) {
       return
     }
 
-    // First pass: match each row to an invoice.
-    const matchedInvoices = rawEntries.map((entry) => {
-      const key = normalizeReferenceNumber(entry.reference)
-      return key ? (refMap.get(key) ?? null) : null
-    })
-
-    // Group by invoice so several rows for one reference are judged together.
-    const groupTotals = new Map<string, { total: number; size: number }>()
-    matchedInvoices.forEach((inv, i) => {
-      if (!inv) return
-      const g = groupTotals.get(inv.id) ?? { total: 0, size: 0 }
-      g.total += rawEntries[i].amount
-      g.size += 1
-      groupTotals.set(inv.id, g)
-    })
-
-    const matched: ParsedEntry[] = rawEntries.map((entry, i) => {
-      const inv = matchedInvoices[i]
-      if (!inv) return { ...entry, matchedInvoice: null, kind: null, groupTotal: 0, groupSize: 0, alreadyPaid: false }
-      const g = groupTotals.get(inv.id)!
-      const remaining = remainingOf(inv)
-      let kind: MatchKind
-      if (Math.abs(g.total - remaining) <= CENT) kind = g.size > 1 ? 'split' : 'exact'
-      else if (g.total < remaining) kind = 'partial'
-      else kind = 'overpaid'
-      return {
-        ...entry,
-        matchedInvoice: inv,
-        kind,
-        groupTotal: g.total,
-        groupSize: g.size,
-        alreadyPaid: inv.status === 'paid',
-      }
-    })
+    const matched: ParsedEntry[] = matchEntries(rawEntries, unpaidInvoices)
 
     setResults(matched)
 

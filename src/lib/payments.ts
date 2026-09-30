@@ -12,7 +12,7 @@ export interface PaymentInput {
   reference?: string | null
   /** Bank-side identifier of the statement entry. Unique, so re-imports are no-ops. */
   bankEntryRef?: string | null
-  source: 'bank_import' | 'manual'
+  source: 'bank_import' | 'manual' | 'bank_sync'
 }
 
 export type RecordPaymentResult = 'recorded' | 'duplicate' | 'invoice_not_found'

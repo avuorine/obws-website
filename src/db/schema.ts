@@ -32,7 +32,16 @@ export const invoiceTypeEnum = pgEnum('invoice_type', ['membership_fee', 'event_
 
 export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'sent', 'paid', 'cancelled'])
 
-export const paymentSourceEnum = pgEnum('payment_source', ['bank_import', 'manual'])
+export const paymentSourceEnum = pgEnum('payment_source', ['bank_import', 'manual', 'bank_sync'])
+
+export const bankConnectionStatusEnum = pgEnum('bank_connection_status', ['active', 'expired', 'revoked', 'error'])
+
+export const bankTransactionStatusEnum = pgEnum('bank_transaction_status', [
+  'auto_recorded',
+  'needs_review',
+  'recorded',
+  'ignored',
+])
 
 // --- Localized JSON type helper ---
 export type LocalizedText = { sv?: string; fi?: string; en?: string }
@@ -291,4 +300,73 @@ export const associationSettings = pgTable('association_settings', {
   email: text('email').default(''),
   phone: text('phone').default(''),
   nextInvoiceNumber: integer('next_invoice_number').notNull().default(1),
+})
+
+// --- Bank sync (Enable Banking) ---
+
+// A consented link to one bank account. One live row today; gains an
+// organisation_id when the site serves several organisations. Provider
+// credentials (app id, private key) are server env vars, not stored here.
+export const bankConnections = pgTable('bank_connections', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  provider: text('provider').notNull().default('enablebanking'),
+  aspspName: text('aspsp_name').notNull(),
+  aspspCountry: text('aspsp_country').notNull(),
+  psuType: text('psu_type').notNull().default('business'),
+  sessionId: text('session_id').notNull(),
+  accountUid: text('account_uid').notNull(),
+  iban: text('iban'),
+  accountName: text('account_name'),
+  // PSD2 consent end (max 180 days, per bank); renew before this.
+  validUntil: timestamp('valid_until').notNull(),
+  status: bankConnectionStatusEnum('status').notNull().default('active'),
+  lastSyncedAt: timestamp('last_synced_at'),
+  lastSyncError: text('last_sync_error'),
+  // Bit 1: 14-day reminder sent, bit 2: 3-day reminder sent.
+  remindersSent: integer('reminders_sent').notNull().default(0),
+  createdBy: text('created_by').references(() => user.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// Single-use state for the bank consent redirect, bound to the admin who
+// started it (CSRF protection for the callback). Expires after 15 minutes.
+export const bankAuthStates = pgTable('bank_auth_states', {
+  state: text('state').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  aspspName: text('aspsp_name').notNull(),
+  aspspCountry: text('aspsp_country').notNull(),
+  psuType: text('psu_type').notNull(),
+  validUntil: timestamp('valid_until').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  // Set after the bank redirect when the admin still has to pick one of
+  // several accounts; the row is deleted once the connection is saved.
+  sessionId: text('session_id'),
+  accounts: jsonb('accounts').$type<{ uid: string; iban: string | null; name: string | null }[]>(),
+})
+
+// Incoming transactions fetched from the bank: an audit log and the review
+// queue. Only what matching needs is kept (no payer IBAN, no raw payload);
+// rows older than 13 months are purged by the sync job.
+export const bankTransactions = pgTable('bank_transactions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  connectionId: text('connection_id')
+    .notNull()
+    .references(() => bankConnections.id, { onDelete: 'cascade' }),
+  // Same shape as invoice_payments.bank_entry_ref so camt uploads and the
+  // sync can't record one payment twice.
+  bankEntryRef: text('bank_entry_ref').notNull().unique(),
+  bookingDate: timestamp('booking_date').notNull(),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  reference: text('reference'),
+  remittance: text('remittance'),
+  debtorName: text('debtor_name'),
+  status: bankTransactionStatusEnum('status').notNull(),
+  invoiceId: text('invoice_id').references(() => invoices.id, { onDelete: 'set null' }),
+  matchKind: text('match_kind'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  resolvedBy: text('resolved_by').references(() => user.id, { onDelete: 'set null' }),
+  resolvedAt: timestamp('resolved_at'),
 })
