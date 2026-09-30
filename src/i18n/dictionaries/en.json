@@ -199,7 +199,8 @@
     "inactiveNotice": "Your membership is not active. Contact the board if this is a mistake.",
     "addToApple": "Add to Apple Wallet",
     "addToGoogle": "Add to Google Wallet",
-    "qrHelp": "The QR code identifies you for event check-in."
+    "qrHelp": "The QR code identifies you for event check-in.",
+    "discountsLink": "Member discounts →"
   },
   "board": {
     "title": "Board",
@@ -566,7 +567,24 @@
     "bankTransactionNotFound": "This payment was already handled.",
     "sourceBankSync": "Bank (automatic)",
     "bankNoBanks": "No banks were returned by Enable Banking. Check that the application is active (restricted mode: an account linked in the control panel).",
-    "bankNoMatch": "No bank matches the search."
+    "bankNoMatch": "No bank matches the search.",
+    "discounts": "Discounts",
+    "addDiscount": "New discount",
+    "editDiscount": "Edit discount",
+    "noDiscounts": "No discounts yet.",
+    "discountName": "Place",
+    "discountOffer": "Discount",
+    "discountOfferPlaceholder": "e.g. 10 % off whiskies",
+    "discountDetails": "Conditions",
+    "discountDetailsPlaceholder": "e.g. Show your membership card",
+    "discountAddress": "Address",
+    "discountUrl": "Website",
+    "discountActive": "Visible to members",
+    "discountVisible": "Visible",
+    "discountHidden": "Hidden",
+    "discountSaved": "Discount saved.",
+    "discountConfirmDelete": "Delete this discount?",
+    "required": "Required"
   },
   "rules": {
     "title": "Rules",
@@ -759,5 +777,13 @@
         "content": "Questions about these terms can be sent to the board by email. Contact details can be found on the board page. How personal data is processed is described in the privacy policy."
       }
     }
+  },
+  "discounts": {
+    "title": "Discounts",
+    "intro": "Places that give discounts to members of the club.",
+    "showCard": "Show your membership card →",
+    "empty": "No member discounts at the moment.",
+    "requiresValidCard": "Member discounts require a valid membership card. Your membership is not active; contact the board if this is a mistake.",
+    "website": "Website"
   }
 }

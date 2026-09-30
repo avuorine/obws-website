@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import QRCode from 'qrcode'
@@ -57,6 +58,11 @@ export default async function MembershipCardPage() {
       <div className="mt-6">
         <WalletButtons appleLabel={t('addToApple')} googleLabel={t('addToGoogle')} />
         <p className="mt-3 max-w-md text-sm text-muted-foreground">{t('qrHelp')}</p>
+        {card.isValid && (
+          <Link href="/members/discounts" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
+            {t('discountsLink')}
+          </Link>
+        )}
       </div>
     </div>
   )

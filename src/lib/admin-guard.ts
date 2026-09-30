@@ -11,7 +11,10 @@ import { auth } from './auth'
 export async function requireAdmin() {
   const session = await auth.api.getSession({
     headers: await headers(),
-    query: { disableCookieCache: true },
+    // disableRefresh: return straight after the database read. Otherwise
+    // better-auth rewrites the session cookie, and a cookie write inside a
+    // server action makes Next re-render the whole page on every admin action.
+    query: { disableCookieCache: true, disableRefresh: true },
   })
   const member = session?.user ?? null
   if (!member || member.role !== 'admin') redirect('/members')

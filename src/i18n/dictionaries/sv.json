@@ -199,7 +199,8 @@
     "inactiveNotice": "Ditt medlemskap är inte aktivt. Kontakta styrelsen om detta är ett fel.",
     "addToApple": "Lägg till i Apple Wallet",
     "addToGoogle": "Lägg till i Google Wallet",
-    "qrHelp": "QR-koden identifierar dig vid incheckning till evenemang."
+    "qrHelp": "QR-koden identifierar dig vid incheckning till evenemang.",
+    "discountsLink": "Medlemsrabatter →"
   },
   "board": {
     "title": "Styrelsen",
@@ -566,7 +567,24 @@
     "bankTransactionNotFound": "Betalningen har redan hanterats.",
     "sourceBankSync": "Bank (automatisk)",
     "bankNoBanks": "Enable Banking returnerade inga banker. Kontrollera att applikationen är aktiv (begränsat läge: ett konto länkat i kontrollpanelen).",
-    "bankNoMatch": "Ingen bank matchar sökningen."
+    "bankNoMatch": "Ingen bank matchar sökningen.",
+    "discounts": "Rabatter",
+    "addDiscount": "Ny rabatt",
+    "editDiscount": "Redigera rabatt",
+    "noDiscounts": "Inga rabatter ännu.",
+    "discountName": "Ställe",
+    "discountOffer": "Rabatt",
+    "discountOfferPlaceholder": "t.ex. 10 % rabatt på whisky",
+    "discountDetails": "Villkor",
+    "discountDetailsPlaceholder": "t.ex. Visa ditt medlemskort",
+    "discountAddress": "Adress",
+    "discountUrl": "Webbplats",
+    "discountActive": "Synlig för medlemmar",
+    "discountVisible": "Synlig",
+    "discountHidden": "Dold",
+    "discountSaved": "Rabatten har sparats.",
+    "discountConfirmDelete": "Radera denna rabatt?",
+    "required": "Obligatoriskt"
   },
   "rules": {
     "title": "Stadgar",
@@ -759,5 +777,13 @@
         "content": "Frågor om dessa villkor kan skickas till styrelsen per e-post. Kontaktuppgifter finns på styrelsesidan. Hur personuppgifter behandlas beskrivs i integritetspolicyn."
       }
     }
+  },
+  "discounts": {
+    "title": "Rabatter",
+    "intro": "Ställen som ger rabatt till klubbens medlemmar.",
+    "showCard": "Visa ditt medlemskort →",
+    "empty": "Inga medlemsrabatter just nu.",
+    "requiresValidCard": "Medlemsrabatter kräver ett giltigt medlemskort. Ditt medlemskap är inte aktivt; kontakta styrelsen om detta är fel.",
+    "website": "Webbplats"
   }
 }
