@@ -564,7 +564,9 @@
     "bankMatch_exact": "Exact",
     "bankMatch_split": "Split",
     "bankTransactionNotFound": "This payment was already handled.",
-    "sourceBankSync": "Bank (automatic)"
+    "sourceBankSync": "Bank (automatic)",
+    "bankNoBanks": "No banks were returned by Enable Banking. Check that the application is active (restricted mode: an account linked in the control panel).",
+    "bankNoMatch": "No bank matches the search."
   },
   "rules": {
     "title": "Rules",

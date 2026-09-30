@@ -3,10 +3,13 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Alert } from '@/components/ui/alert'
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { chooseBankAccount, disconnectBank, startBankConnection, syncBankNow } from './actions'
 
 interface Props {
@@ -22,17 +25,24 @@ export function BankConnectionPanel({ banks, defaultBank, connected, pick }: Pro
   const t = useTranslations('admin')
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [filter, setFilter] = useState('')
+  const [open, setOpen] = useState(false)
   const [bank, setBank] = useState(defaultBank ?? '')
   const [psuType, setPsuType] = useState<'business' | 'personal'>('business')
   const [account, setAccount] = useState(pick?.accounts[0]?.uid ?? '')
   const [message, setMessage] = useState<{ tone: 'success' | 'destructive'; text: string } | null>(null)
 
-  const visible = banks.filter((b) => b.name.toLowerCase().includes(filter.toLowerCase()))
+  // Banks that don't list the chosen account type can't be connected with it.
+  const visible = banks.filter((b) => b.psuTypes.length === 0 || b.psuTypes.includes(psuType))
   const known = (e?: string) =>
     e && ['bankNotConfigured', 'bankNotFound', 'bankProviderError', 'bankStateInvalid', 'bankNotConnected', 'bankSyncTooSoon', 'bankSyncFailed'].includes(e)
       ? t(e)
       : t('error')
+
+  function changePsuType(next: 'business' | 'personal') {
+    setPsuType(next)
+    const selected = banks.find((b) => b.name === bank)
+    if (selected && selected.psuTypes.length > 0 && !selected.psuTypes.includes(next)) setBank('')
+  }
 
   function connect() {
     setMessage(null)
@@ -93,25 +103,56 @@ export function BankConnectionPanel({ banks, defaultBank, connected, pick }: Pro
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="bank-filter">{t('bankChoose')}</Label>
-          <Input id="bank-filter" placeholder={t('bankSearch')} value={filter} onChange={(e) => setFilter(e.target.value)} />
-          <select className={selectClass} value={bank} onChange={(e) => setBank(e.target.value)} aria-label={t('bankChoose')}>
-            <option value="">—</option>
-            {visible.map((b) => (
-              <option key={b.name} value={b.name}>
-                {b.name}
-              </option>
-            ))}
-          </select>
+          <Label htmlFor="bank-picker">{t('bankChoose')}</Label>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                id="bank-picker"
+                type="button"
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className={cn('w-full justify-between font-normal', !bank && 'text-muted-foreground')}
+              >
+                {bank || t('bankSearch')}
+                <ChevronsUpDownIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+              <Command>
+                <CommandInput placeholder={t('bankSearch')} />
+                <CommandList>
+                  <CommandEmpty>{banks.length === 0 ? t('bankNoBanks') : t('bankNoMatch')}</CommandEmpty>
+                  <CommandGroup>
+                    {visible.map((b) => (
+                      <CommandItem
+                        key={b.name}
+                        value={b.name}
+                        onSelect={() => {
+                          setBank(b.name)
+                          setOpen(false)
+                        }}
+                      >
+                        <CheckIcon className={cn('mr-2 h-4 w-4', bank === b.name ? 'opacity-100' : 'opacity-0')} />
+                        {b.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-1">
           <Label htmlFor="psu-type">{t('bankAccountType')}</Label>
-          <select id="psu-type" className={selectClass} value={psuType} onChange={(e) => setPsuType(e.target.value as 'business' | 'personal')}>
+          <select id="psu-type" className={selectClass} value={psuType} onChange={(e) => changePsuType(e.target.value as 'business' | 'personal')}>
             <option value="business">{t('bankBusiness')}</option>
             <option value="personal">{t('bankPersonal')}</option>
           </select>
         </div>
       </div>
+
+      {banks.length === 0 && <Alert variant="warning">{t('bankNoBanks')}</Alert>}
 
       <div className="flex flex-wrap gap-2">
         <Button onClick={connect} disabled={isPending || !bank}>

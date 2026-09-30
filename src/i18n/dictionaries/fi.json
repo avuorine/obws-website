@@ -564,7 +564,9 @@
     "bankMatch_exact": "Täsmää",
     "bankMatch_split": "Jaettu",
     "bankTransactionNotFound": "Maksu on jo käsitelty.",
-    "sourceBankSync": "Pankki (automaattinen)"
+    "sourceBankSync": "Pankki (automaattinen)",
+    "bankNoBanks": "Enable Banking ei palauttanut yhtään pankkia. Tarkista, että sovellus on aktiivinen (rajoitettu tila: tili linkitetty hallintapaneelissa).",
+    "bankNoMatch": "Haulla ei löytynyt pankkia."
   },
   "rules": {
     "title": "Säännöt",
