@@ -95,6 +95,9 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "@peculiar/asn1-schema": "^2.9.4"
+    }
   }
 }
