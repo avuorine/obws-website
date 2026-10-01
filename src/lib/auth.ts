@@ -67,9 +67,19 @@ export const auth = betterAuth({
         })
       },
     }),
-    passkey(),
+    passkey(passkeyOptions()),
   ],
 })
+
+// Passkeys are bound to a relying-party ID (hostname). Pin it to the site's registrable
+// domain so passkeys work on both obws.fi and www.obws.fi, instead of relying on baseURL.
+function passkeyOptions() {
+  const site = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
+  const rpID = site.hostname.replace(/^www\./, '')
+  const origin =
+    rpID === 'localhost' ? site.origin : [`https://${rpID}`, `https://www.${rpID}`]
+  return { rpID, rpName: 'OBWS', origin }
+}
 
 function magicLinkEmailHtml(url: string, societyName: string): string {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
