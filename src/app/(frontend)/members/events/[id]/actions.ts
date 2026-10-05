@@ -3,18 +3,53 @@
 import { revalidatePath } from 'next/cache'
 import { getLocale } from 'next-intl/server'
 import { getMember } from '@/lib/auth-server'
-import { cancelRegistrationRow } from '@/lib/registrations'
+import { cancelRegistrationRow, promoteWaitlisted } from '@/lib/registrations'
 import { getOverdueBalance } from '@/lib/overdue-balance'
-import { cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
+import { isRegistrationClosed, memberCancelBlockReason } from '@/lib/event-deadlines'
 import { sendRegistrationConfirmation } from '@/lib/registration-email'
+import { deliverInvoices, issueEventInvoice } from '@/lib/event-invoicing'
 import { db } from '@/db'
 import { events, eventRegistrations } from '@/db/schema'
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and, ne, sql } from 'drizzle-orm'
 
-export async function registerForEvent(
-  eventId: string,
-  acceptedTerms: boolean,
-): Promise<{ success: boolean; error?: string }> {
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+type Result = { success: boolean; error?: string }
+
+/**
+ * The event row, locked for the rest of the transaction so concurrent
+ * signups for the same event are serialised: capacity checks and counter
+ * updates can't interleave, and the last seat can't be given out twice.
+ */
+function lockEvent(tx: Tx, eventId: string) {
+  return tx
+    .select()
+    .from(events)
+    .where(eq(events.id, eventId))
+    .for('update')
+    .then((r) => r[0])
+}
+
+function liveRegistration(tx: Tx, eventId: string, userId: string) {
+  return tx
+    .select()
+    .from(eventRegistrations)
+    .where(
+      and(
+        eq(eventRegistrations.eventId, eventId),
+        eq(eventRegistrations.userId, userId),
+        ne(eventRegistrations.status, 'cancelled'),
+      ),
+    )
+    .then((r) => r[0])
+}
+
+function revalidateEvent(eventId: string) {
+  revalidatePath(`/members/events/${eventId}`)
+  revalidatePath('/members/events')
+  revalidatePath('/members/invoices')
+}
+
+export async function registerForEvent(eventId: string, acceptedTerms: boolean): Promise<Result> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
   // The member must have seen and accepted the binding terms dialog.
@@ -23,80 +58,73 @@ export async function registerForEvent(
   // Members with overdue invoices can't book until the balance is cleared
   if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
 
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
+  const result = await db.transaction(async (tx) => {
+    const event = await lockEvent(tx, eventId)
+    if (!event || event.status !== 'published') return { error: 'Event not found' }
 
-  if (event.registrationOpensAt && new Date() < event.registrationOpensAt) {
-    return { success: false, error: 'Registration not open yet' }
-  }
+    if (event.registrationOpensAt && new Date() < event.registrationOpensAt) {
+      return { error: 'Registration not open yet' }
+    }
+    if (isRegistrationClosed(event)) return { error: 'registrationClosed' }
+    if (await liveRegistration(tx, eventId, member.id)) return { error: 'Already registered' }
 
-  if (isRegistrationClosed(event)) {
-    return { success: false, error: 'registrationClosed' }
-  }
+    const isLottery = event.allocationMethod === 'lottery'
+    const isFull = event.capacity ? (event.registrationCount ?? 0) >= event.capacity : false
 
-  // Check for existing non-cancelled registration
-  const existing = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.userId, member.id),
-      ),
-    )
-    .then((r) => r.find((reg) => reg.status !== 'cancelled'))
+    let status: 'registered' | 'waitlisted' | 'pending'
+    if (isLottery && !event.lotteryCompleted) {
+      status = 'pending'
+    } else if (isFull) {
+      status = 'waitlisted'
+    } else {
+      status = 'registered'
+    }
 
-  if (existing) return { success: false, error: 'Already registered' }
+    const [reg] = await tx
+      .insert(eventRegistrations)
+      .values({ eventId, userId: member.id, status, autoInvoice: true })
+      .returning({ id: eventRegistrations.id })
 
-  const isLottery = event.allocationMethod === 'lottery'
-  const isFull = event.capacity ? (event.registrationCount ?? 0) >= event.capacity : false
+    if (status === 'registered' || status === 'pending') {
+      await tx
+        .update(events)
+        .set({ registrationCount: sql`${events.registrationCount} + 1` })
+        .where(eq(events.id, eventId))
+    } else {
+      await tx
+        .update(events)
+        .set({ waitlistCount: sql`${events.waitlistCount} + 1` })
+        .where(eq(events.id, eventId))
+    }
 
-  let status: 'registered' | 'waitlisted' | 'pending'
-  if (isLottery && !event.lotteryCompleted) {
-    status = 'pending'
-  } else if (isFull) {
-    status = 'waitlisted'
-  } else {
-    status = 'registered'
-  }
+    // A seat is invoiced as soon as it is allocated; waitlist and lottery
+    // entries are invoiced on promotion or at the draw.
+    const invoiceId =
+      status === 'registered'
+        ? await issueEventInvoice(tx, { event, registrationId: reg.id, userId: member.id, seats: 1, supplementary: false })
+        : null
 
-  await db.insert(eventRegistrations).values({
-    eventId,
-    userId: member.id,
-    status,
+    return { event, status, invoiceId }
   })
 
-  // Update counts
-  if (status === 'registered' || status === 'pending') {
-    await db
-      .update(events)
-      .set({ registrationCount: sql`${events.registrationCount} + 1` })
-      .where(eq(events.id, eventId))
-  } else if (status === 'waitlisted') {
-    await db
-      .update(events)
-      .set({ waitlistCount: sql`${events.waitlistCount} + 1` })
-      .where(eq(events.id, eventId))
-  }
+  if ('error' in result) return { success: false, error: result.error }
 
   await sendRegistrationConfirmation({
     to: member.email,
     firstName: member.firstName ?? member.name,
     locale: await getLocale(),
-    event,
-    status,
+    event: result.event,
+    status: result.status,
     seats: 1,
+    binding: true,
   })
+  await deliverInvoices([result.invoiceId], { reason: 'signup' })
 
-  revalidatePath(`/members/events/${eventId}`)
-  revalidatePath('/members/events')
+  revalidateEvent(eventId)
   return { success: true }
 }
 
-export async function addGuest(
-  eventId: string,
-  acceptedTerms: boolean,
-): Promise<{ success: boolean; error?: string }> {
+export async function addGuest(eventId: string, acceptedTerms: boolean): Promise<Result> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
   if (acceptedTerms !== true) return { success: false, error: 'termsNotAccepted' }
@@ -104,185 +132,144 @@ export async function addGuest(
   // Members with overdue invoices can't book until the balance is cleared
   if (await getOverdueBalance(member.id)) return { success: false, error: 'overdueInvoices' }
 
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
-  if (!event.guestAllowed) return { success: false, error: 'Guests not allowed' }
+  const result = await db.transaction(async (tx) => {
+    const event = await lockEvent(tx, eventId)
+    if (!event || event.status !== 'published') return { error: 'Event not found' }
+    if (!event.guestAllowed) return { error: 'Guests not allowed' }
 
-  if (event.guestRegistrationOpensAt && new Date() < event.guestRegistrationOpensAt) {
-    return { success: false, error: 'Guest registration not open yet' }
-  }
+    if (event.guestRegistrationOpensAt && new Date() < event.guestRegistrationOpensAt) {
+      return { error: 'Guest registration not open yet' }
+    }
+    if (isRegistrationClosed(event)) return { error: 'registrationClosed' }
+    if (event.allocationMethod === 'lottery' && !event.lotteryCompleted) {
+      return { error: 'Guests allowed after lottery' }
+    }
 
-  if (isRegistrationClosed(event)) {
-    return { success: false, error: 'registrationClosed' }
-  }
+    const reg = await liveRegistration(tx, eventId, member.id)
+    if (!reg) return { error: 'Must register first' }
+    if (reg.guestCount >= event.maxGuestsPerMember) return { error: 'Guest limit reached' }
 
-  if (event.allocationMethod === 'lottery' && !event.lotteryCompleted) {
-    return { success: false, error: 'Guests allowed after lottery' }
-  }
+    if (reg.status === 'registered' && event.capacity && (event.registrationCount ?? 0) >= event.capacity) {
+      return { error: 'Event full' }
+    }
 
-  const reg = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.userId, member.id),
-      ),
-    )
-    .then((r) => r.find((r) => r.status !== 'cancelled'))
+    await tx
+      .update(eventRegistrations)
+      .set({ guestCount: sql`${eventRegistrations.guestCount} + 1` })
+      .where(eq(eventRegistrations.id, reg.id))
 
-  if (!reg) return { success: false, error: 'Must register first' }
-  if (reg.guestCount >= event.maxGuestsPerMember) return { success: false, error: 'Guest limit reached' }
+    if (reg.status === 'registered') {
+      await tx
+        .update(events)
+        .set({ registrationCount: sql`${events.registrationCount} + 1` })
+        .where(eq(events.id, eventId))
+    } else if (reg.status === 'waitlisted') {
+      await tx
+        .update(events)
+        .set({ waitlistCount: sql`${events.waitlistCount} + 1` })
+        .where(eq(events.id, eventId))
+    }
 
-  if (reg.status === 'registered' && event.capacity && (event.registrationCount ?? 0) >= event.capacity) {
-    return { success: false, error: 'Event full' }
-  }
+    // A binding signup's guest seat is invoiced right away on its own
+    // invoice; a waitlisted member's guests are invoiced on promotion.
+    const invoiceId =
+      reg.autoInvoice && reg.status === 'registered'
+        ? await issueEventInvoice(tx, { event, registrationId: reg.id, userId: member.id, seats: 1, supplementary: true })
+        : null
 
-  await db
-    .update(eventRegistrations)
-    .set({ guestCount: sql`${eventRegistrations.guestCount} + 1` })
-    .where(eq(eventRegistrations.id, reg.id))
+    return { event, reg, invoiceId }
+  })
 
-  if (reg.status === 'registered') {
-    await db
-      .update(events)
-      .set({ registrationCount: sql`${events.registrationCount} + 1` })
-      .where(eq(events.id, eventId))
-  } else if (reg.status === 'waitlisted') {
-    await db
-      .update(events)
-      .set({ waitlistCount: sql`${events.waitlistCount} + 1` })
-      .where(eq(events.id, eventId))
-  }
+  if ('error' in result) return { success: false, error: result.error }
 
   await sendRegistrationConfirmation({
     to: member.email,
     firstName: member.firstName ?? member.name,
     locale: await getLocale(),
-    event,
-    status: reg.status as 'registered' | 'waitlisted',
-    seats: reg.guestCount + 2,
+    event: result.event,
+    status: result.reg.status as 'registered' | 'waitlisted',
+    seats: result.reg.guestCount + 2,
     guestAdded: true,
+    binding: result.reg.autoInvoice,
+  })
+  await deliverInvoices([result.invoiceId], { reason: 'guest' })
+
+  revalidateEvent(eventId)
+  return { success: true }
+}
+
+export async function removeGuest(eventId: string): Promise<Result> {
+  const member = await getMember()
+  if (!member) return { success: false, error: 'Not authenticated' }
+
+  const result = await db.transaction(async (tx) => {
+    const event = await lockEvent(tx, eventId)
+    if (!event) return { error: 'Event not found' }
+
+    const reg = await liveRegistration(tx, eventId, member.id)
+    if (!reg) return { error: 'No registration found' }
+
+    const blockReason = memberCancelBlockReason(event, reg)
+    if (blockReason) return { error: blockReason }
+    if (reg.guestCount <= 0) return { error: 'No guests to remove' }
+
+    await tx
+      .update(eventRegistrations)
+      .set({ guestCount: sql`${eventRegistrations.guestCount} - 1` })
+      .where(eq(eventRegistrations.id, reg.id))
+
+    let issuedInvoiceIds: string[] = []
+    if (reg.status === 'registered') {
+      const [updated] = await tx
+        .update(events)
+        .set({ registrationCount: sql`GREATEST(${events.registrationCount} - 1, 0)` })
+        .where(eq(events.id, eventId))
+        .returning({ capacity: events.capacity, registrationCount: events.registrationCount })
+
+      // Promote from the waitlist into whatever is free now.
+      if (updated.capacity) {
+        issuedInvoiceIds = await promoteWaitlisted(tx, eventId, updated.capacity - (updated.registrationCount ?? 0))
+      }
+    } else if (reg.status === 'waitlisted') {
+      await tx
+        .update(events)
+        .set({ waitlistCount: sql`GREATEST(${events.waitlistCount} - 1, 0)` })
+        .where(eq(events.id, eventId))
+    }
+    return { issuedInvoiceIds }
   })
 
-  revalidatePath(`/members/events/${eventId}`)
-  revalidatePath('/members/events')
+  if ('error' in result) return { success: false, error: result.error }
+  await deliverInvoices(result.issuedInvoiceIds, { reason: 'promoted' })
+
+  revalidateEvent(eventId)
   return { success: true }
 }
 
-export async function removeGuest(
-  eventId: string,
-): Promise<{ success: boolean; error?: string }> {
+export async function cancelRegistration(eventId: string): Promise<Result> {
   const member = await getMember()
   if (!member) return { success: false, error: 'Not authenticated' }
 
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
+  // Read and cancel under the event lock, so a promotion from the waitlist
+  // in between can't turn a withdrawal into cancelling a binding seat.
+  const result = await db.transaction(async (tx) => {
+    const event = await lockEvent(tx, eventId)
+    if (!event) return { error: 'Event not found' }
 
-  const blockReason = cancellationBlockReason(event)
-  if (blockReason) return { success: false, error: blockReason }
+    const reg = await liveRegistration(tx, eventId, member.id)
+    if (!reg) return { error: 'No registration found' }
 
-  const reg = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.userId, member.id),
-      ),
-    )
-    .then((r) => r.find((r) => r.status !== 'cancelled'))
+    const blockReason = memberCancelBlockReason(event, reg)
+    if (blockReason) return { error: blockReason }
 
-  if (!reg) return { success: false, error: 'No registration found' }
-  if (reg.guestCount <= 0) return { success: false, error: 'No guests to remove' }
+    const { cancelled, issuedInvoiceIds } = await cancelRegistrationRow(reg, tx)
+    if (!cancelled) return { error: 'No registration found' }
+    return { issuedInvoiceIds }
+  })
 
-  await db
-    .update(eventRegistrations)
-    .set({ guestCount: sql`${eventRegistrations.guestCount} - 1` })
-    .where(eq(eventRegistrations.id, reg.id))
+  if ('error' in result) return { success: false, error: result.error }
+  await deliverInvoices(result.issuedInvoiceIds, { reason: 'promoted' })
 
-  if (reg.status === 'registered') {
-    await db
-      .update(events)
-      .set({ registrationCount: sql`GREATEST(${events.registrationCount} - 1, 0)` })
-      .where(eq(events.id, eventId))
-
-    // Promote from waitlist if a seat freed up
-    const updated = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-    if (updated && updated.capacity && (updated.registrationCount ?? 0) < updated.capacity) {
-      const nextWaitlisted = await db
-        .select()
-        .from(eventRegistrations)
-        .where(
-          and(
-            eq(eventRegistrations.eventId, eventId),
-            eq(eventRegistrations.status, 'waitlisted'),
-          ),
-        )
-        .orderBy(eventRegistrations.registeredAt)
-        .limit(1)
-        .then((r) => r[0])
-
-      if (nextWaitlisted) {
-        const seatsNeeded = 1 + nextWaitlisted.guestCount
-        const seatsAvailable = updated.capacity - (updated.registrationCount ?? 0)
-        if (seatsNeeded <= seatsAvailable) {
-          await db
-            .update(eventRegistrations)
-            .set({ status: 'registered' })
-            .where(eq(eventRegistrations.id, nextWaitlisted.id))
-
-          await db
-            .update(events)
-            .set({
-              registrationCount: sql`${events.registrationCount} + ${seatsNeeded}`,
-              waitlistCount: sql`GREATEST(${events.waitlistCount} - ${seatsNeeded}, 0)`,
-            })
-            .where(eq(events.id, eventId))
-        }
-      }
-    }
-  } else if (reg.status === 'waitlisted') {
-    await db
-      .update(events)
-      .set({ waitlistCount: sql`GREATEST(${events.waitlistCount} - 1, 0)` })
-      .where(eq(events.id, eventId))
-  }
-
-  revalidatePath(`/members/events/${eventId}`)
-  revalidatePath('/members/events')
-  return { success: true }
-}
-
-export async function cancelRegistration(
-  eventId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const member = await getMember()
-  if (!member) return { success: false, error: 'Not authenticated' }
-
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
-
-  const blockReason = cancellationBlockReason(event)
-  if (blockReason) return { success: false, error: blockReason }
-
-  const reg = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.userId, member.id),
-      ),
-    )
-    .then((r) => r.find((reg) => reg.status !== 'cancelled'))
-
-  if (!reg) return { success: false, error: 'No registration found' }
-
-  const cancelled = await cancelRegistrationRow(reg)
-  if (!cancelled) return { success: false, error: 'No registration found' }
-
-  revalidatePath(`/members/events/${eventId}`)
-  revalidatePath('/members/events')
+  revalidateEvent(eventId)
   return { success: true }
 }

@@ -131,9 +131,9 @@
     "overdueBannerBody": "Et voi ilmoittautua tapahtumiin tai lisätä vieraita ennen kuin laskut on maksettu. Nykyiset ilmoittautumisesi pysyvät voimassa. Ilmoittautuminen avautuu uudelleen heti, kun maksu on kirjattu.",
     "bindingTitle": "Vahvista ilmoittautumisesi",
     "bindingGuestTitle": "Lisää vieras",
-    "bindingLotteryIntro": "Osallistut arvontaan. Alla olevat ehdot koskevat sinua, jos saat paikan.",
-    "bindingWaitlistIntro": "Tapahtuma on täynnä, joten sinut lisätään jonotuslistalle. Alla olevat ehdot koskevat sinua, jos sinulle vapautuu paikka.",
-    "bindingGuestIntro": "{paid, select, yes {Vieraasta veloitetaan {price} €, joka lisätään maksuusi. } other {}}Samat ehdot koskevat vierastasi.",
+    "bindingLotteryIntro": "Osallistut arvontaan. Voit perua osallistumisesi arvontaan asti; alla olevat ehdot koskevat sinua, jos saat paikan.",
+    "bindingWaitlistIntro": "Tapahtuma on täynnä, joten sinut lisätään jonotuslistalle. Voit poistua jonotuslistalta, kunnes sinulle vapautuu paikka; sen jälkeen sovelletaan alla olevia ehtoja.",
+    "bindingGuestIntro": "{paid, select, yes {Vieraasta veloitetaan {price} € erillisellä laskulla. } other {}}Samat ehdot koskevat vierastasi.",
     "bindingRule_freeCancelUntil": "Voit perua maksutta {deadline} asti. Sen jälkeen ilmoittautumisesi on sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
     "bindingRule_bindingNow": "Peruutuksen takaraja on umpeutunut, joten ilmoittautumisesi on heti sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
     "bindingRule_noCancellation": "Tätä tapahtumaa ei voi perua. Ilmoittautumisesi on sitova{paid, select, yes {, ja {price} € / henkilö maksu on maksettava, vaikka et pääsisi paikalle} other {}}.",
@@ -147,7 +147,22 @@
     "bindingNote_noCancellation": "Peruutus ei ole mahdollinen — ilmoittautumisesi on sitova{paid, select, yes {, ja maksu on maksettava} other {}}.",
     "termsNotAccepted": "Vahvista, että ymmärrät ilmoittautumisen olevan sitova.",
     "perPerson": "hlö",
-    "overdueViewInvoices": "Näytä laskusi →"
+    "overdueViewInvoices": "Näytä laskusi →",
+    "bindingRule_binding": "Ilmoittautumisesi on sitova, eikä sitä voi perua, kun olet saanut paikan.{paid, select, yes { Lasku ({price} € / henkilö) lähetetään sähköpostitse, kun paikka myönnetään, ja maksuaikaa on enintään 7 päivää. Jos lasku on yhä maksamatta 3 päivää eräpäivän jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan.} other {}}",
+    "bindingNote_binding": "Ilmoittautumisesi on sitova, kun olet saanut paikan{paid, select, yes {. Maksa lasku eräpäivään mennessä, muuten paikka vapautetaan jonotuslistalle} other {}}.",
+    "registrationBinding": "Ilmoittautumisesi on sitova, eikä sitä voi perua. Ota yhteyttä hallitukseen, jos jotain on sattunut.",
+    "leaveWaitlist": "Poistu jonotuslistalta",
+    "leaveLottery": "Peru osallistuminen arvontaan",
+    "yourInvoice": "Lasku #{number}: {amount} €",
+    "invoicePaid": "maksettu",
+    "invoiceBeingSent": "lähetetään",
+    "invoiceDue": "eräpäivä {date}",
+    "seatReleaseNote": "Jos laskua ei makseta, paikka vapautetaan {date}.",
+    "payTitle": "Maksa {amount} € viimeistään {date}",
+    "payBody": "Paikkasi on varattu. Maksa lasku #{number} tilisiirtona alla olevilla tiedoilla – viitenumero on pakollinen. Lasku on lähetetty myös sähköpostiisi.",
+    "copy": "Kopioi",
+    "copied": "Kopioitu",
+    "virtualBarcode": "Virtuaaliviivakoodi"
   },
   "profile": {
     "title": "Profiili",
@@ -584,7 +599,8 @@
     "discountHidden": "Piilotettu",
     "discountSaved": "Alennus tallennettu.",
     "discountConfirmDelete": "Poistetaanko tämä alennus?",
-    "required": "Pakollinen"
+    "required": "Pakollinen",
+    "bindingRemovalExplanation": "Tämä on sitova ilmoittautuminen, joten tapahtumamaksu on edelleen voimassa. Pidä maksu (voimassa olevat laskut säilyvät; lasku luodaan, jos sitä ei ole) tai jätä se perimättä (maksamattomat laskut perutaan)."
   },
   "rules": {
     "title": "Säännöt",
@@ -754,11 +770,11 @@
       },
       "3": {
         "title": "3. Tapahtumailmoittautumiset",
-        "content": "Jokaisen tapahtuman hinta, paikkamäärä ja peruutuksen takaraja ilmoitetaan tapahtuman yhteydessä. Voit perua maksutta takarajaan asti; sen jälkeen ilmoittautumisesi vieraineen on sitova ja tapahtumamaksu on maksettava, vaikka et pääsisi paikalle. Jos tapahtumaa ei voi perua, ilmoittautuminen on sitova heti. Arvonnan ja jonotuslistan kautta saadut paikat muuttuvat sitoviksi, kun sinulle myönnetään paikka."
+        "content": "Jokaisen tapahtuman hinta ja paikkamäärä ilmoitetaan tapahtuman yhteydessä. Ilmoittautumiset vieraineen ovat sitovia: kun sinulle on myönnetty paikka, sitä ei voi perua, ja tapahtumamaksu on maksettava, vaikka et pääsisi paikalle. Voit poistua jonotuslistalta tai perua osallistumisesi arvontaan, kunnes sinulle myönnetään paikka. Ennen näiden ehtojen voimaantuloa tehtyihin ilmoittautumisiin sovelletaan niiden tekohetkellä voimassa olleita peruutusehtoja."
       },
       "4": {
         "title": "4. Maksut ja laskut",
-        "content": "Jäsen- ja tapahtumamaksut laskutetaan sähköpostitse, ja laskut näkyvät jäsenosiossa. Maksa eräpäivään mennessä laskun viitenumerolla. Niin kauan kuin jäsenellä on erääntyneitä laskuja, uudet tapahtumailmoittautumiset ja vieraiden lisääminen on estetty, kunnes laskut on maksettu."
+        "content": "Jäsen- ja tapahtumamaksut laskutetaan sähköpostitse, ja laskut näkyvät jäsenosiossa. Tapahtumamaksu laskutetaan heti, kun sinulle myönnetään paikka (ilmoittautuessa, jonotuslistalta noustessa tai arvonnassa), ja maksuaikaa on enintään 7 päivää. Jos lasku on yhä maksamatta 3 päivää eräpäivän jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan; paikkoja ei vapauteta tapahtumaa edeltävien 2 viimeisen päivän aikana. Maksa eräpäivään mennessä laskun viitenumerolla. Niin kauan kuin jäsenellä on erääntyneitä laskuja, uudet tapahtumailmoittautumiset ja vieraiden lisääminen on estetty, kunnes laskut on maksettu."
       },
       "5": {
         "title": "5. Maksujen kohdistus ja pankkiyhteys",

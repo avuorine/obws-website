@@ -16,7 +16,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { formatDateTime } from '@/lib/format-date'
-import type { BindingRule } from '@/lib/event-deadlines'
+import type { SignupRule } from '@/lib/event-deadlines'
+import { SCROLL_TO_PAYMENT_KEY } from '@/components/EventPaymentCard'
 
 interface EventRsvpProps {
   eventId: string
@@ -38,7 +39,8 @@ interface EventRsvpProps {
   eventDate: string
   /** Price per person, or null for a free event. */
   price: string | null
-  bindingRule: BindingRule
+  /** The terms that apply: the member's registration's, or 'binding' for a new signup. */
+  bindingRule: SignupRule
   cancellationDeadline: string | null
   registerAction: (eventId: string, acceptedTerms: boolean) => Promise<{ success: boolean; error?: string }>
   cancelAction: (eventId: string) => Promise<{ success: boolean; error?: string }>
@@ -83,6 +85,14 @@ function formatCountdown(ms: number, t: (key: string) => string) {
     return `${d}${t('days')} ${h}${t('hours')} ${m}${t('minutes')} ${s}${t('seconds')}`
   }
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
+function clearScrollFlag() {
+  try {
+    sessionStorage.removeItem(SCROLL_TO_PAYMENT_KEY)
+  } catch {
+    // Storage unavailable; nothing to clear.
+  }
 }
 
 export function EventRsvp({
@@ -135,7 +145,8 @@ export function EventRsvp({
       error === 'termsNotAccepted' ||
       error === 'registrationClosed' ||
       error === 'cancellationNotAllowed' ||
-      error === 'cancellationDeadlinePassed'
+      error === 'cancellationDeadlinePassed' ||
+      error === 'registrationBinding'
     ) {
       return t(error)
     }
@@ -153,8 +164,24 @@ export function EventRsvp({
     setDialog(null)
     startTransition(async () => {
       const action = kind === 'guest' ? addGuestAction : registerAction
+      // Flag first: the refreshed page may render the payment card before
+      // this promise resolves.
+      if (price) {
+        try {
+          sessionStorage.setItem(SCROLL_TO_PAYMENT_KEY, '1')
+        } catch {
+          // Storage unavailable; the card just won't scroll into view.
+        }
+      }
       const result = await action(eventId, true)
-      if (!result.success) setError(errorMessage(result.error))
+      if (!result.success) {
+        setError(errorMessage(result.error))
+        clearScrollFlag()
+      } else {
+        // A waitlist or lottery signup has no card to scroll to; don't let
+        // the flag linger until some later visit.
+        setTimeout(clearScrollFlag, 5000)
+      }
     })
   }
 
@@ -240,7 +267,13 @@ export function EventRsvp({
 
         {showCancel && (
           <Button variant="destructive" onClick={handleCancel} disabled={isPending}>
-            {isPending ? t('cancelling') : t('cancel')}
+            {isPending
+              ? t('cancelling')
+              : bindingRule === 'binding' && userStatus === 'waitlisted'
+                ? t('leaveWaitlist')
+                : bindingRule === 'binding' && userStatus === 'pending'
+                  ? t('leaveLottery')
+                  : t('cancel')}
           </Button>
         )}
       </div>

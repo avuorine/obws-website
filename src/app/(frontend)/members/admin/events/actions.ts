@@ -8,6 +8,7 @@ import { eq, and } from 'drizzle-orm'
 import { cancelRegistrationRow } from '@/lib/registrations'
 import { eventFeeDescription } from '@/lib/event-billing'
 import { eventInvoiceDueDate } from '@/lib/event-due-date'
+import { deliverInvoices, issueEventInvoice } from '@/lib/event-invoicing'
 import { getNextInvoiceNumber } from '@/lib/invoice-number'
 import { generateReferenceNumber } from '@/lib/reference-number'
 import { getLocalized } from '@/lib/localize'
@@ -39,8 +40,10 @@ export async function createEvent(
       registrationOpensAt: d.registrationOpensAt ? parseDatetimeLocal(d.registrationOpensAt) : null,
       registrationDeadline: d.registrationDeadline ? parseDatetimeLocal(d.registrationDeadline) : null,
       lotteryDate: d.lotteryDate ? parseDatetimeLocal(d.lotteryDate) : null,
-      cancellationAllowed: d.cancellationAllowed === 'on',
-      cancellationDeadline: d.cancellationDeadline ? parseDatetimeLocal(d.cancellationDeadline) : null,
+      // Signups are binding; the cancellation columns only matter for
+      // registrations made before automatic invoicing.
+      cancellationAllowed: false,
+      cancellationDeadline: null,
       guestAllowed: d.guestAllowed === 'on',
       maxGuestsPerMember: d.maxGuestsPerMember ? Number(d.maxGuestsPerMember) : 1,
       guestRegistrationOpensAt: d.guestRegistrationOpensAt ? parseDatetimeLocal(d.guestRegistrationOpensAt) : null,
@@ -77,8 +80,6 @@ export async function updateEvent(
       registrationOpensAt: d.registrationOpensAt ? parseDatetimeLocal(d.registrationOpensAt) : null,
       registrationDeadline: d.registrationDeadline ? parseDatetimeLocal(d.registrationDeadline) : null,
       lotteryDate: d.lotteryDate ? parseDatetimeLocal(d.lotteryDate) : null,
-      cancellationAllowed: d.cancellationAllowed === 'on',
-      cancellationDeadline: d.cancellationDeadline ? parseDatetimeLocal(d.cancellationDeadline) : null,
       guestAllowed: d.guestAllowed === 'on',
       maxGuestsPerMember: d.maxGuestsPerMember ? Number(d.maxGuestsPerMember) : 1,
       guestRegistrationOpensAt: d.guestRegistrationOpensAt ? parseDatetimeLocal(d.guestRegistrationOpensAt) : null,
@@ -151,14 +152,18 @@ export async function adminCancelRegistration(
   if (!reg) return { success: false, error: 'registrationNotFound' }
   if (reg.status === 'cancelled') return { success: false, error: 'registrationAlreadyCancelled' }
 
-  const event = await db.select().from(events).where(eq(events.id, reg.eventId)).then((r) => r[0])
-  const price = Number(event?.price ?? 0)
-
   // Registration cancel, seat release, waitlist promotion and invoice
   // cleanup commit together, so a failure cannot leave a cancelled
   // registration with a live invoice.
   const result = await db.transaction(async (tx) => {
-    const cancelled = await cancelRegistrationRow(reg, tx)
+    // Lock the event first, in the same order as member signups, and
+    // re-read the registration under it.
+    const event = await tx.select().from(events).where(eq(events.id, reg.eventId)).for('update').then((r) => r[0])
+    const price = Number(event?.price ?? 0)
+    const current = await tx.select().from(eventRegistrations).where(eq(eventRegistrations.id, registrationId)).then((r) => r[0])
+    if (!current) return { cancelled: false as const }
+
+    const { cancelled, issuedInvoiceIds } = await cancelRegistrationRow(current, tx)
     if (!cancelled) return { cancelled: false as const }
 
     // Cancel any unpaid event-fee invoice tied to this registration. A paid
@@ -173,11 +178,11 @@ export async function adminCancelRegistration(
 
     if (keepFee) {
       // Binding signup: only waitlisted/pending members never had a seat to pay for.
-      const hadSeat = reg.status === 'registered'
+      const hadSeat = current.status === 'registered'
       const hasLiveInvoice = linkedInvoices.some((inv) => inv.status !== 'cancelled')
       if (event && price > 0 && hadSeat && !hasLiveInvoice) {
         const member = await tx.select().from(user).where(eq(user.id, reg.userId)).then((r) => r[0])
-        const seats = 1 + reg.guestCount
+        const seats = 1 + current.guestCount
         const invoiceNumber = await getNextInvoiceNumber(tx)
         await tx.insert(invoices).values({
           invoiceNumber,
@@ -193,7 +198,7 @@ export async function adminCancelRegistration(
           referenceNumber: generateReferenceNumber(invoiceNumber),
         })
       }
-      return { cancelled: true as const, warning }
+      return { cancelled: true as const, warning, issuedInvoiceIds }
     }
 
     for (const inv of linkedInvoices) {
@@ -206,11 +211,12 @@ export async function adminCancelRegistration(
         warning = 'registrationRemovedInvoicePaid'
       }
     }
-    return { cancelled: true as const, warning }
+    return { cancelled: true as const, warning, issuedInvoiceIds }
   })
 
   if (!result.cancelled) return { success: false, error: 'registrationAlreadyCancelled' }
   const { warning } = result
+  await deliverInvoices(result.issuedInvoiceIds, { reason: 'promoted' })
 
   revalidatePath(`/members/admin/events/${reg.eventId}`)
   revalidatePath('/members/admin/events')
@@ -225,55 +231,82 @@ export async function runLottery(
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdmin()
 
-  const event = await db.select().from(events).where(eq(events.id, eventId)).then((r) => r[0])
-  if (!event) return { success: false, error: 'Event not found' }
-  if (event.lotteryCompleted) return { success: false, error: 'Lottery already completed' }
-  if (event.allocationMethod !== 'lottery') return { success: false, error: 'Not a lottery event' }
+  // One transaction under the event lock: a crash can't leave a partial
+  // draw, and a double click can't draw twice.
+  const result = await db.transaction(async (tx) => {
+    const event = await tx.select().from(events).where(eq(events.id, eventId)).for('update').then((r) => r[0])
+    if (!event) return { error: 'Event not found' }
+    if (event.lotteryCompleted) return { error: 'Lottery already completed' }
+    if (event.allocationMethod !== 'lottery') return { error: 'Not a lottery event' }
 
-  // Get all pending registrations
-  const pending = await db
-    .select()
-    .from(eventRegistrations)
-    .where(
-      and(
-        eq(eventRegistrations.eventId, eventId),
-        eq(eventRegistrations.status, 'pending'),
-      ),
-    )
+    const pending = await tx
+      .select()
+      .from(eventRegistrations)
+      .where(
+        and(
+          eq(eventRegistrations.eventId, eventId),
+          eq(eventRegistrations.status, 'pending'),
+        ),
+      )
 
-  // Fisher-Yates shuffle
-  const shuffled = [...pending]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
+    // Fisher-Yates shuffle
+    const shuffled = [...pending]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
 
-  const capacity = event.capacity ?? shuffled.length
-  let registeredCount = 0
-  let waitlistCount = 0
+    const capacity = event.capacity ?? shuffled.length
+    let registeredCount = 0
+    let waitlistCount = 0
+    const invoiceIds: string[] = []
 
-  for (let i = 0; i < shuffled.length; i++) {
-    const status = i < capacity ? 'registered' : 'waitlisted'
-    await db
-      .update(eventRegistrations)
-      .set({ status })
-      .where(eq(eventRegistrations.id, shuffled[i].id))
+    for (let i = 0; i < shuffled.length; i++) {
+      const status = i < capacity ? 'registered' : 'waitlisted'
+      await tx
+        .update(eventRegistrations)
+        .set({ status })
+        .where(eq(eventRegistrations.id, shuffled[i].id))
 
-    if (status === 'registered') registeredCount++
-    else waitlistCount++
-  }
+      if (status === 'registered') {
+        registeredCount++
+        // Winners who signed up under the binding terms are invoiced now.
+        if (shuffled[i].autoInvoice) {
+          const id = await issueEventInvoice(tx, {
+            event,
+            registrationId: shuffled[i].id,
+            userId: shuffled[i].userId,
+            seats: 1 + shuffled[i].guestCount,
+            supplementary: false,
+          })
+          if (id) invoiceIds.push(id)
+        }
+      } else {
+        waitlistCount++
+      }
+    }
 
-  await db
-    .update(events)
-    .set({
-      lotteryCompleted: true,
-      registrationCount: registeredCount,
-      waitlistCount,
-    })
-    .where(eq(events.id, eventId))
+    await tx
+      .update(events)
+      .set({
+        lotteryCompleted: true,
+        registrationCount: registeredCount,
+        waitlistCount,
+      })
+      .where(eq(events.id, eventId))
+
+    return { invoiceIds }
+  })
+
+  if ('error' in result) return { success: false, error: result.error }
+
+  // Emails go out after commit; any that fail stay drafts and the nightly
+  // job retries them.
+  await deliverInvoices(result.invoiceIds, { reason: 'lottery' })
 
   revalidatePath(`/members/admin/events/${eventId}`)
   revalidatePath(`/members/events/${eventId}`)
   revalidatePath('/members/events')
+  revalidatePath('/members/admin/invoices')
   return { success: true }
 }

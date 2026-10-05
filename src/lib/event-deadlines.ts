@@ -37,3 +37,35 @@ export function bindingRule(event: EventDeadlines, now: Date = new Date()): Bind
   if (!event.cancellationDeadline) return 'cancelAnytime'
   return now > event.cancellationDeadline ? 'bindingNow' : 'freeCancelUntil'
 }
+
+/**
+ * The terms a signup is made under. Binding signups (every signup since
+ * automatic invoicing) are 'binding'; older registrations keep the event's
+ * cancellation rule.
+ */
+export type SignupRule = BindingRule | 'binding'
+
+interface RegistrationTerms {
+  autoInvoice: boolean
+  status: string
+}
+
+/**
+ * Why a member may not cancel their registration or remove a guest, or null
+ * when they may. A binding signup can withdraw from the waitlist or lottery
+ * but never give up an allocated seat; older registrations follow the
+ * event's cancellation rules.
+ */
+export function memberCancelBlockReason(
+  event: EventDeadlines,
+  reg: RegistrationTerms,
+  now: Date = new Date(),
+): 'registrationBinding' | 'cancellationNotAllowed' | 'cancellationDeadlinePassed' | null {
+  if (reg.autoInvoice) return reg.status === 'registered' ? 'registrationBinding' : null
+  return cancellationBlockReason(event, now)
+}
+
+/** The rule shown to a member: their registration's terms, or 'binding' for a new signup. */
+export function signupRule(event: EventDeadlines, reg: RegistrationTerms | null, now: Date = new Date()): SignupRule {
+  return !reg || reg.autoInvoice ? 'binding' : bindingRule(event, now)
+}

@@ -4,7 +4,7 @@ import { ASSOCIATION_TIMEZONE, formatBarcodeDateInTz } from './timezone'
  * Finnish virtual barcode (virtuaaliviivakoodi) version 4.
  * 54-digit numeric string: version(1) + IBAN(16) + euros(6) + cents(2) + reserved(3) + reference(20) + dueDate(6)
  */
-function generateVirtualBarcode(iban: string, amount: string, referenceNumber: string, dueDate: Date): string {
+export function generateVirtualBarcode(iban: string, amount: string, referenceNumber: string, dueDate: Date): string {
   const version = '4'
   // Strip "FI" prefix and spaces from IBAN → 16 digits
   const ibanDigits = iban.replace(/\s/g, '').replace(/^FI/i, '').padStart(16, '0')
@@ -26,6 +26,47 @@ interface InvoiceEmailSettings {
   iban: string | null
 }
 
+/** Why a binding signup's invoice was issued, for the opening line. */
+export type BindingInvoiceReason = 'signup' | 'guest' | 'promoted' | 'lottery'
+
+/** Extra lines for an invoice issued for a binding (auto-invoiced) signup. */
+export interface BindingInvoiceNotice {
+  reason?: BindingInvoiceReason
+  /** When the seat is released if still unpaid; null when it never is. */
+  seatReleaseAt: Date | null
+}
+
+function bindingNoticeLines(notice: BindingInvoiceNotice): { sv: string; fi: string; en: string } {
+  const release = notice.seatReleaseAt
+    ? notice.seatReleaseAt.toLocaleDateString('fi-FI', { timeZone: ASSOCIATION_TIMEZONE })
+    : null
+  const intro = {
+    promoted: {
+      sv: 'En plats har blivit ledig och du har flyttats från väntelistan till deltagarna.',
+      fi: 'Paikka vapautui, ja sinut on siirretty jonotuslistalta osallistujaksi.',
+      en: 'A seat opened up and you have been moved from the waitlist to the participants.',
+    },
+    lottery: {
+      sv: 'Grattis – du fick en plats i lottningen.',
+      fi: 'Onneksi olkoon – sait paikan arvonnassa.',
+      en: 'Congratulations – you were allocated a seat in the lottery.',
+    },
+  }[notice.reason as 'promoted' | 'lottery'] ?? { sv: '', fi: '', en: '' }
+  const terms = release
+    ? {
+        sv: `Din anmälan är bindande. Betala senast på förfallodagen. Är fakturan fortfarande obetald ${release} frigörs platsen och erbjuds till väntelistan.`,
+        fi: `Ilmoittautumisesi on sitova. Maksathan laskun eräpäivään mennessä. Jos lasku on yhä maksamatta ${release}, paikka vapautetaan jonotuslistalle.`,
+        en: `Your registration is binding. Please pay by the due date. If the invoice is still unpaid on ${release}, the seat is released and offered to the waitlist.`,
+      }
+    : {
+        sv: 'Din anmälan är bindande. Betala senast på förfallodagen.',
+        fi: 'Ilmoittautumisesi on sitova. Maksathan laskun eräpäivään mennessä.',
+        en: 'Your registration is binding. Please pay by the due date.',
+      }
+  const line = (a: string, b: string) => [a, b].filter(Boolean).map((t) => `<p>${t}</p>`).join('')
+  return { sv: line(intro.sv, terms.sv), fi: line(intro.fi, terms.fi), en: line(intro.en, terms.en) }
+}
+
 export function invoiceEmailHtml(invoice: {
   invoiceNumber: number
   recipientName: string
@@ -33,7 +74,8 @@ export function invoiceEmailHtml(invoice: {
   amount: string
   dueDate: Date
   referenceNumber: string
-}, settings: InvoiceEmailSettings): string {
+}, settings: InvoiceEmailSettings, binding?: BindingInvoiceNotice): string {
+  const notes = binding ? bindingNoticeLines(binding) : { sv: '', fi: '', en: '' }
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!
   const societyName = settings.name
   const societyIban = settings.iban || ''
@@ -50,19 +92,19 @@ export function invoiceEmailHtml(invoice: {
 
       <!-- Swedish -->
       <p>Hej ${invoice.recipientName},</p>
-      <p>Bifogat finner du faktura #${invoice.invoiceNumber}.</p>
+      <p>Bifogat finner du faktura #${invoice.invoiceNumber}.</p>${notes.sv}
 
       ${hr}
 
       <!-- Finnish -->
       <p>Hei ${invoice.recipientName},</p>
-      <p>Löydät laskun #${invoice.invoiceNumber} liitteenä.</p>
+      <p>Löydät laskun #${invoice.invoiceNumber} liitteenä.</p>${notes.fi}
 
       ${hr}
 
       <!-- English -->
       <p>Hi ${invoice.recipientName},</p>
-      <p>Please find attached invoice #${invoice.invoiceNumber}.</p>
+      <p>Please find attached invoice #${invoice.invoiceNumber}.</p>${notes.en}
 
       ${hr}
 

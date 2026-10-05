@@ -131,9 +131,9 @@
     "overdueBannerBody": "Until the balance is paid you can’t sign up for events or add guests. Your existing bookings are not affected. Registration opens again as soon as the payment has been recorded.",
     "bindingTitle": "Confirm your registration",
     "bindingGuestTitle": "Add a guest",
-    "bindingLotteryIntro": "You are entering the lottery. The terms below apply if you are allocated a seat.",
-    "bindingWaitlistIntro": "The event is full, so you will be placed on the waitlist. The terms below apply if a seat opens up for you.",
-    "bindingGuestIntro": "{paid, select, yes {The guest is charged {price} €, added to your fee. } other {}}The same terms apply to your guest.",
+    "bindingLotteryIntro": "You are entering the lottery. You can withdraw until the draw; the terms below apply if you are allocated a seat.",
+    "bindingWaitlistIntro": "The event is full, so you will be placed on the waitlist. You can leave the waitlist until a seat opens up for you; the terms below apply once it does.",
+    "bindingGuestIntro": "{paid, select, yes {The guest is charged {price} € on a separate invoice. } other {}}The same terms apply to your guest.",
     "bindingRule_freeCancelUntil": "You can cancel free of charge until {deadline}. After that your registration is binding{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
     "bindingRule_bindingNow": "The cancellation deadline has passed, so your registration is binding immediately{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
     "bindingRule_noCancellation": "This event cannot be cancelled. Your registration is binding{paid, select, yes { and the fee of {price} € per person must be paid even if you cannot attend} other {}}.",
@@ -147,7 +147,22 @@
     "bindingNote_noCancellation": "Cancellation is not available — your registration is binding{paid, select, yes { and the fee must be paid} other {}}.",
     "termsNotAccepted": "Please confirm that you understand the registration is binding.",
     "perPerson": "person",
-    "overdueViewInvoices": "View your invoices →"
+    "overdueViewInvoices": "View your invoices →",
+    "bindingRule_binding": "Your registration is binding and cannot be cancelled once you have a seat.{paid, select, yes { An invoice of {price} € per person is emailed to you when the seat is allocated, with a payment term of up to 7 days. If it is still unpaid 3 days after the due date, the seat is released to the waitlist and the invoice cancelled.} other {}}",
+    "bindingNote_binding": "Your registration is binding once you have a seat{paid, select, yes {. Pay the invoice by the due date, or the seat is released to the waitlist} other {}}.",
+    "registrationBinding": "Your registration is binding and cannot be cancelled. Contact the board if something has come up.",
+    "leaveWaitlist": "Leave the waitlist",
+    "leaveLottery": "Withdraw from the lottery",
+    "yourInvoice": "Invoice #{number}: {amount} €",
+    "invoicePaid": "paid",
+    "invoiceBeingSent": "being sent",
+    "invoiceDue": "due {date}",
+    "seatReleaseNote": "If unpaid, the seat is released on {date}.",
+    "payTitle": "Pay {amount} € by {date}",
+    "payBody": "Your seat is reserved. Pay invoice #{number} by bank transfer with the details below – the reference number is required. The invoice has also been emailed to you.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "virtualBarcode": "Virtual barcode"
   },
   "profile": {
     "title": "Profile",
@@ -584,7 +599,8 @@
     "discountHidden": "Hidden",
     "discountSaved": "Discount saved.",
     "discountConfirmDelete": "Delete this discount?",
-    "required": "Required"
+    "required": "Required",
+    "bindingRemovalExplanation": "This is a binding signup, so the event fee still applies. Keep the fee (live invoices stay; one is created if none exists) or waive it (unpaid invoices are cancelled)."
   },
   "rules": {
     "title": "Rules",
@@ -754,11 +770,11 @@
       },
       "3": {
         "title": "3. Event registrations",
-        "content": "Each event states its price, capacity and cancellation deadline. You can cancel free of charge until the cancellation deadline; after that your registration, including any guests, is binding and the event fee must be paid even if you cannot attend. If no cancellation is allowed for an event, the registration is binding when made. Lottery and waitlist places become binding when a seat is allocated to you."
+        "content": "Each event states its price and capacity. Registrations, including any guests, are binding: once a seat is allocated to you it cannot be cancelled, and the event fee must be paid even if you cannot attend. You can leave a waitlist or withdraw from a lottery until a seat is allocated to you. Registrations made before these terms took effect keep the cancellation terms that applied when they were made."
       },
       "4": {
         "title": "4. Fees and invoices",
-        "content": "Membership and event fees are invoiced by email and can be viewed in the member section. Pay by the due date using the invoice’s reference number. While a member has overdue invoices, new event registrations and guest additions are paused until the balance is paid."
+        "content": "Membership and event fees are invoiced by email and can be viewed in the member section. An event fee is invoiced as soon as a seat is allocated to you (at signup, when you move up from the waitlist, or at the lottery draw), with a payment term of up to 7 days. If the invoice is still unpaid 3 days after the due date, the seat is released to the waitlist and the invoice cancelled; seats are not released in the last 2 days before the event. Pay by the due date using the invoice’s reference number. While a member has overdue invoices, new event registrations and guest additions are paused until the balance is paid."
       },
       "5": {
         "title": "5. Payment matching and bank connection",

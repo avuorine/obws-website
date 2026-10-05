@@ -99,6 +99,13 @@
       "when": 1790794952917,
       "tag": "0013_member_discounts",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790866500528,
+      "tag": "0014_binding_auto_invoicing",
+      "breakpoints": true
     }
   ]
 }

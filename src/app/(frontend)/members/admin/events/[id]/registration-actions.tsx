@@ -19,8 +19,10 @@ interface RegistrationActionsProps {
   registrationId: string
   memberName: string
   status: string
-  /** Past the cancellation deadline the signup is binding; ask whether the fee still applies. */
+  /** The seat is binding (past the deadline, or a binding signup); ask whether the fee still applies. */
   pastCancellationDeadline: boolean
+  /** Signed up under the binding, auto-invoiced terms. */
+  binding: boolean
 }
 
 export function RegistrationActions({
@@ -28,6 +30,7 @@ export function RegistrationActions({
   memberName,
   status,
   pastCancellationDeadline,
+  binding,
 }: RegistrationActionsProps) {
   const t = useTranslations('admin')
   const router = useRouter()
@@ -89,7 +92,7 @@ export function RegistrationActions({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('removeRegistration')}: {memberName}</DialogTitle>
-            <DialogDescription>{t('lateRemovalExplanation')}</DialogDescription>
+            <DialogDescription>{t(binding ? 'bindingRemovalExplanation' : 'lateRemovalExplanation')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => remove(false)} disabled={isPending}>
