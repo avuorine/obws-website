@@ -9,7 +9,9 @@ import {
   pgEnum,
   serial,
   unique,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
 // --- Enums ---
 
@@ -178,20 +180,34 @@ export const tastingWhiskies = pgTable('tasting_whiskies', {
   sortOrder: integer('sort_order').default(0),
 })
 
-export const eventRegistrations = pgTable('event_registrations', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  eventId: text('event_id')
-    .notNull()
-    .references(() => events.id, { onDelete: 'cascade' }),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  status: registrationStatusEnum('status').notNull().default('registered'),
-  guestCount: integer('guest_count').notNull().default(0),
-  registeredAt: timestamp('registered_at').notNull().defaultNow(),
-  cancelledAt: timestamp('cancelled_at'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-})
+export const eventRegistrations = pgTable(
+  'event_registrations',
+  {
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    eventId: text('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    status: registrationStatusEnum('status').notNull().default('registered'),
+    guestCount: integer('guest_count').notNull().default(0),
+    // Signed up under the binding terms (Oct 2026): a seat is invoiced as
+    // soon as it is allocated, cannot be cancelled by the member, and is
+    // released if left unpaid. Older rows keep the event's cancellation
+    // rules and are invoiced by hand.
+    autoInvoice: boolean('auto_invoice').notNull().default(false),
+    registeredAt: timestamp('registered_at').notNull().defaultNow(),
+    cancelledAt: timestamp('cancelled_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  // One live registration per member and event.
+  (t) => [
+    uniqueIndex('event_registrations_live_unique')
+      .on(t.eventId, t.userId)
+      .where(sql`${t.status} <> 'cancelled'`),
+  ],
+)
 
 // --- Fee & Invoice tables ---
 
@@ -232,6 +248,15 @@ export const invoices = pgTable('invoices', {
   eventRegistrationId: text('event_registration_id').references(() => eventRegistrations.id),
   // Number of seats billed on an event-fee invoice (1 + guests). Null for membership fees.
   seatCount: integer('seat_count'),
+  // Event fee for guest seats added after the member's own seat was invoiced.
+  supplementary: boolean('supplementary').notNull().default(false),
+  // Binding signups only: when the seats on this invoice are released if
+  // it is still unpaid. Null when the seats are never released (signups
+  // close to the event, older invoices).
+  seatReleaseAt: timestamp('seat_release_at'),
+  reminderSentAt: timestamp('reminder_sent_at'),
+  // Why a cancelled invoice was cancelled, e.g. 'unpaid_release'.
+  cancelReason: text('cancel_reason'),
   recipientName: text('recipient_name').notNull(),
   recipientEmail: text('recipient_email').notNull(),
   description: text('description').notNull(),

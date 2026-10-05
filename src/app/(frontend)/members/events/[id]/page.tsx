@@ -3,14 +3,19 @@ import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { getMember } from '@/lib/auth-server'
 import { db } from '@/db'
-import { events, eventRegistrations, eventCategories } from '@/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { events, eventRegistrations, eventCategories, invoices } from '@/db/schema'
+import { eq, and, ne } from 'drizzle-orm'
 import { getLocalized } from '@/lib/localize'
-import { formatDateTime, formatTime } from '@/lib/format-date'
+import { formatDate, formatDateTime, formatTime } from '@/lib/format-date'
 import { getDatePartsInTz } from '@/lib/timezone'
 import { EventRsvp } from '@/components/EventRsvp'
+import { EventPaymentCard } from '@/components/EventPaymentCard'
+import { getSettings } from '@/lib/settings'
+import { generateVirtualBarcode } from '@/lib/invoice-email'
+import { formatReferenceNumber } from '@/lib/reference-number'
 import { getOverdueBalance } from '@/lib/overdue-balance'
-import { bindingRule, cancellationBlockReason, isRegistrationClosed } from '@/lib/event-deadlines'
+import { isRegistrationClosed, memberCancelBlockReason, signupRule } from '@/lib/event-deadlines'
+import { effectiveInvoiceStatus, remainingAmount } from '@/lib/invoice-status'
 import { Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -58,7 +63,30 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const isDeadlinePassed = isRegistrationClosed(event)
   const isLottery = event.allocationMethod === 'lottery'
   const isAdmin = member?.role === 'admin'
-  const canCancel = cancellationBlockReason(event) === null
+  const canCancel = userReg ? memberCancelBlockReason(event, userReg) === null : false
+  // Registrations from before binding signups keep the event's cancellation deadline.
+  const showCancellationDeadline = !!event.cancellationDeadline && !!userReg && !userReg.autoInvoice
+
+  const settings = await getSettings()
+
+  // A binding signup's invoices for this event, so the member sees what to
+  // pay and when the seat would be released.
+  const myInvoices = userReg?.autoInvoice
+    ? await db
+        .select({
+          id: invoices.id,
+          invoiceNumber: invoices.invoiceNumber,
+          status: invoices.status,
+          amount: invoices.amount,
+          paidAmount: invoices.paidAmount,
+          dueDate: invoices.dueDate,
+          seatReleaseAt: invoices.seatReleaseAt,
+          referenceNumber: invoices.referenceNumber,
+        })
+        .from(invoices)
+        .where(and(eq(invoices.eventRegistrationId, userReg.id), ne(invoices.status, 'cancelled')))
+        .orderBy(invoices.createdAt)
+    : []
   const isGuestRegistrationOpen = event.guestAllowed &&
     (!event.guestRegistrationOpensAt || new Date() >= event.guestRegistrationOpensAt)
 
@@ -140,7 +168,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </p>
           </div>
         )}
-        {event.cancellationDeadline && (
+        {showCancellationDeadline && event.cancellationDeadline && (
           <div>
             <span className="font-medium">{t('cancellationDeadline')}</span>
             <p className="text-muted-foreground">
@@ -177,13 +205,53 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             eventTitle={getLocalized(event.titleLocales, locale)}
             eventDate={event.date.toISOString()}
             price={event.price != null && Number(event.price) > 0 ? event.price : null}
-            bindingRule={bindingRule(event)}
+            bindingRule={signupRule(event, userReg ?? null)}
             cancellationDeadline={event.cancellationDeadline?.toISOString() ?? null}
             registerAction={registerForEvent}
             cancelAction={cancelRegistration}
             addGuestAction={addGuest}
             removeGuestAction={removeGuest}
           />
+          {myInvoices.length > 0 && (
+            <div className="mt-4 space-y-3 border-t pt-4 text-sm">
+              {myInvoices.map((inv) => {
+                const status = effectiveInvoiceStatus(inv)
+                if (status === 'sent' || status === 'partial' || status === 'overdue') {
+                  const remaining = remainingAmount(inv).toFixed(2)
+                  return (
+                    <EventPaymentCard
+                      key={inv.id}
+                      invoiceId={inv.id}
+                      invoiceNumber={inv.invoiceNumber}
+                      amount={remaining}
+                      dueLabel={formatDate(inv.dueDate, locale)}
+                      seatReleaseLabel={inv.seatReleaseAt ? formatDate(inv.seatReleaseAt, locale) : null}
+                      overdue={status === 'overdue'}
+                      recipient={settings.name}
+                      iban={settings.iban || null}
+                      bic={settings.bic || null}
+                      reference={formatReferenceNumber(inv.referenceNumber)}
+                      barcode={
+                        settings.iban
+                          ? generateVirtualBarcode(settings.iban, remaining, inv.referenceNumber, inv.dueDate)
+                          : null
+                      }
+                    />
+                  )
+                }
+                return (
+                  <p key={inv.id} className="font-medium">
+                    {t('yourInvoice', { number: inv.invoiceNumber, amount: Number(inv.amount).toFixed(2) })}
+                    {' · '}
+                    {status === 'paid' ? t('invoicePaid') : t('invoiceBeingSent')}
+                  </p>
+                )
+              })}
+              <Link href="/members/invoices" className="block text-primary hover:underline">
+                {t('overdueViewInvoices')}
+              </Link>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

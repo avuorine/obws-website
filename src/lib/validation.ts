@@ -120,8 +120,6 @@ export const eventSchema = z.object({
   registrationOpensAt: z.string().optional(),
   registrationDeadline: z.string().optional(),
   lotteryDate: z.string().optional(),
-  cancellationAllowed: z.string().optional(),
-  cancellationDeadline: z.string().optional(),
   guestAllowed: z.string().optional(),
   maxGuestsPerMember: z.string().optional(),
   guestRegistrationOpensAt: z.string().optional(),

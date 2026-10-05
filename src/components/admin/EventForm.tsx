@@ -55,11 +55,10 @@ export function EventForm({ eventId, defaultValues, categories }: EventFormProps
     formState: { errors },
   } = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
-    defaultValues: defaultValues ?? { allocationMethod: 'first_come', cancellationAllowed: 'on' },
+    defaultValues: defaultValues ?? { allocationMethod: 'first_come' },
   })
 
   const allocationMethod = watch('allocationMethod')
-  const cancellationAllowed = watch('cancellationAllowed')
   const guestAllowed = watch('guestAllowed')
 
   const langSuffix = lang.charAt(0).toUpperCase() + lang.slice(1) as 'Sv' | 'Fi' | 'En'
@@ -271,30 +270,6 @@ export function EventForm({ eventId, defaultValues, categories }: EventFormProps
           <Input id="lotteryDate" type="datetime-local" {...register('lotteryDate')} />
         </div>
       )}
-
-      {/* Cancellation */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Controller
-            control={control}
-            name="cancellationAllowed"
-            render={({ field }) => (
-              <Checkbox
-                id="cancellationAllowed"
-                checked={field.value === 'on'}
-                onCheckedChange={(checked) => field.onChange(checked ? 'on' : '')}
-              />
-            )}
-          />
-          <Label htmlFor="cancellationAllowed" className="translate-y-[2px]">{t('cancellationAllowed')}</Label>
-        </div>
-        {cancellationAllowed === 'on' && (
-          <div className="sm:w-1/2">
-            <Label htmlFor="cancellationDeadline">{t('cancellationDeadline')}</Label>
-            <Input id="cancellationDeadline" type="datetime-local" {...register('cancellationDeadline')} />
-          </div>
-        )}
-      </div>
 
       {/* Guest settings */}
       <div className="space-y-3">

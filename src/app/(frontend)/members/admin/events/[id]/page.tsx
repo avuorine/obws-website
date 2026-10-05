@@ -45,6 +45,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       id: eventRegistrations.id,
       status: eventRegistrations.status,
       guestCount: eventRegistrations.guestCount,
+      autoInvoice: eventRegistrations.autoInvoice,
       registeredAt: eventRegistrations.registeredAt,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -143,8 +144,6 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
               registrationOpensAt: toDatetimeLocalString(event.registrationOpensAt),
               registrationDeadline: toDatetimeLocalString(event.registrationDeadline),
               lotteryDate: toDatetimeLocalString(event.lotteryDate),
-              cancellationAllowed: event.cancellationAllowed !== false ? 'on' : '',
-              cancellationDeadline: toDatetimeLocalString(event.cancellationDeadline),
               guestAllowed: event.guestAllowed ? 'on' : '',
               maxGuestsPerMember: event.maxGuestsPerMember != null ? String(event.maxGuestsPerMember) : '1',
               guestRegistrationOpensAt: toDatetimeLocalString(event.guestRegistrationOpensAt),
@@ -294,7 +293,10 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
                           registrationId={reg.id}
                           memberName={`${reg.firstName ?? ''} ${reg.lastName ?? ''}`.trim()}
                           status={reg.status}
-                          pastCancellationDeadline={cancellationBlockReason(event) !== null}
+                          binding={reg.autoInvoice}
+                          pastCancellationDeadline={
+                            reg.autoInvoice ? reg.status === 'registered' : cancellationBlockReason(event) !== null
+                          }
                         />
                       </td>
                     </tr>

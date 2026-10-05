@@ -4,7 +4,7 @@ import { getSettings } from './settings'
 import { getLocalized } from './localize'
 import type { LocalizedText } from '@/db/schema'
 import { formatDateTime } from './format-date'
-import { bindingRule } from './event-deadlines'
+import { bindingRule, type SignupRule } from './event-deadlines'
 
 interface ConfirmationEvent {
   id: string
@@ -26,6 +26,8 @@ interface ConfirmationData {
   seats: number
   /** A guest was added to an existing registration. */
   guestAdded?: boolean
+  /** Made under the binding, auto-invoiced terms (every signup since Oct 2026). */
+  binding?: boolean
 }
 
 function escapeHtml(s: string): string {
@@ -46,7 +48,7 @@ export async function sendRegistrationConfirmation(data: ConfirmationData): Prom
 
     const title = getLocalized(event.titleLocales, locale)
     const price = event.price != null && Number(event.price) > 0 ? event.price : null
-    const rule = bindingRule(event)
+    const rule: SignupRule = data.binding ? 'binding' : bindingRule(event)
     const ruleText = tEvents(`bindingRule_${rule}`, {
       paid: price ? 'yes' : 'no',
       price: price ?? '',
@@ -58,7 +60,7 @@ export async function sendRegistrationConfirmation(data: ConfirmationData): Prom
       ...(event.locationLocales ? [[tEvents('location'), getLocalized(event.locationLocales, locale)] as [string, string]] : []),
       [t('seats'), String(data.seats)],
       ...(price ? [[tEvents('price'), `${price} € / ${tEvents('perPerson')}`] as [string, string]] : []),
-      ...(event.cancellationDeadline
+      ...(event.cancellationDeadline && !data.binding
         ? [[tEvents('cancellationDeadline'), formatDateTime(event.cancellationDeadline, locale)] as [string, string]]
         : []),
     ]
