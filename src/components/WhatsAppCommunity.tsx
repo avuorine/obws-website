@@ -1,7 +1,6 @@
 import QRCode from 'qrcode'
 import { getTranslations } from 'next-intl/server'
-import { Card, CardContent } from '@/components/ui/card'
-import { WHATSAPP_COMMUNITY_URL, WHATSAPP_GREEN } from '@/lib/whatsapp'
+import { WHATSAPP_COMMUNITY_URL, WHATSAPP_GREEN, WHATSAPP_GREEN_DARK } from '@/lib/whatsapp'
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -23,35 +22,34 @@ export async function WhatsAppCommunity() {
   return (
     <section className="mt-8">
       <h2 className="mb-4 font-serif text-xl font-semibold">{t('whatsappTitle')}</h2>
-      <Card>
-        <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <p className="mb-4 text-muted-foreground">{t('whatsappText')}</p>
-            <a
-              href={WHATSAPP_COMMUNITY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: WHATSAPP_GREEN }}
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+        <div className="hidden shrink-0 flex-col items-center gap-2 sm:flex">
+          <div className="relative size-36 rounded-md bg-white p-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qrDataUrl} alt={t('whatsappQrAlt')} className="size-full" />
+            <div
+              className="absolute left-1/2 top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white"
+              style={{ color: WHATSAPP_GREEN }}
             >
-              <WhatsAppIcon className="size-5" />
-              {t('whatsappJoin')}
-            </a>
-          </div>
-          <div className="hidden flex-col items-center gap-2 sm:flex">
-            <div className="relative size-40 rounded-md bg-white p-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={qrDataUrl} alt={t('whatsappQrAlt')} className="size-full" />
-              <div className="absolute left-1/2 top-1/2 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white"
-                style={{ color: WHATSAPP_GREEN }}
-              >
-                <WhatsAppIcon className="size-8" />
-              </div>
+              <WhatsAppIcon className="size-7" />
             </div>
-            <p className="text-xs text-muted-foreground">{t('whatsappScan')}</p>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-xs text-muted-foreground">{t('whatsappScan')}</p>
+        </div>
+        <div>
+          <p className="mb-4 max-w-prose text-muted-foreground">{t('whatsappText')}</p>
+          <a
+            href={WHATSAPP_COMMUNITY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: WHATSAPP_GREEN_DARK }}
+          >
+            <WhatsAppIcon className="size-5" />
+            {t('whatsappJoin')}
+          </a>
+        </div>
+      </div>
     </section>
   )
 }

@@ -1,5 +1,5 @@
 import { ASSOCIATION_TIMEZONE, formatBarcodeDateInTz } from './timezone'
-import { WHATSAPP_COMMUNITY_URL, WHATSAPP_GREEN } from './whatsapp'
+import { WHATSAPP_COMMUNITY_URL, WHATSAPP_GREEN_DARK } from './whatsapp'
 
 /**
  * Finnish virtual barcode (virtuaaliviivakoodi) version 4.
@@ -142,7 +142,7 @@ export function welcomeMemberEmailHtml(data: WelcomeEmailData, settings: Welcome
   const hr = '<hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />'
   const labelStyle = 'style="color: #492a0d; font-weight: bold; font-size: 14px;"'
   const whatsappButton = (label: string) =>
-    `<p><a href="${WHATSAPP_COMMUNITY_URL}" style="display: inline-block; background: ${WHATSAPP_GREEN}; color: #ffffff; font-weight: bold; text-decoration: none; padding: 10px 18px; border-radius: 6px;">${label}</a></p>`
+    `<p><a href="${WHATSAPP_COMMUNITY_URL}" style="display: inline-block; background: ${WHATSAPP_GREEN_DARK}; color: #ffffff; font-weight: bold; text-decoration: none; padding: 10px 18px; border-radius: 6px;">${label}</a></p>`
   const numStyle = 'style="font-size: 24px; font-weight: bold; color: #492a0d;"'
 
   return `
