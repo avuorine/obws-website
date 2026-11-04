@@ -3,9 +3,9 @@ import { bankConnections, eventRegistrations, events, invoices } from '@/db/sche
 import { and, asc, eq, gt, inArray, isNotNull, isNull, lt, lte, ne, sql } from 'drizzle-orm'
 import { cancelRegistrationRow, promoteWaitlisted } from './registrations'
 import { deliverInvoices } from './event-invoicing'
-import { isDueDateReminderDue } from './event-due-date'
+import { isPaymentReminderDue, paymentReminderDeadline } from './event-due-date'
 import { remainingAmount } from './invoice-status'
-import { sendDueDateReminder, sendSeatReleased } from './seat-release-email'
+import { sendPaymentReminder, sendSeatReleased } from './seat-release-email'
 
 const CENT = 0.005
 const HOUR_MS = 60 * 60 * 1000
@@ -79,8 +79,12 @@ export async function retryUndeliveredInvoices(now: Date = new Date()): Promise<
   return deliverInvoices(drafts.map((d) => d.id), { now })
 }
 
-/** Due-date reminders for binding signups' unpaid invoices. */
-export async function sendDueDateReminders(now: Date = new Date()): Promise<number> {
+/**
+ * Payment reminders for binding signups' unpaid invoices, sent on the last
+ * banking day of the payment window (the day the seat is released at
+ * midnight if still unpaid).
+ */
+export async function sendPaymentReminders(now: Date = new Date()): Promise<number> {
   const rows = await db
     .select({
       id: invoices.id,
@@ -104,15 +108,16 @@ export async function sendDueDateReminders(now: Date = new Date()): Promise<numb
         eq(invoices.status, 'sent'),
         eq(eventRegistrations.autoInvoice, true),
         isNull(invoices.reminderSentAt),
-        gt(invoices.dueDate, now),
-        lte(invoices.dueDate, new Date(now.getTime() + 24 * HOUR_MS)),
+        lt(invoices.dueDate, now),
+        // The window is at most ~a week (3 banking days plus holidays).
+        gt(invoices.dueDate, new Date(now.getTime() - 14 * 24 * HOUR_MS)),
       ),
     )
 
   let sent = 0
   for (const inv of rows) {
     const remaining = remainingAmount(inv)
-    if (remaining <= CENT || !isDueDateReminderDue(inv.dueDate, now)) continue
+    if (remaining <= CENT || !isPaymentReminderDue(paymentReminderDeadline(inv), now)) continue
 
     // Claim first so overlapping runs can't both send.
     const [claimed] = await db
@@ -123,7 +128,7 @@ export async function sendDueDateReminders(now: Date = new Date()): Promise<numb
     if (!claimed) continue
 
     try {
-      await sendDueDateReminder({
+      await sendPaymentReminder({
         to: inv.recipientEmail,
         name: inv.recipientName,
         eventTitle: inv.eventTitle,
@@ -134,7 +139,7 @@ export async function sendDueDateReminders(now: Date = new Date()): Promise<numb
       })
       sent++
     } catch (error) {
-      console.error(`Failed to send due-date reminder for invoice ${inv.id}`, error)
+      console.error(`Failed to send payment reminder for invoice ${inv.id}`, error)
     }
   }
   return sent

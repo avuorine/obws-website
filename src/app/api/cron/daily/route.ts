@@ -5,7 +5,7 @@ import {
   bankSyncIsFresh,
   releaseUnpaidSeats,
   retryUndeliveredInvoices,
-  sendDueDateReminders,
+  sendPaymentReminders,
 } from '@/lib/seat-release'
 
 // Runs nightly from Vercel Cron (vercel.json). Vercel sends
@@ -24,7 +24,7 @@ function authorised(request: Request): boolean {
 /**
  * 1. Bank sync, so the steps below see last night's payments.
  * 2. Retry binding-signup invoices whose email failed.
- * 3. Due-date reminders.
+ * 3. Payment reminders on the last day before an unpaid seat is released.
  * 4. Release unpaid seats — only when the bank sync is current, otherwise a
  *    paid seat could look unpaid.
  */
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
   }
 
   const invoicesRetried = await retryUndeliveredInvoices(now)
-  const remindersSent = await sendDueDateReminders(now)
+  const remindersSent = await sendPaymentReminders(now)
   const release = (await bankSyncIsFresh(new Date()))
     ? await releaseUnpaidSeats(now)
     : { skipped: 'bank sync not current' }

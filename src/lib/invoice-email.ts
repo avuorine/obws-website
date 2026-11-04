@@ -55,14 +55,14 @@ function bindingNoticeLines(notice: BindingInvoiceNotice): { sv: string; fi: str
   }[notice.reason as 'promoted' | 'lottery'] ?? { sv: '', fi: '', en: '' }
   const terms = release
     ? {
-        sv: `Din anmälan är bindande. Betala senast på förfallodagen. Är fakturan fortfarande obetald ${release} frigörs platsen och erbjuds till väntelistan.`,
-        fi: `Ilmoittautumisesi on sitova. Maksathan laskun eräpäivään mennessä. Jos lasku on yhä maksamatta ${release}, paikka vapautetaan jonotuslistalle.`,
-        en: `Your registration is binding. Please pay by the due date. If the invoice is still unpaid on ${release}, the seat is released and offered to the waitlist.`,
+        sv: `Din anmälan är bindande. Fakturan förfaller i dag. Är den fortfarande obetald efter ${release} (tre bankdagar) frigörs platsen och erbjuds till väntelistan.`,
+        fi: `Ilmoittautumisesi on sitova. Lasku erääntyy tänään. Jos se on yhä maksamatta ${release} jälkeen (kolme pankkipäivää), paikka vapautetaan jonotuslistalle.`,
+        en: `Your registration is binding. The invoice is due today. If it is still unpaid after ${release} (three banking days), the seat is released and offered to the waitlist.`,
       }
     : {
-        sv: 'Din anmälan är bindande. Betala senast på förfallodagen.',
-        fi: 'Ilmoittautumisesi on sitova. Maksathan laskun eräpäivään mennessä.',
-        en: 'Your registration is binding. Please pay by the due date.',
+        sv: 'Din anmälan är bindande. Fakturan förfaller i dag.',
+        fi: 'Ilmoittautumisesi on sitova. Lasku erääntyy tänään.',
+        en: 'Your registration is binding. The invoice is due today.',
       }
   const line = (a: string, b: string) => [a, b].filter(Boolean).map((t) => `<p>${t}</p>`).join('')
   return { sv: line(intro.sv, terms.sv), fi: line(intro.fi, terms.fi), en: line(intro.en, terms.en) }
