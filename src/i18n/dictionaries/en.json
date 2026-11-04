@@ -76,7 +76,12 @@
     "viewAllEvents": "View all events",
     "quickLinks": "Quick Links",
     "viewProfile": "View profile",
-    "browseEvents": "Browse events"
+    "browseEvents": "Browse events",
+    "whatsappTitle": "WhatsApp community",
+    "whatsappText": "Join our WhatsApp community for news, event updates and chat with other members.",
+    "whatsappJoin": "Join on WhatsApp",
+    "whatsappScan": "Scan with your phone",
+    "whatsappQrAlt": "QR code for our WhatsApp community"
   },
   "events": {
     "title": "Events",

@@ -76,7 +76,12 @@
     "viewAllEvents": "Näytä kaikki tapahtumat",
     "quickLinks": "Pikalinkit",
     "viewProfile": "Näytä profiili",
-    "browseEvents": "Selaa tapahtumia"
+    "browseEvents": "Selaa tapahtumia",
+    "whatsappTitle": "WhatsApp-yhteisö",
+    "whatsappText": "Liity WhatsApp-yhteisöömme saadaksesi uutisia, tapahtumatietoja ja jutellaksesi muiden jäsenten kanssa.",
+    "whatsappJoin": "Liity WhatsAppissa",
+    "whatsappScan": "Skannaa puhelimella",
+    "whatsappQrAlt": "QR-koodi WhatsApp-yhteisöömme"
   },
   "events": {
     "title": "Tapahtumat",
