@@ -153,8 +153,8 @@
     "termsNotAccepted": "Vahvista, että ymmärrät ilmoittautumisen olevan sitova.",
     "perPerson": "hlö",
     "overdueViewInvoices": "Näytä laskusi →",
-    "bindingRule_binding": "Ilmoittautumisesi on sitova, eikä sitä voi perua, kun olet saanut paikan.{paid, select, yes { Lasku ({price} € / henkilö) lähetetään sähköpostitse, kun paikka myönnetään, ja maksuaikaa on enintään 7 päivää. Jos lasku on yhä maksamatta 3 päivää eräpäivän jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan.} other {}}",
-    "bindingNote_binding": "Ilmoittautumisesi on sitova, kun olet saanut paikan{paid, select, yes {. Maksa lasku eräpäivään mennessä, muuten paikka vapautetaan jonotuslistalle} other {}}.",
+    "bindingRule_binding": "Ilmoittautumisesi on sitova, eikä sitä voi perua, kun olet saanut paikan.{paid, select, yes { Lasku ({price} € / henkilö) lähetetään sähköpostitse, kun paikka myönnetään, ja se erääntyy samana päivänä. Jos lasku on yhä maksamatta kolmen pankkipäivän jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan.} other {}}",
+    "bindingNote_binding": "Ilmoittautumisesi on sitova, kun olet saanut paikan{paid, select, yes {. Lasku erääntyy samana päivänä; jos se on maksamatta kolmen pankkipäivän jälkeen, paikka vapautetaan jonotuslistalle} other {}}.",
     "registrationBinding": "Ilmoittautumisesi on sitova, eikä sitä voi perua. Ota yhteyttä hallitukseen, jos jotain on sattunut.",
     "leaveWaitlist": "Poistu jonotuslistalta",
     "leaveLottery": "Peru osallistuminen arvontaan",
@@ -162,7 +162,7 @@
     "invoicePaid": "maksettu",
     "invoiceBeingSent": "lähetetään",
     "invoiceDue": "eräpäivä {date}",
-    "seatReleaseNote": "Jos laskua ei makseta, paikka vapautetaan {date}.",
+    "seatReleaseNote": "Jos lasku on yhä maksamatta {date} jälkeen, paikka vapautetaan.",
     "payTitle": "Maksa {amount} € viimeistään {date}",
     "payBody": "Paikkasi on varattu. Maksa lasku #{number} tilisiirtona alla olevilla tiedoilla – viitenumero on pakollinen. Lasku on lähetetty myös sähköpostiisi.",
     "copy": "Kopioi",
@@ -779,7 +779,7 @@
       },
       "4": {
         "title": "4. Maksut ja laskut",
-        "content": "Jäsen- ja tapahtumamaksut laskutetaan sähköpostitse, ja laskut näkyvät jäsenosiossa. Tapahtumamaksu laskutetaan heti, kun sinulle myönnetään paikka (ilmoittautuessa, jonotuslistalta noustessa tai arvonnassa), ja maksuaikaa on enintään 7 päivää. Jos lasku on yhä maksamatta 3 päivää eräpäivän jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan; paikkoja ei vapauteta tapahtumaa edeltävien 2 viimeisen päivän aikana. Maksa eräpäivään mennessä laskun viitenumerolla. Niin kauan kuin jäsenellä on erääntyneitä laskuja, uudet tapahtumailmoittautumiset ja vieraiden lisääminen on estetty, kunnes laskut on maksettu."
+        "content": "Jäsen- ja tapahtumamaksut laskutetaan sähköpostitse, ja laskut näkyvät jäsenosiossa. Tapahtumamaksu laskutetaan heti, kun sinulle myönnetään paikka (ilmoittautuessa, jonotuslistalta noustessa tai arvonnassa), ja lasku erääntyy samana päivänä. Jos lasku on yhä maksamatta kolmen pankkipäivän (arkipäivät pankkivapaapäiviä lukuun ottamatta) jälkeen, paikka vapautetaan jonotuslistalle ja lasku perutaan; paikkoja ei vapauteta tapahtumaa edeltävien 2 viimeisen päivän aikana. Maksa laskun viitenumerolla. Niin kauan kuin jäsenellä on erääntyneitä laskuja (tapahtumamaksujen osalta vasta kolmen pankkipäivän jälkeen), uudet tapahtumailmoittautumiset ja vieraiden lisääminen on estetty, kunnes laskut on maksettu."
       },
       "5": {
         "title": "5. Maksujen kohdistus ja pankkiyhteys",

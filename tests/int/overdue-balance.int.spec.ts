@@ -27,4 +27,12 @@ describe('summarizeOverdue', () => {
     )
     expect(result).toEqual({ count: 2, total: 60 })
   })
+
+  it('ignores binding invoices still inside their payment window', () => {
+    const rows = [
+      { status: 'sent', dueDate: past, amount: '30.00', paymentWindowEnd: future },
+      { status: 'sent', dueDate: past, amount: '40.00', paymentWindowEnd: past },
+    ]
+    expect(summarizeOverdue(rows, now)).toEqual({ count: 1, total: 40 })
+  })
 })

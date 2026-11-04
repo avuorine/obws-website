@@ -153,8 +153,8 @@
     "termsNotAccepted": "Bekräfta att du förstår att anmälan är bindande.",
     "perPerson": "person",
     "overdueViewInvoices": "Visa dina fakturor →",
-    "bindingRule_binding": "Din anmälan är bindande och kan inte avbokas när du har fått en plats.{paid, select, yes { En faktura på {price} € per person skickas per e-post när platsen tilldelas, med högst 7 dagars betalningstid. Är den fortfarande obetald 3 dagar efter förfallodagen frigörs platsen till väntelistan och fakturan annulleras.} other {}}",
-    "bindingNote_binding": "Din anmälan är bindande när du har fått en plats{paid, select, yes {. Betala fakturan senast på förfallodagen, annars frigörs platsen till väntelistan} other {}}.",
+    "bindingRule_binding": "Din anmälan är bindande och kan inte avbokas när du har fått en plats.{paid, select, yes { En faktura på {price} € per person skickas per e-post när platsen tilldelas, och förfaller samma dag. Är den fortfarande obetald efter tre bankdagar frigörs platsen till väntelistan och fakturan annulleras.} other {}}",
+    "bindingNote_binding": "Din anmälan är bindande när du har fått en plats{paid, select, yes {. Fakturan förfaller samma dag; är den obetald efter tre bankdagar frigörs platsen till väntelistan} other {}}.",
     "registrationBinding": "Din anmälan är bindande och kan inte avbokas. Kontakta styrelsen om något har kommit emellan.",
     "leaveWaitlist": "Lämna väntelistan",
     "leaveLottery": "Dra dig ur lottningen",
@@ -162,7 +162,7 @@
     "invoicePaid": "betald",
     "invoiceBeingSent": "skickas",
     "invoiceDue": "förfaller {date}",
-    "seatReleaseNote": "Om fakturan är obetald frigörs platsen {date}.",
+    "seatReleaseNote": "Är fakturan fortfarande obetald efter {date} frigörs platsen.",
     "payTitle": "Betala {amount} € senast {date}",
     "payBody": "Din plats är reserverad. Betala faktura #{number} via banköverföring med uppgifterna nedan – referensnumret måste anges. Fakturan har också skickats till din e-post.",
     "copy": "Kopiera",
@@ -779,7 +779,7 @@
       },
       "4": {
         "title": "4. Avgifter och fakturor",
-        "content": "Medlems- och evenemangsavgifter faktureras per e-post och kan ses på medlemssidorna. Evenemangsavgiften faktureras så snart du tilldelas en plats (vid anmälan, när du flyttas upp från väntelistan eller vid lottningen), med högst 7 dagars betalningstid. Är fakturan fortfarande obetald 3 dagar efter förfallodagen frigörs platsen till väntelistan och fakturan annulleras; platser frigörs inte de sista 2 dagarna före evenemanget. Betala senast på förfallodagen med fakturans referensnummer. Så länge en medlem har förfallna fakturor pausas nya evenemangsanmälningar och tillägg av gäster tills saldot är betalt."
+        "content": "Medlems- och evenemangsavgifter faktureras per e-post och kan ses på medlemssidorna. Evenemangsavgiften faktureras så snart du tilldelas en plats (vid anmälan, när du flyttas upp från väntelistan eller vid lottningen), och fakturan förfaller samma dag. Är fakturan fortfarande obetald efter tre bankdagar (vardagar utom bankfria helgdagar) frigörs platsen till väntelistan och fakturan annulleras; platser frigörs inte de sista 2 dagarna före evenemanget. Betala med fakturans referensnummer. Så länge en medlem har förfallna fakturor (för evenemangsavgifter först efter de tre bankdagarna) pausas nya evenemangsanmälningar och tillägg av gäster tills saldot är betalt."
       },
       "5": {
         "title": "5. Betalningsmatchning och bankkoppling",

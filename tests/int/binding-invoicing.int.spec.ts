@@ -1,55 +1,101 @@
 import { describe, it, expect } from 'vitest'
-import { bindingInvoiceDueDate, isDueDateReminderDue, seatReleaseDate } from '@/lib/event-due-date'
+import {
+  bindingInvoiceDueDate,
+  bindingPaymentDeadline,
+  isPaymentReminderDue,
+  paymentReminderDeadline,
+  seatReleaseDate,
+} from '@/lib/event-due-date'
 import { memberCancelBlockReason, signupRule } from '@/lib/event-deadlines'
 import { isReleasable, isSyncFresh } from '@/lib/seat-release'
 import { toDatetimeLocalString } from '@/lib/timezone'
+import { addBankingDays, easterSunday, isBankingDay } from '@/lib/working-days'
 
 // Compared as Helsinki wall-clock strings.
 const local = (d: Date | null) => (d ? toDatetimeLocalString(d) : null)
-const due = (event: string, now: string) => local(bindingInvoiceDueDate(new Date(event), new Date(now)))
+const due = (now: string) => local(bindingInvoiceDueDate(new Date(now)))
 const release = (event: string, now: string) => {
   const e = new Date(event)
-  return local(seatReleaseDate(bindingInvoiceDueDate(e, new Date(now)), e))
+  return local(seatReleaseDate(bindingInvoiceDueDate(new Date(now)), e))
 }
+const FAR_EVENT = '2028-06-01T16:00:00Z'
 
 describe('bindingInvoiceDueDate', () => {
-  it('uses the 7-day term when the event is far away', () => {
-    expect(due('2026-12-01T16:00:00Z', '2026-10-01T09:00:00Z')).toBe('2026-10-08T23:59')
+  it('is due at the end of the day of issue', () => {
+    expect(due('2026-10-05T09:00:00Z')).toBe('2026-10-05T23:59')
   })
 
-  it('is due at the latest 5 days before the event', () => {
-    // Event Sat 17 Oct 18:00 Helsinki; signed up 6 Oct -> due 12 Oct, not 13 Oct.
-    expect(due('2026-10-17T15:00:00Z', '2026-10-06T09:00:00Z')).toBe('2026-10-12T23:59')
+  it('uses Helsinki days, not UTC days', () => {
+    // 23:30 Helsinki on 5 Oct (20:30 UTC) and 00:30 Helsinki on 6 Oct (21:30 UTC 5 Oct).
+    expect(due('2026-10-05T20:30:00Z')).toBe('2026-10-05T23:59')
+    expect(due('2026-10-05T21:30:00Z')).toBe('2026-10-06T23:59')
+  })
+})
+
+describe('working days', () => {
+  it('computes Easter Sunday', () => {
+    expect(easterSunday(2024)).toEqual({ year: 2024, month: 3, day: 31 })
+    expect(easterSunday(2025)).toEqual({ year: 2025, month: 4, day: 20 })
+    expect(easterSunday(2026)).toEqual({ year: 2026, month: 4, day: 5 })
+    expect(easterSunday(2027)).toEqual({ year: 2027, month: 3, day: 28 })
   })
 
-  it('is due today for signups in the last 5 days', () => {
-    expect(due('2026-10-17T15:00:00Z', '2026-10-14T09:00:00Z')).toBe('2026-10-14T23:59')
+  it('skips weekends and Finnish bank holidays', () => {
+    expect(isBankingDay({ year: 2026, month: 10, day: 10 })).toBe(false) // Saturday
+    expect(isBankingDay({ year: 2026, month: 5, day: 14 })).toBe(false) // Ascension Day
+    expect(isBankingDay({ year: 2026, month: 6, day: 19 })).toBe(false) // Midsummer Eve
+    expect(isBankingDay({ year: 2027, month: 1, day: 6 })).toBe(false) // Epiphany
+    expect(isBankingDay({ year: 2026, month: 6, day: 18 })).toBe(true)
+  })
+
+  it('counts banking days after a day, not including it', () => {
+    expect(addBankingDays({ year: 2026, month: 10, day: 5 }, 3)).toEqual({ year: 2026, month: 10, day: 8 })
   })
 })
 
 describe('seatReleaseDate', () => {
-  it('releases 3 days after the due date', () => {
-    expect(release('2026-12-01T16:00:00Z', '2026-10-01T09:00:00Z')).toBe('2026-10-11T23:59')
+  it('releases at the end of the 3rd banking day after signup', () => {
+    expect(release(FAR_EVENT, '2026-10-05T09:00:00Z')).toBe('2026-10-08T23:59') // Mon -> Thu
+    expect(release(FAR_EVENT, '2026-10-09T09:00:00Z')).toBe('2026-10-14T23:59') // Fri -> Wed
+    expect(release(FAR_EVENT, '2026-10-10T09:00:00Z')).toBe('2026-10-14T23:59') // Sat -> Wed
   })
 
-  it('lands exactly on the cutoff when the due date is capped', () => {
-    // Due 12 Oct -> released end of 15 Oct, 2 days before the 17 Oct event.
-    expect(release('2026-10-17T15:00:00Z', '2026-10-06T09:00:00Z')).toBe('2026-10-15T23:59')
+  it('skips bank holidays', () => {
+    expect(release(FAR_EVENT, '2027-03-25T09:00:00Z')).toBe('2027-04-01T23:59') // Easter
+    expect(release(FAR_EVENT, '2026-12-23T09:00:00Z')).toBe('2026-12-30T23:59') // Christmas
+    expect(release(FAR_EVENT, '2026-06-18T09:00:00Z')).toBe('2026-06-24T23:59') // Midsummer
+    expect(release(FAR_EVENT, '2027-12-03T09:00:00Z')).toBe('2027-12-09T23:59') // Independence Day
   })
 
-  it('never releases late signups', () => {
-    expect(release('2026-10-17T15:00:00Z', '2026-10-14T09:00:00Z')).toBeNull()
+  it('handles the DST change (Helsinki leaves summer time on 25 Oct 2026)', () => {
+    const r = seatReleaseDate(bindingInvoiceDueDate(new Date('2026-10-22T09:00:00Z')), new Date(FAR_EVENT))
+    expect(local(r)).toBe('2026-10-27T23:59')
+    expect(r?.toISOString()).toBe('2026-10-27T21:59:59.000Z')
+  })
+
+  it('releases up to 2 days before the event, never later', () => {
+    // Event Sat 10 Oct 18:00 Helsinki; cutoff end of Thu 8 Oct.
+    expect(release('2026-10-10T15:00:00Z', '2026-10-05T09:00:00Z')).toBe('2026-10-08T23:59')
+    expect(release('2026-10-10T15:00:00Z', '2026-10-06T09:00:00Z')).toBeNull()
   })
 })
 
-describe('isDueDateReminderDue', () => {
-  const dueDate = new Date('2026-10-08T20:59:59Z') // 8 Oct 23:59:59 Helsinki
-  it('fires in the nightly run on the due date', () => {
-    expect(isDueDateReminderDue(dueDate, new Date('2026-10-08T01:00:00Z'))).toBe(true)
+describe('isPaymentReminderDue', () => {
+  const deadline = new Date('2026-10-08T20:59:59Z') // Thu 8 Oct 23:59:59 Helsinki
+  it('fires in the nightly run on the last day of the payment window', () => {
+    expect(isPaymentReminderDue(deadline, new Date('2026-10-08T01:00:00Z'))).toBe(true)
+    expect(isPaymentReminderDue(deadline, new Date('2026-10-07T21:30:00Z'))).toBe(true) // 00:30 Helsinki
   })
-  it('not the night before, nor after the due date', () => {
-    expect(isDueDateReminderDue(dueDate, new Date('2026-10-07T01:00:00Z'))).toBe(false)
-    expect(isDueDateReminderDue(dueDate, new Date('2026-10-09T01:00:00Z'))).toBe(false)
+  it('not the night before, nor after the deadline', () => {
+    expect(isPaymentReminderDue(deadline, new Date('2026-10-07T01:00:00Z'))).toBe(false)
+    expect(isPaymentReminderDue(deadline, new Date('2026-10-09T01:00:00Z'))).toBe(false)
+  })
+  it('keys to the release date, or the payment deadline when seats are never released', () => {
+    const dueDate = bindingInvoiceDueDate(new Date('2026-10-05T09:00:00Z'))
+    expect(paymentReminderDeadline({ dueDate, seatReleaseAt: deadline })).toBe(deadline)
+    expect(local(paymentReminderDeadline({ dueDate, seatReleaseAt: null }))).toBe(
+      local(bindingPaymentDeadline(dueDate)),
+    )
   })
 })
 

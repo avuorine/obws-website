@@ -49,8 +49,12 @@ interface ReminderData {
   seatReleaseAt: Date | null
 }
 
-/** Sent on the due date of a binding signup's unpaid invoice. */
-export async function sendDueDateReminder(d: ReminderData): Promise<void> {
+/**
+ * Sent on the last banking day of a binding invoice's payment window. With
+ * `seatReleaseAt` the seat is released at the end of that day; without it
+ * (late signups) the seat is kept but the fee is still owed.
+ */
+export async function sendPaymentReminder(d: ReminderData): Promise<void> {
   const t = (l: 'sv' | 'fi' | 'en') => escapeHtml(getLocalized(d.eventTitle, l))
   const name = escapeHtml(d.name)
   const amount = d.remaining.toFixed(2)
@@ -62,20 +66,26 @@ export async function sendDueDateReminder(d: ReminderData): Promise<void> {
     {
       sv: [
         `Hej ${name},`,
-        `Faktura #${d.invoiceNumber} för ${t('sv')} förfaller i dag. Att betala: ${amount} €, referensnummer ${d.referenceNumber}.`,
-        ...(release ? [`Är fakturan fortfarande obetald ${release} frigörs din plats och erbjuds till väntelistan.`] : []),
+        `Faktura #${d.invoiceNumber} för ${t('sv')} är fortfarande obetald. Att betala: ${amount} €, referensnummer ${d.referenceNumber}.`,
+        release
+          ? `Betala i dag (${release}). Är fakturan fortfarande obetald efter det frigörs din plats och erbjuds till väntelistan.`
+          : 'Betala fakturan så snart som möjligt. Anmälan är bindande och avgiften ska betalas även om du inte kan delta.',
         'Har du redan betalat kan du bortse från detta meddelande.',
       ],
       fi: [
         `Hei ${name},`,
-        `Tapahtuman ${t('fi')} lasku #${d.invoiceNumber} erääntyy tänään. Maksettavaa: ${amount} €, viitenumero ${d.referenceNumber}.`,
-        ...(release ? [`Jos lasku on yhä maksamatta ${release}, paikkasi vapautetaan jonotuslistalle.`] : []),
+        `Tapahtuman ${t('fi')} lasku #${d.invoiceNumber} on yhä maksamatta. Maksettavaa: ${amount} €, viitenumero ${d.referenceNumber}.`,
+        release
+          ? `Maksathan tänään (${release}). Jos lasku on sen jälkeen yhä maksamatta, paikkasi vapautetaan jonotuslistalle.`
+          : 'Maksathan laskun mahdollisimman pian. Ilmoittautuminen on sitova, ja maksu on maksettava, vaikka et pääsisi paikalle.',
         'Jos olet jo maksanut, voit jättää tämän viestin huomiotta.',
       ],
       en: [
         `Hi ${name},`,
-        `Invoice #${d.invoiceNumber} for ${t('en')} is due today. Amount due: ${amount} €, reference ${d.referenceNumber}.`,
-        ...(release ? [`If the invoice is still unpaid on ${release}, your seat is released and offered to the waitlist.`] : []),
+        `Invoice #${d.invoiceNumber} for ${t('en')} is still unpaid. Amount due: ${amount} €, reference ${d.referenceNumber}.`,
+        release
+          ? `Please pay today (${release}). If the invoice is still unpaid after that, your seat is released and offered to the waitlist.`
+          : 'Please pay the invoice as soon as possible. Your registration is binding and the fee is owed even if you cannot attend.',
         'If you have already paid, you can ignore this message.',
       ],
     },

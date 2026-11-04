@@ -153,8 +153,8 @@
     "termsNotAccepted": "Please confirm that you understand the registration is binding.",
     "perPerson": "person",
     "overdueViewInvoices": "View your invoices →",
-    "bindingRule_binding": "Your registration is binding and cannot be cancelled once you have a seat.{paid, select, yes { An invoice of {price} € per person is emailed to you when the seat is allocated, with a payment term of up to 7 days. If it is still unpaid 3 days after the due date, the seat is released to the waitlist and the invoice cancelled.} other {}}",
-    "bindingNote_binding": "Your registration is binding once you have a seat{paid, select, yes {. Pay the invoice by the due date, or the seat is released to the waitlist} other {}}.",
+    "bindingRule_binding": "Your registration is binding and cannot be cancelled once you have a seat.{paid, select, yes { An invoice of {price} € per person is emailed to you when the seat is allocated, and is due the same day. If it is still unpaid after three banking days, the seat is released to the waitlist and the invoice cancelled.} other {}}",
+    "bindingNote_binding": "Your registration is binding once you have a seat{paid, select, yes {. The invoice is due the same day; if it is unpaid after three banking days, the seat is released to the waitlist} other {}}.",
     "registrationBinding": "Your registration is binding and cannot be cancelled. Contact the board if something has come up.",
     "leaveWaitlist": "Leave the waitlist",
     "leaveLottery": "Withdraw from the lottery",
@@ -162,7 +162,7 @@
     "invoicePaid": "paid",
     "invoiceBeingSent": "being sent",
     "invoiceDue": "due {date}",
-    "seatReleaseNote": "If unpaid, the seat is released on {date}.",
+    "seatReleaseNote": "If still unpaid after {date}, the seat is released.",
     "payTitle": "Pay {amount} € by {date}",
     "payBody": "Your seat is reserved. Pay invoice #{number} by bank transfer with the details below – the reference number is required. The invoice has also been emailed to you.",
     "copy": "Copy",
@@ -779,7 +779,7 @@
       },
       "4": {
         "title": "4. Fees and invoices",
-        "content": "Membership and event fees are invoiced by email and can be viewed in the member section. An event fee is invoiced as soon as a seat is allocated to you (at signup, when you move up from the waitlist, or at the lottery draw), with a payment term of up to 7 days. If the invoice is still unpaid 3 days after the due date, the seat is released to the waitlist and the invoice cancelled; seats are not released in the last 2 days before the event. Pay by the due date using the invoice’s reference number. While a member has overdue invoices, new event registrations and guest additions are paused until the balance is paid."
+        "content": "Membership and event fees are invoiced by email and can be viewed in the member section. An event fee is invoiced as soon as a seat is allocated to you (at signup, when you move up from the waitlist, or at the lottery draw), and the invoice is due the same day. If the invoice is still unpaid after three banking days (weekdays other than bank holidays), the seat is released to the waitlist and the invoice cancelled; seats are not released in the last 2 days before the event. Pay using the invoice’s reference number. While a member has overdue invoices (for event fees, only once the three banking days have passed), new event registrations and guest additions are paused until the balance is paid."
       },
       "5": {
         "title": "5. Payment matching and bank connection",

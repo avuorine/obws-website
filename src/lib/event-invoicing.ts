@@ -41,7 +41,7 @@ export async function issueEventInvoice(
   if (!member) return null
 
   const invoiceNumber = await getNextInvoiceNumber(tx)
-  const dueDate = bindingInvoiceDueDate(event.date)
+  const dueDate = bindingInvoiceDueDate()
   const [row] = await tx
     .insert(invoices)
     .values({
@@ -92,7 +92,7 @@ export async function deliverInvoice(
       .then((r) => r[0])
     if (ctx?.autoInvoice) {
       binding = true
-      dueDate = bindingInvoiceDueDate(ctx.date, now)
+      dueDate = bindingInvoiceDueDate(now)
       seatReleaseAt = seatReleaseDate(dueDate, ctx.date)
     } else if (ctx) {
       dueDate = eventInvoiceDueDate(ctx.date, now)
