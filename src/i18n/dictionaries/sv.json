@@ -76,7 +76,12 @@
     "viewAllEvents": "Visa alla evenemang",
     "quickLinks": "Snabblänkar",
     "viewProfile": "Visa profil",
-    "browseEvents": "Bläddra evenemang"
+    "browseEvents": "Bläddra evenemang",
+    "whatsappTitle": "WhatsApp-community",
+    "whatsappText": "Gå med i vår WhatsApp-community för nyheter, evenemangsinfo och snack med andra medlemmar.",
+    "whatsappJoin": "Gå med på WhatsApp",
+    "whatsappScan": "Skanna med mobilen",
+    "whatsappQrAlt": "QR-kod till vår WhatsApp-community"
   },
   "events": {
     "title": "Evenemang",

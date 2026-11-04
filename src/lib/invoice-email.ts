@@ -1,4 +1,5 @@
 import { ASSOCIATION_TIMEZONE, formatBarcodeDateInTz } from './timezone'
+import { WHATSAPP_COMMUNITY_URL, WHATSAPP_GREEN } from './whatsapp'
 
 /**
  * Finnish virtual barcode (virtuaaliviivakoodi) version 4.
@@ -140,6 +141,8 @@ export function welcomeMemberEmailHtml(data: WelcomeEmailData, settings: Welcome
   const loginUrl = `${siteUrl}/login`
   const hr = '<hr style="border: none; border-top: 1px solid #d4c4a8; margin: 20px 0;" />'
   const labelStyle = 'style="color: #492a0d; font-weight: bold; font-size: 14px;"'
+  const whatsappButton = (label: string) =>
+    `<p><a href="${WHATSAPP_COMMUNITY_URL}" style="display: inline-block; background: ${WHATSAPP_GREEN}; color: #ffffff; font-weight: bold; text-decoration: none; padding: 10px 18px; border-radius: 6px;">${label}</a></p>`
   const numStyle = 'style="font-size: 24px; font-weight: bold; color: #492a0d;"'
 
   return `
@@ -161,6 +164,8 @@ export function welcomeMemberEmailHtml(data: WelcomeEmailData, settings: Welcome
       </ol>
       <p><strong>Tips:</strong> Efter din första inloggning kan du registrera en passkey (t.ex. fingeravtryck eller Face ID) i din profil för snabbare inloggning i framtiden.</p>
       <p>I medlemsområdet kan du anmäla dig till evenemang och hantera din profil.</p>
+      <p>Gå med i vår WhatsApp-community för nyheter och snack med andra medlemmar:</p>
+      ${whatsappButton('Gå med på WhatsApp')}
 
       ${hr}
 
@@ -178,6 +183,8 @@ export function welcomeMemberEmailHtml(data: WelcomeEmailData, settings: Welcome
       </ol>
       <p><strong>Vinkki:</strong> Ensimmäisen kirjautumisen jälkeen voit rekisteröidä pääsyavaimen (esim. sormenjälki tai Face ID) profiilissasi nopeampaa kirjautumista varten.</p>
       <p>Jäsenalueella voit ilmoittautua tapahtumiin ja hallita profiiliasi.</p>
+      <p>Liity WhatsApp-yhteisöömme saadaksesi uutisia ja jutellaksesi muiden jäsenten kanssa:</p>
+      ${whatsappButton('Liity WhatsAppissa')}
 
       ${hr}
 
@@ -195,6 +202,8 @@ export function welcomeMemberEmailHtml(data: WelcomeEmailData, settings: Welcome
       </ol>
       <p><strong>Tip:</strong> After your first login, you can register a passkey (e.g. fingerprint or Face ID) in your profile for faster sign-in in the future.</p>
       <p>In the members area you can sign up for events and manage your profile.</p>
+      <p>Join our WhatsApp community for news and chat with other members:</p>
+      ${whatsappButton('Join on WhatsApp')}
 
       ${hr}
       <p style="color: #6b4423; font-size: 12px;">${societyName}</p>

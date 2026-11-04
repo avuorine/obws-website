@@ -10,6 +10,7 @@ import { formatDateTime } from '@/lib/format-date'
 import { getLocale } from 'next-intl/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { WhatsAppCommunity } from '@/components/WhatsAppCommunity'
 
 export default async function MembersDashboard() {
   const member = await getMember()
@@ -81,6 +82,8 @@ export default async function MembersDashboard() {
           </Button>
         </div>
       </section>
+
+      <WhatsAppCommunity />
     </div>
   )
 }
